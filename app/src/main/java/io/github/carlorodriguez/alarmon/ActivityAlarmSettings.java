@@ -98,6 +98,10 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
     private static final String SETTINGS_VOLUME_CHANGE_TIME_SEC_KEY = "SETTINGS_VOLUME_CHANGE_TIME_SEC_KEY";
     private static final String SETTINGS_TONE_NAME_KEY = "SETTINGS_TONE_NAME_KEY";
     private static final String SETTINGS_TONE_URI_KEY = "SETTINGS_TONE_URI_KEY";
+
+    private static final String SETTINGS_MEDIA_NAME_KEY = "SETTINGS_MEDIA_NAME_KEY";
+    private static final String SETTINGS_MEDIA_URI_KEY = "SETTINGS_MEDIA_URI_KEY";
+
     private static final String SETTINGS_DAYS_OF_WEEK_KEY = "SETTINGS_DAYS_OF_WEEK_KEY";
 
   private enum SettingType {
@@ -229,10 +233,12 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                   && savedInstanceState.containsKey(SETTINGS_TONE_NAME_KEY)) {
               settings.setTone((Uri) savedInstanceState.getParcelable(SETTINGS_TONE_URI_KEY),
                       savedInstanceState.getString(SETTINGS_TONE_NAME_KEY));
+          }
 
-              Log.d(TAG, "setTone URI= "+ savedInstanceState.getParcelable(SETTINGS_TONE_URI_KEY)+
-                              "setTone NAME= "+
-                      savedInstanceState.getString(SETTINGS_TONE_NAME_KEY));
+          if (savedInstanceState.containsKey(SETTINGS_MEDIA_URI_KEY)
+                  && savedInstanceState.containsKey(SETTINGS_MEDIA_NAME_KEY)) {
+              settings.setMedia((Uri) savedInstanceState.getParcelable(SETTINGS_TONE_URI_KEY),
+                      savedInstanceState.getString(SETTINGS_MEDIA_NAME_KEY));
           }
       }
 
@@ -461,6 +467,10 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
         outState.putParcelable(SETTINGS_TONE_URI_KEY, settings.getTone());
 
         outState.putString(SETTINGS_TONE_NAME_KEY, settings.getToneName());
+
+        outState.putParcelable(SETTINGS_MEDIA_URI_KEY, settings.getMediaUri());
+
+        outState.putString(SETTINGS_MEDIA_NAME_KEY, settings.getMediaName());
 
         outState.putInt(SETTINGS_VOLUME_START_PERCENT_KEY,
                 settings.getVolumeStartPercent());
