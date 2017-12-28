@@ -655,7 +655,12 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                         if (MediaName.length() == 0) {
                             MediaName = getString(R.string.unknown_name);
                         }
-                        settings.setMedia(MediaUri, MediaName);
+
+                        if (albumFile.getMediaType() == AlbumFile.TYPE_IMAGE){
+                            settings.setMedia(MediaUri, MediaName);// Set photo url on media
+                        }else {
+                            settings.setTone(MediaUri, MediaName);// Set video url on tone
+                        }
                         settingsAdapter.notifyDataSetChanged();
 
                     }

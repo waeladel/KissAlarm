@@ -70,7 +70,7 @@ public final class AlarmSettings {
   public AlarmSettings() {
 
       mediaUri = AlarmUtil.getDefaultMediaUri();
-      mediaName = "Defaulttt";//getResources().getString(R.string.default_media);
+      mediaName = "Default";//getResources().getString(R.string.default_media);
     tone = AlarmUtil.getDefaultAlarmUri();
     toneName = "Default";
     snoozeMinutes = 10;
