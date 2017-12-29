@@ -88,7 +88,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity {
         // Setup a self-scheduling event loops.
         handler = new Handler();
 
-        timeTick = new Runnable() {
+        /*timeTick = new Runnable() {
             @Override
             public void run() {
                 notifyService.call(new NotificationServiceBinder.
@@ -113,9 +113,9 @@ public final class ActivityAlarmNotification extends AppCompatActivity {
                     }
                 });
             }
-        };
+        };*/
 
-        // Setup individual UI elements.
+        /*// Setup individual UI elements.
         final Button snoozeButton = (Button) findViewById(R.id.notify_snooze);
 
         snoozeButton.setOnClickListener(new View.OnClickListener() {
@@ -161,7 +161,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity {
 
                 redraw();
             }
-        });
+        });*/
 
         final Slider dismiss = (Slider) findViewById(R.id.dismiss_slider);
 
@@ -245,7 +245,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity {
                     infoName = alarmInfo.getName();
                 }
 
-                String info = infoTime + "\n" + infoName;
+                /*String info = infoTime + "\n" + infoName;
 
                 if (AppSettings.isDebugMode(getApplicationContext())) {
                     info += " [" + alarmId + "]";
@@ -264,7 +264,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity {
                 String snoozeInfoText = getString(R.string.snooze) + "\n"
                         + getString(R.string.minutes, snoozeMinutes);
 
-                snoozeInfo.setText(snoozeInfoText);
+                snoozeInfo.setText(snoozeInfoText);*/
             }
         });
     }
