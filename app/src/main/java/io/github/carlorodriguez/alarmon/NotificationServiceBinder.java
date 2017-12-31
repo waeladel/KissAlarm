@@ -29,6 +29,8 @@ public class NotificationServiceBinder {
   private NotificationServiceInterface notify;
   private LinkedList<ServiceCallback> callbacks;
 
+  NotificationService mService;
+
   NotificationServiceBinder(Context context) {
     this.context = context;
     this.callbacks = new LinkedList<>();
@@ -53,6 +55,11 @@ public class NotificationServiceBinder {
   final private ServiceConnection serviceConnection = new ServiceConnection() {
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
+
+      /*// We've bound to LocalService, cast the IBinder and get LocalService instance
+      NotificationService.LocalBinder binder = (NotificationService.LocalBinder) service;
+      mService = binder.getService();*/
+
       notify = NotificationServiceInterface.Stub.asInterface(service);
       while (callbacks.size() > 0) {
         ServiceCallback callback = callbacks.remove();
@@ -73,6 +80,7 @@ public class NotificationServiceBinder {
       callbacks.offer(callback);
     }
   }
+
 
   public void acknowledgeCurrentNotification(final int snoozeMinutes) {
     call(new ServiceCallback() {

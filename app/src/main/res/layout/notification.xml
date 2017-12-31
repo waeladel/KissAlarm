@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
   android:layout_width="fill_parent"
   android:layout_height="fill_parent">
 
-  <LinearLayout android:layout_weight="3"
+  <!--<<LinearLayout android:layout_weight="3"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content">
-    <!--<Button android:text="@string/minus_five"
+    Button android:text="@string/minus_five"
       android:id="@+id/notify_snooze_minus_five"
       android:layout_weight="1"
       android:textSize="24sp"
@@ -27,8 +28,8 @@
       android:layout_weight="1"
       android:textSize="24sp"
       android:layout_width="wrap_content"
-      android:layout_height="fill_parent" />-->
-  </LinearLayout>
+      android:layout_height="fill_parent"
+  </LinearLayout>/>-->
 
   <DigitalClock android:id="@+id/clock"
     android:gravity="center"
@@ -53,9 +54,16 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" />-->
 
+  <SurfaceView
+      android:id="@+id/surfaceView"
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"
+      android:gravity="center"
+      android:layout_weight=".3"/>
+
   <io.github.carlorodriguez.alarmon.Slider
-    android:id="@+id/dismiss_slider"
-    android:layout_weight="1"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content" />
+      android:id="@+id/dismiss_slider"
+      android:layout_width="fill_parent"
+      android:layout_height="match_parent"
+      android:layout_weight="1" />
 </LinearLayout>

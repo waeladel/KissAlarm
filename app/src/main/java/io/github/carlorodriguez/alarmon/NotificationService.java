@@ -29,12 +29,16 @@ import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+
 
 /**
  * This service is responsible for notifying the user when an alarm is
@@ -48,6 +52,11 @@ import android.support.v4.content.ContextCompat;
  * alarms).
  */
 public class NotificationService extends Service {
+
+  // Binder given to clients
+  private final IBinder mBinder = new LocalBinder();
+  public Uri currentTone;
+
   public class NoAlarmsException extends Exception {
     private static final long serialVersionUID = 1L;
   }
@@ -58,13 +67,14 @@ public class NotificationService extends Service {
   private enum MediaSingleton {
     INSTANCE;
 
-    private MediaPlayer mediaPlayer = null;
+    public MediaPlayer mediaPlayer = null;
     private Ringtone fallbackSound = null;
     private Vibrator vibrator = null;
     private int systemNotificationVolume = 0;
 
+
     MediaSingleton() {
-      mediaPlayer = new MediaPlayer();
+      mediaPlayer = new MediaPlayer(); //App.getMediaPlayer();
       mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
     }
 
@@ -171,6 +181,7 @@ public class NotificationService extends Service {
   @Override
   public IBinder onBind(Intent intent) {
     return new NotificationServiceInterfaceStub(this);
+    //return mBinder;
   }
 
   @Override
@@ -318,6 +329,10 @@ public class NotificationService extends Service {
     return volumeIncreaseCallback.volume();
   }
 
+  public Uri currentTone() {
+    return currentTone;
+  }
+
   public void acknowledgeCurrentNotification(int snoozeMinutes) throws NoAlarmsException {
     long alarmId = currentAlarmId();
     if (firingAlarms.contains(alarmId)) {
@@ -357,7 +372,8 @@ public class NotificationService extends Service {
     MediaSingleton.INSTANCE.normalizeVolume(
         getApplicationContext(), volumeIncreaseCallback.volume());
     MediaSingleton.INSTANCE.play(getApplicationContext(), settings.getTone());
-
+    //Store getTone value for notification activity
+    currentTone = settings.getTone();
     // Start periodic events for handling this notification.
     handler.post(volumeIncreaseCallback);
     handler.post(soundCheck);
@@ -411,4 +427,18 @@ public class NotificationService extends Service {
       }
     }
   }
+
+  /**
+   * Class used for the client Binder.  Because we know this service always
+   * runs in the same process as its clients, we don't need to deal with IPC.
+   */
+  public class LocalBinder extends Binder {
+    NotificationService getService() {
+      // Return this instance of LocalService so clients can call public methods
+      return NotificationService.this;
+    }
+  }
 }
+
+
+

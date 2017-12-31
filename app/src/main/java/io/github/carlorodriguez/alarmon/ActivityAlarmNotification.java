@@ -21,12 +21,16 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
@@ -43,9 +47,13 @@ import android.widget.TextView;
  */
 public final class ActivityAlarmNotification extends AppCompatActivity {
 
+    private static String TAG = ActivityAlarmNotification.class.getSimpleName();
+
     public static final String TIMEOUT_COMMAND = "timeout";
 
     public static final int TIMEOUT = 0;
+
+    private NotificationService mService;
 
     private NotificationServiceBinder notifyService;
     private DbAccessor db;
@@ -84,10 +92,8 @@ public final class ActivityAlarmNotification extends AppCompatActivity {
         notifyService = new NotificationServiceBinder(getApplicationContext());
 
         notifyService.bind();
-
         // Setup a self-scheduling event loops.
         handler = new Handler();
-
         /*timeTick = new Runnable() {
             @Override
             public void run() {
@@ -168,6 +174,8 @@ public final class ActivityAlarmNotification extends AppCompatActivity {
         dismiss.setOnCompleteListener(new Slider.OnCompleteListener() {
             @Override
             public void complete() {
+                getMediaPlayer();
+
                 notifyService.acknowledgeCurrentNotification(0);
 
                 finish();
@@ -268,6 +276,25 @@ public final class ActivityAlarmNotification extends AppCompatActivity {
             }
         });
     }
+
+    private Uri getMediaPlayer() {
+        final Uri[] alarmId = new Uri[1];
+        notifyService.call(new NotificationServiceBinder.ServiceCallback() {
+
+            public void run(NotificationServiceInterface service) {
+
+                try {
+                    //MediaPlayer mediaPlayer = service.currentMediaPlayer();
+                    Log.d(TAG, "mamaMediaPlayer= "+service.currentTone());
+                    alarmId[0] = service.currentTone();
+                } catch (RemoteException e) {
+                    //return;
+                }
+            }
+        });
+        return alarmId[0];
+    }
+
 
     private void showDialogFragment(int id) {
         DialogFragment dialog = new ActivityDialogFragment().newInstance(

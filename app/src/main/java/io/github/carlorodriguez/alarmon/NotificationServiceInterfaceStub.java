@@ -18,7 +18,12 @@ package io.github.carlorodriguez.alarmon;
 import io.github.carlorodriguez.alarmon.NotificationService.NoAlarmsException;
 
 import android.content.Context;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Binder;
 import android.os.RemoteException;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.widget.Toast;
 
 public class NotificationServiceInterfaceStub extends NotificationServiceInterface.Stub {
@@ -46,6 +51,10 @@ public class NotificationServiceInterfaceStub extends NotificationServiceInterfa
     return service.volume();
   }
 
+  public Uri currentTone() throws RemoteException {
+    return service.currentTone();
+  }
+
   @Override
   public void acknowledgeCurrentNotification(int snoozeMinutes) throws RemoteException {
     debugToast("STOP NOTIFICATION");
@@ -63,3 +72,8 @@ public class NotificationServiceInterfaceStub extends NotificationServiceInterfa
     }
   }
 }
+
+
+
+
+
