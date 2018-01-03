@@ -23,7 +23,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.nfc.Tag;
+import android.opengl.GLES20;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
@@ -31,11 +31,17 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Surface;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.VideoView;
+
 
 /**
  * This is the activity responsible for alerting the user when an alarm goes
@@ -45,7 +51,7 @@ import android.widget.TextView;
  * more than once at the same time. (ie, it assumes
  * android:launchMode="singleInstance" is set in the manifest file).
  */
-public final class ActivityAlarmNotification extends AppCompatActivity {
+public final class ActivityAlarmNotification extends AppCompatActivity implements SurfaceHolder.Callback {
 
     private static String TAG = ActivityAlarmNotification.class.getSimpleName();
 
@@ -53,12 +59,17 @@ public final class ActivityAlarmNotification extends AppCompatActivity {
 
     public static final int TIMEOUT = 0;
 
-    private NotificationService mService;
-
     private NotificationServiceBinder notifyService;
     private DbAccessor db;
     private Handler handler;
     private Runnable timeTick;
+    //private VideoView mVideoView;
+    private SurfaceView mSurfaceView;
+    private MediaPlayer mMediaPlayer;
+    private SurfaceHolder mSurfaceHolder;
+    private Surface mSurface;
+
+    //private FrameLayout fl_surfaceview_container;
 
     // Dialog state
     int snoozeMinutes;
@@ -94,14 +105,14 @@ public final class ActivityAlarmNotification extends AppCompatActivity {
         notifyService.bind();
         // Setup a self-scheduling event loops.
         handler = new Handler();
-        /*timeTick = new Runnable() {
+        timeTick = new Runnable() {
             @Override
             public void run() {
                 notifyService.call(new NotificationServiceBinder.
                         ServiceCallback() {
                     @Override
                     public void run(NotificationServiceInterface service) {
-                        try {
+                        /*try {
                             TextView volume = (TextView)
                                     findViewById(R.id.volume);
 
@@ -110,7 +121,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity {
                             volume.setText(volumeText);
                         } catch (RemoteException e) {
                             e.printStackTrace();
-                        }
+                        }*/
 
                         long next = AlarmUtil.millisTillNextInterval(
                                 AlarmUtil.Interval.SECOND);
@@ -119,21 +130,63 @@ public final class ActivityAlarmNotification extends AppCompatActivity {
                     }
                 });
             }
-        };*/
+        };
+        Log.d(TAG, "mamaMediaPlayer= onCreate");
 
-        /*// Setup individual UI elements.
+        // Setup individual UI elements.
+
+        //mVideoView = findViewById(R.id.videoView);
+        /*fl_surfaceview_container =
+                (FrameLayout)findViewById(R.id.fragment_file_videoplayer_surface_container);
+        mSurfaceView = new SurfaceView(this);
+        fl_surfaceview_container.addView(mSurfaceView);*/
+
+        mSurfaceView = findViewById(R.id.surfaceView);
+        mSurfaceHolder = mSurfaceView.getHolder();
+        mSurface = mSurfaceHolder.getSurface();
+
+        Log.d(TAG, "mamaMediaPlayer= mSurfaceHolder= "+mSurfaceView.getHolder());
+        mSurfaceHolder.addCallback(this);
+
+        /////////code when i was using VideoView instead of SurfaceView/////////
+
+        /*notifyService.call(new NotificationServiceBinder.ServiceCallback() {
+
+            public void run(NotificationServiceInterface service) {
+                try {
+                    mVideoView.setVideoURI(service.currentTone());
+                    Log.d(TAG, "getMediaPlayerUri= "+service.currentTone());
+                    Log.d(TAG, "MediaSingleton= "+NotificationService.MediaSingleton.INSTANCE.mediaPlayer);
+                    mVideoView.start();
+                } catch (RemoteException e) {
+                    //return;
+                }
+            }
+        });
+
+        mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mp.setLooping(true);
+            }
+        });*/
+        /////////code when i was using VideoView instead of SurfaceView/////////
+
         final Button snoozeButton = (Button) findViewById(R.id.notify_snooze);
 
         snoozeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 notifyService.acknowledgeCurrentNotification(snoozeMinutes);
 
                 finish();
+                //NotificationService.MediaSingleton.INSTANCE.mediaPlayer.setSurface(mSurface);
+                //NotificationService.MediaSingleton.INSTANCE.mediaPlayer.setDisplay(mSurfaceHolder);
             }
         });
 
-        final Button decreaseSnoozeButton = (Button) findViewById(
+        /*final Button decreaseSnoozeButton = (Button) findViewById(
                 R.id.notify_snooze_minus_five);
 
         decreaseSnoozeButton.setOnClickListener(new OnClickListener() {
@@ -174,14 +227,13 @@ public final class ActivityAlarmNotification extends AppCompatActivity {
         dismiss.setOnCompleteListener(new Slider.OnCompleteListener() {
             @Override
             public void complete() {
-                getMediaPlayer();
-
+                //getMediaPlayerUri();
                 notifyService.acknowledgeCurrentNotification(0);
-
                 finish();
             }
         });
     }
+
 
     @Override
     protected void onResume() {
@@ -190,22 +242,24 @@ public final class ActivityAlarmNotification extends AppCompatActivity {
         handler.post(timeTick);
 
         redraw();
+
+        Log.d(TAG, "mamaMediaPlayer= onResume");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
         handler.removeCallbacks(timeTick);
+        //fl_surfaceview_container.removeAllViews();
+        Log.d(TAG, "mamaMediaPlayer= onPause");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
         db.closeConnections();
-
         notifyService.unbind();
+        Log.d(TAG, "mamaMediaPlayer= onDestroy");
     }
 
     @Override
@@ -277,12 +331,11 @@ public final class ActivityAlarmNotification extends AppCompatActivity {
         });
     }
 
-    private Uri getMediaPlayer() {
+    private Uri getMediaPlayerUri() {
         final Uri[] alarmId = new Uri[1];
         notifyService.call(new NotificationServiceBinder.ServiceCallback() {
 
             public void run(NotificationServiceInterface service) {
-
                 try {
                     //MediaPlayer mediaPlayer = service.currentMediaPlayer();
                     Log.d(TAG, "mamaMediaPlayer= "+service.currentTone());
@@ -302,6 +355,46 @@ public final class ActivityAlarmNotification extends AppCompatActivity {
 
         dialog.show(getFragmentManager(), "ActivityDialogFragment");
     }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        notifyService.call(new NotificationServiceBinder.ServiceCallback() {
+            public void run(NotificationServiceInterface service) {
+                try {
+                    service.setPlayerSurface(mSurface);
+                } catch (RemoteException e) {
+                    //return;
+                }
+            }
+        });
+
+        /*mMediaPlayer = NotificationService.MediaSingleton.INSTANCE.mediaPlayer;
+        mMediaPlayer.setDisplay(mSurfaceHolder);*/
+        Log.d(TAG, "mamaMediaPlayer surfaceCreated + MediaPlayer=" + mMediaPlayer);
+
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        Log.d(TAG, "mamaMediaPlayer= surfaceChanged");
+
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        //mMediaPlayer.setDisplay(null);
+        notifyService.call(new NotificationServiceBinder.ServiceCallback() {
+            public void run(NotificationServiceInterface service) {
+                try {
+                    service.releasePlayerSurfaceHolder(null);
+                } catch (RemoteException e) {
+                    //return;
+                }
+            }
+        });
+        Log.d(TAG, "mamaMediaPlayer= surfaceDestroyed");
+    }
+
 
     public static class ActivityDialogFragment extends DialogFragment {
 

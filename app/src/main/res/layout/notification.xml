@@ -37,33 +37,41 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content" />
 
-  <!--<Button android:text="@string/snooze"
-    android:id="@+id/notify_snooze"
-    android:layout_weight="4"
-    android:textSize="32sp"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content" />
+  <Button
+      android:id="@+id/notify_snooze"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:elevation="1dp"
+      android:text="@string/snooze"
+      android:textSize="32sp" />
 
-  <TextView android:id="@+id/volume"
-    android:visibility="gone"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content" />
+    <!--<TextView android:id="@+id/volume"
+      android:visibility="gone"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content" />
 
-  <TextView android:id="@+id/alarm_info"
-    android:layout_weight="3"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content" />-->
+    <TextView android:id="@+id/alarm_info"
+      android:layout_weight="3"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content" />-->
+
+  <!--<FrameLayout
+    android:id="@+id/fragment_file_videoplayer_surface_container"
+    android:layout_width="match_parent"
+    android:layout_height="302dp"
+    android:layout_weight="1.08">
+    android:layout_weight=".1"
+    </FrameLayout>-->
 
   <SurfaceView
       android:id="@+id/surfaceView"
-      android:layout_width="fill_parent"
-      android:layout_height="fill_parent"
-      android:gravity="center"
-      android:layout_weight=".3"/>
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_weight=".1"
+      android:gravity="fill_vertical|fill_horizontal|center" />
 
   <io.github.carlorodriguez.alarmon.Slider
       android:id="@+id/dismiss_slider"
       android:layout_width="fill_parent"
-      android:layout_height="match_parent"
-      android:layout_weight="1" />
+      android:layout_height="wrap_content" />
 </LinearLayout>

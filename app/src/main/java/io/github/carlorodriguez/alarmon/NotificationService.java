@@ -36,6 +36,7 @@ import android.os.IBinder;
 import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -64,7 +65,7 @@ public class NotificationService extends Service {
   // Since the media player objects are expensive to create and destroy,
   // share them across invocations of this service (there should never be
   // more than one instance of this class in a given application).
-  private enum MediaSingleton {
+  public enum MediaSingleton {
     INSTANCE;
 
     public MediaPlayer mediaPlayer = null;
@@ -331,6 +332,15 @@ public class NotificationService extends Service {
 
   public Uri currentTone() {
     return currentTone;
+  }
+
+  public void setPlayerSurfaceOnService(Surface surface) {
+    MediaSingleton.INSTANCE.mediaPlayer.setSurface(surface);
+  }
+
+  public void releasePlayerSurfaceHolderOnService(Surface surface) {
+
+    MediaSingleton.INSTANCE.mediaPlayer.setDisplay(null);
   }
 
   public void acknowledgeCurrentNotification(int snoozeMinutes) throws NoAlarmsException {

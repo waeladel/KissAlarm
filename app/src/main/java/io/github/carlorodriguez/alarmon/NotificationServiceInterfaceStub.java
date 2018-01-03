@@ -22,6 +22,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.RemoteException;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Toast;
@@ -53,6 +54,14 @@ public class NotificationServiceInterfaceStub extends NotificationServiceInterfa
 
   public Uri currentTone() throws RemoteException {
     return service.currentTone();
+  }
+
+  public void setPlayerSurface (Surface surface) throws RemoteException {
+    service.setPlayerSurfaceOnService(surface);
+  }
+
+  public void releasePlayerSurfaceHolder (Surface surface) throws RemoteException {
+    service.releasePlayerSurfaceHolderOnService(surface);
   }
 
   @Override
