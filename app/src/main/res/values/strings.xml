@@ -5,6 +5,10 @@
   <string name="default_tone">Default Tone</string>
   <string name="partner_video_or_photo">Partner video/photo</string>
 
+  <string name="audio_source">Audio source</string>
+  <string name="selected_file">Select a file</string>
+  <string name="record">Record via microphone</string>
+  <string name="btn_choose">Choose</string>
 
   <string name="app_name">AlarmOn</string>
   <string name="add_alarm">Add alarm</string>

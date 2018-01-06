@@ -101,4 +101,10 @@
     <item>grey</item>
     <item>blue-grey</item>
   </string-array>
+
+  <string-array name="audio_source">
+    <item>@string/selected_file</item>
+    <item>@string/record</item>
+  </string-array>
+
 </resources>

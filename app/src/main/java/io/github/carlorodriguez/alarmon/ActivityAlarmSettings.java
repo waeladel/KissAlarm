@@ -15,6 +15,8 @@
 
 package io.github.carlorodriguez.alarmon;
 
+import java.io.File;
+import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -27,11 +29,17 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -55,11 +63,18 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 import com.yanzhenjie.album.Action;
 import com.yanzhenjie.album.Album;
 import com.yanzhenjie.album.AlbumFile;
+
+import cafe.adriel.androidaudiorecorder.AndroidAudioRecorder;
+import cafe.adriel.androidaudiorecorder.model.AudioChannel;
+import cafe.adriel.androidaudiorecorder.model.AudioSampleRate;
+import cafe.adriel.androidaudiorecorder.model.AudioSource;
+
 
 /**
  * This activity is used for editing alarm settings.  Settings are broken
@@ -82,6 +97,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
     private static String TAG = ActivityAlarmSettings.class.getSimpleName();
     private static final int SELECT_MULTIMEDIA = 2;
     private ArrayList<AlbumFile> mMediaFiles;
+    private File mOutputFile;
 
 
     public static final String EXTRAS_ALARM_ID = "alarm_id";
@@ -151,6 +167,9 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
       if (actionBar != null) {
           actionBar.setDisplayHomeAsUpEnabled(true);
       }
+
+      // Step 4: Set output file
+      mOutputFile = CameraHelper.getOutputMediaFile(CameraHelper.MEDIA_TYPE_Audio);
 
     // An alarm id is required in the extras bundle.
     alarmId = getIntent().getExtras().getLong(EXTRAS_ALARM_ID, MISSING_EXTRAS);
@@ -422,6 +441,23 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
   }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 4) {
+            if (resultCode == RESULT_OK) {
+                Log.d(TAG, "Great! User has recorded and saved the audio file");
+                Log.d(TAG, "data= "+data);
+                // Great! User has recorded and saved the audio file
+                settings.setTone(Uri.parse(mOutputFile.getPath()), "Alarm Recording: ");// Set video url on tone
+                settingsAdapter.notifyDataSetChanged();
+            } else if (resultCode == RESULT_CANCELED) {
+                // Oops! User has canceled the recording
+                Log.d(TAG, "Oops! User has canceled the recording");
+            }
+        }
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode,
             @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == READ_EXTERNAL_STORAGE_PERMISSION_REQUEST) {
@@ -598,9 +634,13 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
             if (ContextCompat.checkSelfPermission(ActivityAlarmSettings.this,
                     Manifest.permission.READ_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED) {
-                showProgressDialog();
+                String audioSourceTitle = getResources().getString(R.string.audio_source);
+                String cancelButton = getResources().getString(R.string.cancel);
+                String[] audioSourceArray = getResources().getStringArray(R.array.audio_source);
 
-                showDialogFragment(TONE_PICKER);
+                showAudioDialog(audioSourceTitle,audioSourceArray ,cancelButton );
+                /*showProgressDialog();
+                showDialogFragment(TONE_PICKER);*/
 
             } else {
                 requestReadExternalStoragePermission();
@@ -794,7 +834,74 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
         dialog.show(getFragmentManager(), "ActivityDialogFragment");
     }
 
-  public static class ActivityDialogFragment extends DialogFragment {
+    private void showAudioDialog(String title, String[] items , String cancel) {
+
+        SharedPreferences sharedPref = PreferenceManager.
+                getDefaultSharedPreferences(getBaseContext());
+
+        String theme = sharedPref.getString(AppSettings.APP_THEME_KEY, "0");
+        Drawable icon = null;
+        Log.d(TAG, "theme= " + theme);
+        switch (theme) {
+            case "0":
+                icon= getResources().getDrawable(R.drawable.ic_mic_white_36dp);
+                break;
+            case "1":
+                icon =  getResources().getDrawable(R.drawable.ic_mic_black_36dp);
+                break;
+            case "2":
+                icon =  getResources().getDrawable(R.drawable.ic_mic_black_36dp);
+                break;
+        }
+
+        new MaterialDialog.Builder(this)
+                .title(title)
+                .items(items)
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                        Log.d(TAG, "which= " + which);
+                        Log.d(TAG, "CharSequence= " + text);
+                        switch (which) {
+                            case 0://Select a file
+                                showProgressDialog();
+                                showDialogFragment(TONE_PICKER);
+                                break;
+                            case 1: //Record via microphone
+                                recordAudio();
+                                break;
+                        }
+
+                    }
+                })
+                .negativeText(cancel)
+                .icon(icon)
+                .show();
+    }
+
+    private void recordAudio() {
+        String filePath = Environment.getExternalStorageDirectory() + "/recorded_audio.wav";
+        int color = getResources().getColor(R.color.blue_grey);
+        int requestCode = 4;
+        AndroidAudioRecorder.with(this)
+                // Required
+                .setFilePath(mOutputFile.getPath())
+                .setColor(color)
+                .setRequestCode(requestCode)
+
+                // Optional
+                .setSource(AudioSource.MIC)
+                .setChannel(AudioChannel.STEREO)
+                .setSampleRate(AudioSampleRate.HZ_16000)
+                //.setAutoStart(true)
+                .setKeepDisplayOn(true)
+
+                // Start recording
+                .record();
+
+    }
+
+    public static class ActivityDialogFragment extends DialogFragment {
 
     public ActivityDialogFragment newInstance(int id) {
       ActivityDialogFragment fragment = new ActivityDialogFragment();
