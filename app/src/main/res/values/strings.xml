@@ -25,7 +25,7 @@
   <string name="none">None</string>
   <string name="repeat">Repeat</string>
   <string name="scheduled_days">Scheduled days</string>
-  <string name="tone">Partner\'s Audio</string>
+  <string name="tone">Partner\'s Voice</string>
   <string name="alarm_tone">Alarm tone</string>
   <string name="snooze_minutes">Snooze (minutes)</string>
   <string name="vibrate">Vibrate</string>

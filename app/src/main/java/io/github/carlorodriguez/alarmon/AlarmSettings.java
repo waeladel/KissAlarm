@@ -28,6 +28,7 @@ public final class AlarmSettings {
   static public final long DEFAULT_SETTINGS_ID = -1;
 
     private Uri mediaUri;
+    private String mediaName;
     private String mediaType;
   private Uri tone;
   private String toneName;
@@ -41,6 +42,7 @@ public final class AlarmSettings {
     ContentValues values = new ContentValues();
     values.put(DbHelper.SETTINGS_COL_ID, alarmId);
       values.put(DbHelper.SETTINGS_COL_MEDIA_URL, mediaUri.toString());
+      values.put(DbHelper.SETTINGS_COL_MEDIA_NAME, mediaName);
       values.put(DbHelper.SETTINGS_COL_MEDIA_TYPE, mediaType);
     values.put(DbHelper.SETTINGS_COL_TONE_URL, tone.toString());
     values.put(DbHelper.SETTINGS_COL_TONE_NAME, toneName);
@@ -56,6 +58,7 @@ public final class AlarmSettings {
     return new String[] {
       DbHelper.SETTINGS_COL_ID,
        DbHelper.SETTINGS_COL_MEDIA_URL,
+       DbHelper.SETTINGS_COL_MEDIA_NAME,
        DbHelper.SETTINGS_COL_MEDIA_TYPE,
       DbHelper.SETTINGS_COL_TONE_URL,
       DbHelper.SETTINGS_COL_TONE_NAME,
@@ -70,6 +73,7 @@ public final class AlarmSettings {
   public AlarmSettings() {
 
       mediaUri = AlarmUtil.getDefaultMediaUri();
+      mediaName = "girl.jpg";
       mediaType = "Default";//getResources().getString(R.string.default_media);
     tone = AlarmUtil.getDefaultAlarmUri();
     toneName = "Default";
@@ -82,6 +86,7 @@ public final class AlarmSettings {
 
   public AlarmSettings(AlarmSettings rhs) {
       mediaUri = rhs.mediaUri;
+      mediaName = rhs.mediaName;
       mediaType = rhs.mediaType;
     tone = rhs.tone;
     toneName = rhs.toneName;
@@ -95,6 +100,7 @@ public final class AlarmSettings {
   public AlarmSettings(Cursor cursor) {
     cursor.moveToFirst();
     mediaUri = Uri.parse(cursor.getString(cursor.getColumnIndex(DbHelper.SETTINGS_COL_MEDIA_URL)));
+    mediaName= cursor.getString(cursor.getColumnIndex(DbHelper.SETTINGS_COL_MEDIA_NAME));
     mediaType = cursor.getString(cursor.getColumnIndex(DbHelper.SETTINGS_COL_MEDIA_TYPE));
     tone = Uri.parse(cursor.getString(cursor.getColumnIndex(DbHelper.SETTINGS_COL_TONE_URL)));
     toneName = cursor.getString(cursor.getColumnIndex(DbHelper.SETTINGS_COL_TONE_NAME));
@@ -112,6 +118,7 @@ public final class AlarmSettings {
     }
     AlarmSettings rhs = (AlarmSettings) o;
     return mediaUri.equals(rhs.mediaUri)
+      && mediaName.equals(rhs.mediaName)
       && mediaType.equals(rhs.mediaType)
       && tone.equals(rhs.tone)
       && toneName.equals(rhs.toneName)
@@ -135,8 +142,9 @@ public final class AlarmSettings {
     this.toneName = name;
   }
 
-  public void setMedia(Uri media, String type) {
+  public void setMedia(Uri media, String name, String type) {
     this.mediaUri = media;
+    this.mediaName = name;
     this.mediaType = type;
   }
 
@@ -146,6 +154,9 @@ public final class AlarmSettings {
   public String getMediaType() {
     return mediaType;
   }
+    public String getMediaName() {
+        return mediaName;
+    }
 
   public int getSnoozeMinutes() {
     return snoozeMinutes;
