@@ -20,7 +20,7 @@ public class App extends Application {
         super.onCreate();
 
         sApplicationContext = getApplicationContext();
-        sMediaPlayer = new MediaPlayer();
+        //sMediaPlayer = new MediaPlayer();
 
         // Initialize the SDK before executing any other operations,
         //FacebookSdk.sdkInitialize(sApplicationContext);
@@ -32,10 +32,10 @@ public class App extends Application {
         //return instance.getApplicationContext();
     }
 
-    public static MediaPlayer getMediaPlayer() {
+    /*public static MediaPlayer getMediaPlayer() {
         return sMediaPlayer;
         //return instance.getApplicationContext();
-    }
+    }*/
 
 }
 

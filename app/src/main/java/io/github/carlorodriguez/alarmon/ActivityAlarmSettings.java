@@ -115,7 +115,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
     private static final String SETTINGS_TONE_NAME_KEY = "SETTINGS_TONE_NAME_KEY";
     private static final String SETTINGS_TONE_URI_KEY = "SETTINGS_TONE_URI_KEY";
 
-    private static final String SETTINGS_MEDIA_NAME_KEY = "SETTINGS_MEDIA_NAME_KEY";
+    private static final String SETTINGS_MEDIA_TYPE_KEY = "SETTINGS_MEDIA_TYPE_KEY";
     private static final String SETTINGS_MEDIA_URI_KEY = "SETTINGS_MEDIA_URI_KEY";
 
     private static final String SETTINGS_DAYS_OF_WEEK_KEY = "SETTINGS_DAYS_OF_WEEK_KEY";
@@ -255,9 +255,9 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
           }
 
           if (savedInstanceState.containsKey(SETTINGS_MEDIA_URI_KEY)
-                  && savedInstanceState.containsKey(SETTINGS_MEDIA_NAME_KEY)) {
-              settings.setMedia((Uri) savedInstanceState.getParcelable(SETTINGS_TONE_URI_KEY),
-                      savedInstanceState.getString(SETTINGS_MEDIA_NAME_KEY));
+                  && savedInstanceState.containsKey(SETTINGS_MEDIA_TYPE_KEY)) {
+              settings.setMedia((Uri) savedInstanceState.getParcelable(SETTINGS_MEDIA_URI_KEY),
+                      savedInstanceState.getString(SETTINGS_MEDIA_TYPE_KEY));
           }
       }
 
@@ -303,7 +303,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
           public String name() { return getString(R.string.partner_video_or_photo); }
           @Override
           public String value() {
-              String value = settings.getMediaName();
+              String value = settings.getMediaType();
               if (AppSettings.isDebugMode(getApplicationContext())) {
                   value += " " + settings.getMediaUri().toString();
               }
@@ -506,7 +506,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
 
         outState.putParcelable(SETTINGS_MEDIA_URI_KEY, settings.getMediaUri());
 
-        outState.putString(SETTINGS_MEDIA_NAME_KEY, settings.getMediaName());
+        outState.putString(SETTINGS_MEDIA_TYPE_KEY, settings.getMediaType());
 
         outState.putInt(SETTINGS_VOLUME_START_PERCENT_KEY,
                 settings.getVolumeStartPercent());
@@ -693,22 +693,23 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                         String  MediaName = albumFile.getName();
                         Uri MediaUri = Uri.parse(albumFile.getPath()) ;
 
-                        Log.d(TAG, "requestCode" +albumFile.getMediaType());
-                        Log.d(TAG, "requestCode" +albumFile.getName());
-                        Log.d(TAG, "requestCode" +albumFile.getPath());
+                        Log.d(TAG, "MediaType" +albumFile.getMediaType());
+                        Log.d(TAG, "Name" +albumFile.getName());
+                        Log.d(TAG, "Path" +albumFile.getPath());
 
                         if (progressDialog != null) {
                             progressDialog.dismiss();
                             progressDialog = null;
                         }
 
-                        if (MediaName.length() == 0) {
+                        /*if (MediaName.length() == 0) {
                             MediaName = getString(R.string.unknown_name);
-                        }
+                        }*/
 
-                        if (albumFile.getMediaType() == AlbumFile.TYPE_IMAGE){
-                            settings.setMedia(MediaUri, MediaName);// Set photo url on media
+                        if (MediaType == AlbumFile.TYPE_IMAGE){
+                            settings.setMedia(MediaUri, getResources().getString(R.string.media_photo));// Set photo url on media
                         }else {
+                            settings.setMedia(MediaUri, getResources().getString(R.string.media_video));// Set photo url on media
                             settings.setTone(MediaUri, MediaName);// Set video url on tone
                         }
                         settingsAdapter.notifyDataSetChanged();

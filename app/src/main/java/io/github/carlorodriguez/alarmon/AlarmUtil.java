@@ -69,6 +69,7 @@ public final class AlarmUtil {
 
   public static Uri getDefaultMediaUri() {
     Uri imageUri = Uri.parse("android.resource://"+R.string.package_name+"/mipmap/girl");
+    //App.getContext().getResources().getDrawable(R.drawable.ic_mic_black_36dp)
     return imageUri;
   }
 }

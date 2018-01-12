@@ -157,7 +157,7 @@ public final class DbAccessor {
         while (cursor.moveToNext()){
             buffer.append("id = "+ cursor.getString(0)+"\n");
             buffer.append("media_url = "+ cursor.getString(1)+"\n");
-            buffer.append("media_name = "+ cursor.getString(2)+"\n");
+            buffer.append("media_type = "+ cursor.getString(2)+"\n");
             buffer.append("tone_url = "+ cursor.getString(3)+"\n");
             buffer.append("tone_name = "+ cursor.getString(4)+"\n");
             buffer.append("snooze = "+ cursor.getString(5)+"\n");

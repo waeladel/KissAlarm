@@ -3,7 +3,10 @@
   <string name="package_name">com.kiss.alarm</string>
   <string name="default_media">Default Media</string>
   <string name="default_tone">Default Tone</string>
-  <string name="partner_video_or_photo">Partner video/photo</string>
+  <string name="partner_video_or_photo">Partner\'s video/photo</string>
+  <string name="media_photo">Photo</string>
+  <string name="media_video">Video</string>
+
 
   <string name="audio_source">Audio source</string>
   <string name="selected_file">Select a file</string>
@@ -22,7 +25,7 @@
   <string name="none">None</string>
   <string name="repeat">Repeat</string>
   <string name="scheduled_days">Scheduled days</string>
-  <string name="tone">Tone</string>
+  <string name="tone">Partner\'s Audio</string>
   <string name="alarm_tone">Alarm tone</string>
   <string name="snooze_minutes">Snooze (minutes)</string>
   <string name="vibrate">Vibrate</string>
