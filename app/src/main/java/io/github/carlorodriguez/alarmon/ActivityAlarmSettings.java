@@ -368,6 +368,12 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
             settingsObjects);
     settingsList.setAdapter(settingsAdapter);
     settingsList.setOnItemClickListener(new SettingsListClickListener());
+      //settingsAdapter.getItem(SettingType.VOLUME_FADE);
+      //settingsObjects.remove(4);
+      //settingsList.getChildAt(0).setEnabled(false);
+      //settingsList.getItemAtPosition(4).setVisibility(View.GONE);
+      //settingsList.getItemAtPosition(4);.setEnabled(false);
+
   }
 
     @Override
@@ -595,11 +601,11 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
       final SettingsAdapter adapter = (SettingsAdapter) parent.getAdapter();
       SettingType type = adapter.getItem(position).type();
-      Log.d(TAG, "type" + type);
+        Log.d(TAG, "AdapterType position" + position);
+        Log.d(TAG, "AdapterType" + type);
       switch (type) {
         case TIME:
             final AlarmTime time = info.getTime();
-
             Calendar c = time.calendar();
 
             picker = TimePickerDialog.newInstance(
@@ -638,21 +644,24 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
           break;
 
         case TONE:
-            if (ContextCompat.checkSelfPermission(ActivityAlarmSettings.this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED) {
-                String audioSourceTitle = getResources().getString(R.string.audio_source);
-                String cancelButton = getResources().getString(R.string.cancel);
-                String[] audioSourceArray = getResources().getStringArray(R.array.audio_source);
+            Log.d(TAG, "type = photo1"+ settings.getMediaType());
+            if(settings.getMediaType().equals("Photo")){
+                Log.d(TAG, "type = photo1");
+                if (ContextCompat.checkSelfPermission(ActivityAlarmSettings.this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    String audioSourceTitle = getResources().getString(R.string.audio_source);
+                    String cancelButton = getResources().getString(R.string.cancel);
+                    String[] audioSourceArray = getResources().getStringArray(R.array.audio_source);
 
-                showAudioDialog(audioSourceTitle,audioSourceArray ,cancelButton );
+                    showAudioDialog(audioSourceTitle,audioSourceArray ,cancelButton );
                 /*showProgressDialog();
                 showDialogFragment(TONE_PICKER);*/
 
-            } else {
-                requestReadExternalStoragePermission();
+                } else {
+                    requestReadExternalStoragePermission();
+                }
             }
-
             break;
 
           case MEDIA:
@@ -787,6 +796,17 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
             holder = new ViewHolder(convertView);
 
             convertView.setTag(holder);
+
+            if (settingsObjects.get(position).name().
+                    equalsIgnoreCase(getString(R.string.tone))) {
+
+                if(settings.getMediaType().equals("Video")){
+                    convertView.setAlpha(0.2f);
+                }else {
+                    convertView.setAlpha(1);
+                    //holder.row.setAlpha(0.2f);
+                }
+            }
 
 			holder.populateFrom(settingsObjects.get(position));
 
