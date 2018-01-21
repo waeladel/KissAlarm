@@ -56,8 +56,26 @@ public class NotificationServiceInterfaceStub extends NotificationServiceInterfa
     return service.currentTone();
   }
 
+  public Uri getPhotoUri() throws RemoteException {
+    try {
+      return service.getPhotoUri();
+    } catch (NoAlarmsException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
   public void setPlayerSurface (Surface surface) throws RemoteException {
     service.setPlayerSurfaceOnService(surface);
+  }
+
+  public String getMediaType () throws RemoteException {
+    try {
+      return service.getMediaType();
+    } catch (NoAlarmsException e) {
+      e.printStackTrace();
+      return "Default";
+    }
   }
 
   public void releasePlayerSurfaceHolder (Surface surface) throws RemoteException {

@@ -13,6 +13,9 @@
   <string name="record">Record via microphone</string>
   <string name="btn_choose">Choose</string>
 
+  <string name="Scaning">Scaning</string>
+  <string name="detecting_you_partner_face">Detecting your partner\'s face</string>
+
   <string name="app_name">AlarmOn</string>
   <string name="add_alarm">Add alarm</string>
   <string name="default_settings">Default Alarm Settings</string>

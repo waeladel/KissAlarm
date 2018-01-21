@@ -334,6 +334,16 @@ public class NotificationService extends Service {
     return currentTone;
   }
 
+  public Uri getPhotoUri() throws NoAlarmsException {
+    AlarmSettings settings = db.readAlarmSettings(currentAlarmId());
+    return settings.getMediaUri();
+  }
+
+  public String getMediaType() throws NoAlarmsException{
+    AlarmSettings settings = db.readAlarmSettings(currentAlarmId());
+    return settings.getMediaType();
+  }
+
   public void setPlayerSurfaceOnService(Surface surface) {
     MediaSingleton.INSTANCE.mediaPlayer.setSurface(surface);
   }

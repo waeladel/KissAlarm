@@ -645,7 +645,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
 
         case TONE:
             Log.d(TAG, "type = photo1"+ settings.getMediaType());
-            if(settings.getMediaType().equals("Photo")){
+            if(!settings.getMediaType().equals("Video")){
                 Log.d(TAG, "type = photo1");
                 if (ContextCompat.checkSelfPermission(ActivityAlarmSettings.this,
                         Manifest.permission.READ_EXTERNAL_STORAGE)

@@ -18,12 +18,17 @@ package io.github.carlorodriguez.alarmon;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Path;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.opengl.GLES20;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
@@ -31,16 +36,23 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.TextView;
-import android.widget.VideoView;
+import android.widget.LinearLayout;
+
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.face.Face;
+import com.google.android.gms.vision.face.FaceDetector;
+
+import java.io.InputStream;
+
 
 
 /**
@@ -68,6 +80,20 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
     private MediaPlayer mMediaPlayer;
     private SurfaceHolder mSurfaceHolder;
     private Surface mSurface;
+    private FaceView overlay;
+   //private ImageView mImageView;
+
+    private InputStream mStream ;
+    private Bitmap mBitmap ;
+    private SparseArray<Face> mFaces;
+    private FaceDetector mDetector;
+    private Frame mFrame ;
+    private static ProgressDialog progressDialog;
+    public static Button lipButton;// lip button for onClick listener
+    public static LinearLayout lipLayout; // lip button layout to control it's width and height
+
+    public static Button foreheadButton;// lip button for onClick listener
+    public static LinearLayout foreheadLayout; // lip button layout to control it's width and height
 
     //private FrameLayout fl_surfaceview_container;
 
@@ -141,6 +167,15 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         mSurfaceView = new SurfaceView(this);
         fl_surfaceview_container.addView(mSurfaceView);*/
 
+        //mImageView = findViewById(R.id.imageView);
+        //the layout on which you are working
+        lipButton = findViewById(R.id.lip_button);
+        lipLayout = (LinearLayout) findViewById(R.id.lip_Layout);
+
+        foreheadButton = findViewById(R.id.forehead_button);
+        foreheadLayout = (LinearLayout) findViewById(R.id.forehead_Layout);
+
+        overlay = findViewById(R.id.faceView);
         mSurfaceView = findViewById(R.id.surfaceView);
         mSurfaceHolder = mSurfaceView.getHolder();
         mSurface = mSurfaceHolder.getSurface();
@@ -170,19 +205,14 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                 mp.setLooping(true);
             }
         });*/
-        /////////code when i was using VideoView instead of SurfaceView/////////
 
         final Button snoozeButton = (Button) findViewById(R.id.notify_snooze);
 
         snoozeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 notifyService.acknowledgeCurrentNotification(snoozeMinutes);
-
                 finish();
-                //NotificationService.MediaSingleton.INSTANCE.mediaPlayer.setSurface(mSurface);
-                //NotificationService.MediaSingleton.INSTANCE.mediaPlayer.setDisplay(mSurfaceHolder);
             }
         });
 
@@ -222,6 +252,24 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
             }
         });*/
 
+        lipButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "lipButton clicked ");
+                notifyService.acknowledgeCurrentNotification(0);
+                finish();
+            }
+        });
+
+        foreheadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "foreheadButton clicked ");
+                notifyService.acknowledgeCurrentNotification(snoozeMinutes);
+                finish();
+            }
+        });
+
         final Slider dismiss = (Slider) findViewById(R.id.dismiss_slider);
 
         dismiss.setOnCompleteListener(new Slider.OnCompleteListener() {
@@ -230,6 +278,37 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                 //getMediaPlayerUri();
                 notifyService.acknowledgeCurrentNotification(0);
                 finish();
+            }
+        });
+
+        notifyService.call(new NotificationServiceBinder.ServiceCallback() {
+            public void run(NotificationServiceInterface service) {
+                try {
+                    if(service.getMediaType().equalsIgnoreCase("Video")){
+                        //mImageView.setVisibility(View.INVISIBLE);
+                        mSurfaceView.setVisibility(View.VISIBLE);
+                    }else if(service.getMediaType().equalsIgnoreCase("Photo")){
+                        //mImageView.setVisibility(View.VISIBLE);
+                        mSurfaceView.setVisibility(View.INVISIBLE);
+
+                        //mImageView.setImageURI(service.getPhotoUri());
+                        mBitmap = BitmapFactory.decodeFile(service.getPhotoUri().toString());
+                        new FaceDetectorAsyncTask().execute(mBitmap);
+
+                        //mBitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(),R.mipmap.girl);
+                        //mBitmap = BitmapFactory.decodeStream(stream);
+                        //InputStream stream = getResources().openRawResource(R.raw.girlraw);
+                        //mBitmap = BitmapFactory.decodeStream(stream);
+                        //mImageView.setImageBitmap(mBitmap);
+
+                    }else{
+                        mSurfaceView.setVisibility(View.INVISIBLE);
+                        mBitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(),R.mipmap.girl);
+                        new FaceDetectorAsyncTask().execute(mBitmap);
+                    }
+                    Log.d(TAG, "getMediaType= "+service.getMediaType()+ service.getPhotoUri());
+                } catch (RemoteException e) {
+                }
             }
         });
     }
@@ -444,6 +523,77 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                     return super.onCreateDialog(savedInstanceState);
             }
         }
+
+    }
+
+    public class FaceDetectorAsyncTask extends AsyncTask<Bitmap, Void , SparseArray<Face>> {
+
+        @Override
+        protected void onPreExecute() {
+            showProgressDialog();
+        }
+
+        @Override
+        protected SparseArray<Face> doInBackground(Bitmap... bitmapParams) {
+
+            // By default, landmark detection is not enabled since it increases detection time.  We
+            // enable it here in order to visualize detected landmarks.
+            mDetector = new FaceDetector.Builder(getApplicationContext())
+                    .setTrackingEnabled(false)
+                    .setLandmarkType(FaceDetector.ALL_LANDMARKS)
+                    .setMode(FaceDetector.FAST_MODE )
+                    .setProminentFaceOnly(true)
+                    .build();
+            Log.d(TAG, "FaceDetector built.");
+
+
+            // Create a frame from the bitmap and run face detection on the frame.
+            mFrame = new Frame.Builder().setBitmap(bitmapParams[0]).build();
+            mFaces = mDetector.detect(mFrame);
+            Log.d(TAG, "faces frame.");
+
+            if (!mDetector.isOperational()) {
+                Log.d(TAG, "Face detector dependencies are not yet available.");
+
+                // Check for low storage.  If there is low storage, the native library will not be
+                // downloaded, so detection will not become operational.
+                IntentFilter lowstorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
+                boolean hasLowStorage = registerReceiver(null, lowstorageFilter) != null;
+
+                if (hasLowStorage) {
+                    //Toast.makeText(this, R.string.low_storage_error, Toast.LENGTH_LONG).show();
+                    Log.d(TAG, getString(R.string.tone));
+                }
+            }
+
+            return mFaces;
+        }
+
+        @Override
+        protected void onPostExecute(SparseArray<Face> faces) {
+
+            overlay.setVisibility(View.VISIBLE);
+            Log.d(TAG, "mBitmap getWidth= " +mBitmap.getWidth());
+            overlay.setContent(mBitmap, faces);
+            Log.d(TAG, "overlay setContent.");
+
+            // Although detector may be used multiple times for different images, it should be released
+            // when it is no longer needed in order to free native resources.
+            mDetector.release();
+            Log.d(TAG, "detector released.");
+
+            if (progressDialog != null) {
+                progressDialog.dismiss();
+                progressDialog = null;
+            }
+
+        }
+    }
+
+    private void showProgressDialog() {
+        progressDialog = ProgressDialog.show(ActivityAlarmNotification.this,
+                getString(R.string.Scaning),
+                getString(R.string.detecting_you_partner_face), true, true);
 
     }
 
