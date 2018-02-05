@@ -150,4 +150,11 @@
   <string name="undo">UNDO</string>
   <string name="swipe_right_to_delete">Hi There! Swipe right this card and see what happens.</string>
   <string name="material_intro_id_alarm_deletion">material_intro_id_119.104</string>
+
+
+
+
+
+  <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
+
 </resources>

@@ -15,17 +15,22 @@
 
 package io.github.carlorodriguez.alarmon;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Path;
+import android.graphics.SurfaceTexture;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -34,12 +39,15 @@ import android.os.Handler;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -47,10 +55,16 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.MultiProcessor;
+import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 
@@ -63,7 +77,7 @@ import java.io.InputStream;
  * more than once at the same time. (ie, it assumes
  * android:launchMode="singleInstance" is set in the manifest file).
  */
-public final class ActivityAlarmNotification extends AppCompatActivity implements SurfaceHolder.Callback {
+public final class ActivityAlarmNotification extends AppCompatActivity implements SurfaceHolder.Callback , TextureView.SurfaceTextureListener{
 
     private static String TAG = ActivityAlarmNotification.class.getSimpleName();
 
@@ -77,6 +91,16 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
     private Runnable timeTick;
     //private VideoView mVideoView;
     private SurfaceView mSurfaceView;
+    private TextureView mTextureView;
+    private GraphicOverlay mGraphicOverlay;
+    private CameraSourcePreview mPreview;
+    private CameraSource mCameraSource = null;
+
+    private static final int RC_HANDLE_GMS = 9001;
+    // permission request codes need to be < 256
+    private static final int RC_HANDLE_CAMERA_PERM = 2;
+
+
     private MediaPlayer mMediaPlayer;
     private SurfaceHolder mSurfaceHolder;
     private Surface mSurface;
@@ -176,12 +200,27 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         foreheadLayout = (LinearLayout) findViewById(R.id.forehead_Layout);
 
         overlay = findViewById(R.id.faceView);
-        mSurfaceView = findViewById(R.id.surfaceView);
-        mSurfaceHolder = mSurfaceView.getHolder();
+        //mSurfaceView = findViewById(R.id.surfaceView);
+        mTextureView = findViewById(R.id.textureView);
+        mGraphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);
+        mPreview = (CameraSourcePreview) findViewById(R.id.preview);
+
+        // Check for the camera permission before accessing the camera.  If the
+        // permission is not granted yet, request permission.
+        int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+        if (rc == PackageManager.PERMISSION_GRANTED) {
+            createCameraSource();
+        } else {
+            requestCameraPermission();
+        }
+
+
+        mTextureView.setSurfaceTextureListener(this);
+        /*mSurfaceHolder = mSurfaceView.getHolder();
         mSurface = mSurfaceHolder.getSurface();
 
         Log.d(TAG, "mamaMediaPlayer= mSurfaceHolder= "+mSurfaceView.getHolder());
-        mSurfaceHolder.addCallback(this);
+        mSurfaceHolder.addCallback(this);*/
 
         /////////code when i was using VideoView instead of SurfaceView/////////
 
@@ -286,10 +325,12 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                 try {
                     if(service.getMediaType().equalsIgnoreCase("Video")){
                         //mImageView.setVisibility(View.INVISIBLE);
-                        mSurfaceView.setVisibility(View.VISIBLE);
+                        mTextureView.setVisibility(View.VISIBLE);
+
+
                     }else if(service.getMediaType().equalsIgnoreCase("Photo")){
                         //mImageView.setVisibility(View.VISIBLE);
-                        mSurfaceView.setVisibility(View.INVISIBLE);
+                        mTextureView.setVisibility(View.INVISIBLE);
 
                         //mImageView.setImageURI(service.getPhotoUri());
                         mBitmap = BitmapFactory.decodeFile(service.getPhotoUri().toString());
@@ -300,6 +341,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                         //InputStream stream = getResources().openRawResource(R.raw.girlraw);
                         //mBitmap = BitmapFactory.decodeStream(stream);
                         //mImageView.setImageBitmap(mBitmap);
+
 
                     }else{
                         mSurfaceView.setVisibility(View.INVISIBLE);
@@ -317,12 +359,10 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
     @Override
     protected void onResume() {
         super.onResume();
-
         handler.post(timeTick);
-
         redraw();
-
         Log.d(TAG, "mamaMediaPlayer= onResume");
+        startCameraSource();
     }
 
     @Override
@@ -474,6 +514,57 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         Log.d(TAG, "mamaMediaPlayer= surfaceDestroyed");
     }
 
+    //=============================================================================================
+    // Activity Methods
+    //==============================================================================================
+
+    @Override
+    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+        mSurface = new Surface(surface);
+        notifyService.call(new NotificationServiceBinder.ServiceCallback() {
+            public void run(NotificationServiceInterface service) {
+                try {
+                    service.setPlayerSurface(mSurface);
+                    mBitmap = mTextureView.getBitmap();
+                    //new FaceDetectorAsyncTask().execute(mBitmap);
+                    createCameraSource();
+
+                } catch (RemoteException e) {
+                    //return;
+                }
+            }
+        });
+        /*mMediaPlayer = NotificationService.MediaSingleton.INSTANCE.mediaPlayer;
+        mMediaPlayer.setDisplay(mSurfaceHolder);*/
+        Log.d(TAG, "mamaMediaPlayer surfaceCreated + MediaPlayer=" + mMediaPlayer);
+        //startCameraSource();
+    }
+
+    @Override
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+
+    }
+
+    @Override
+    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+        notifyService.call(new NotificationServiceBinder.ServiceCallback() {
+            public void run(NotificationServiceInterface service) {
+                try {
+                    service.releasePlayerSurfaceHolder(null);
+                } catch (RemoteException e) {
+                    //return;
+                }
+            }
+        });
+        Log.d(TAG, "mamaMediaPlayer= surfaceDestroyed");
+        return false;
+    }
+
+    @Override
+    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+
+    }
+
 
     public static class ActivityDialogFragment extends DialogFragment {
 
@@ -546,12 +637,6 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                     .build();
             Log.d(TAG, "FaceDetector built.");
 
-
-            // Create a frame from the bitmap and run face detection on the frame.
-            mFrame = new Frame.Builder().setBitmap(bitmapParams[0]).build();
-            mFaces = mDetector.detect(mFrame);
-            Log.d(TAG, "faces frame.");
-
             if (!mDetector.isOperational()) {
                 Log.d(TAG, "Face detector dependencies are not yet available.");
 
@@ -566,6 +651,11 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                 }
             }
 
+            // Create a frame from the bitmap and run face detection on the frame.
+            mFrame = new Frame.Builder().setBitmap(bitmapParams[0]).build();
+            mFaces = mDetector.detect(mFrame);
+            Log.d(TAG, "faces frame.");
+
             return mFaces;
         }
 
@@ -579,6 +669,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
             // Although detector may be used multiple times for different images, it should be released
             // when it is no longer needed in order to free native resources.
+
             mDetector.release();
             Log.d(TAG, "detector released.");
 
@@ -595,6 +686,173 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                 getString(R.string.Scaning),
                 getString(R.string.detecting_you_partner_face), true, true);
 
+    }
+
+    /**
+     * Handles the requesting of the camera permission.  This includes
+     * showing a "Snackbar" message of why the permission is needed then
+     * sending the request.
+     */
+    private void requestCameraPermission() {
+        Log.w(TAG, "Camera permission is not granted. Requesting permission");
+
+        final String[] permissions = new String[]{Manifest.permission.CAMERA};
+
+        if (!ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.CAMERA)) {
+            ActivityCompat.requestPermissions(this, permissions, RC_HANDLE_CAMERA_PERM);
+            return;
+        }
+
+        final Activity thisActivity = this;
+
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ActivityCompat.requestPermissions(thisActivity, permissions,
+                        RC_HANDLE_CAMERA_PERM);
+            }
+        };
+
+        Snackbar.make(mGraphicOverlay, R.string.permission_camera_rationale,
+                Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.ok, listener)
+                .show();
+    }
+    /**
+     * Creates and starts the camera.  Note that this uses a higher resolution in comparison
+     * to other detection examples to enable the barcode detector to detect small barcodes
+     * at long distances.
+     */
+    private void createCameraSource() {
+
+        Context context = getApplicationContext();
+        FaceDetector detector = new FaceDetector.Builder(context)
+                .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
+                .build();
+
+        detector.setProcessor(
+                new MultiProcessor.Builder<>(new GraphicFaceTrackerFactory())
+                        .build());
+
+        if (!detector.isOperational()) {
+            Log.d(TAG, "Face detector dependencies are not yet available.");
+            // Check for low storage.  If there is low storage, the native library will not be
+            // downloaded, so detection will not become operational.
+            IntentFilter lowstorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
+            boolean hasLowStorage = registerReceiver(null, lowstorageFilter) != null;
+
+            if (hasLowStorage) {
+                //Toast.makeText(this, R.string.low_storage_error, Toast.LENGTH_LONG).show();
+                Log.d(TAG, getString(R.string.tone));
+            }
+        }
+
+        mCameraSource = new CameraSource.Builder(context, detector)
+                //.setRequestedPreviewSize(640, 480)
+                .setFacing(CameraSource.CAMERA_FACING_FRONT)
+                .setRequestedFps(30.0f)
+                .build();
+
+        // Create a frame from the bitmap and run face detection on the frame.
+        //mFrame = new Frame.Builder().setBitmap(bitmap).build();
+        //mFaces = mDetector.detect(mFrame);
+    }
+
+    //==============================================================================================
+    // Camera Source Preview
+    //==============================================================================================
+
+    /**
+     * Starts or restarts the camera source, if it exists.  If the camera source doesn't exist yet
+     * (e.g., because onResume was called before the camera source was created), this will be called
+     * again when the camera source is created.
+     */
+    private void startCameraSource() {
+
+        // check that the device has play services available.
+        int code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(
+                getApplicationContext());
+        if (code != ConnectionResult.SUCCESS) {
+            Dialog dlg =
+                    GoogleApiAvailability.getInstance().getErrorDialog(this, code, RC_HANDLE_GMS);
+            dlg.show();
+        }
+
+        if (mCameraSource != null) {
+            try {
+                mPreview.start(mCameraSource, mGraphicOverlay);
+            } catch (IOException e) {
+                Log.e(TAG, "Unable to start camera source.", e);
+                mCameraSource.release();
+                mCameraSource = null;
+            }
+        }
+    }
+
+    //==============================================================================================
+    // Graphic Face Tracker
+    //==============================================================================================
+
+    /**
+     * Factory for creating a face tracker to be associated with a new face.  The multiprocessor
+     * uses this factory to create face trackers as needed -- one for each individual.
+     */
+    private class GraphicFaceTrackerFactory implements MultiProcessor.Factory<Face> {
+        @Override
+        public Tracker<Face> create(Face face) {
+            return new GraphicFaceTracker(mGraphicOverlay);
+        }
+    }
+
+    /**
+     * Face tracker for each detected individual. This maintains a face graphic within the app's
+     * associated face overlay.
+     */
+    private class GraphicFaceTracker extends Tracker<Face> {
+        private GraphicOverlay mOverlay;
+        private FaceGraphic mFaceGraphic;
+
+        GraphicFaceTracker(GraphicOverlay overlay) {
+            mOverlay = overlay;
+            mFaceGraphic = new FaceGraphic(overlay);
+        }
+
+        /**
+         * Start tracking the detected face instance within the face overlay.
+         */
+        @Override
+        public void onNewItem(int faceId, Face item) {
+            mFaceGraphic.setId(faceId);
+        }
+
+        /**
+         * Update the position/characteristics of the face within the overlay.
+         */
+        @Override
+        public void onUpdate(FaceDetector.Detections<Face> detectionResults, Face face) {
+            mOverlay.add(mFaceGraphic);
+            mFaceGraphic.updateFace(face);
+        }
+
+        /**
+         * Hide the graphic when the corresponding face was not detected.  This can happen for
+         * intermediate frames temporarily (e.g., if the face was momentarily blocked from
+         * view).
+         */
+        @Override
+        public void onMissing(FaceDetector.Detections<Face> detectionResults) {
+            mOverlay.remove(mFaceGraphic);
+        }
+
+        /**
+         * Called when the face is assumed to be gone for good. Remove the graphic annotation from
+         * the overlay.
+         */
+        @Override
+        public void onDone() {
+            mOverlay.remove(mFaceGraphic);
+        }
     }
 
 }

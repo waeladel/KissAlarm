@@ -10,6 +10,7 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import com.google.android.gms.vision.face.Face;
@@ -65,6 +66,7 @@ public class FaceView extends View {
             drawFaceForehead(canvas, scale);
         }
     }
+
 
     /**
      * Draws the bitmap background, scaled to the device size.  Returns the scale for future use in
@@ -169,6 +171,8 @@ public class FaceView extends View {
             Face face = mFaces.valueAt(i);
             for (Landmark landmark : face.getLandmarks()) {
                 //Log.d(TAG, "landmark getType= " +landmark.getType());
+                Log.d(TAG, "getEulerY= " +face.getEulerY()+ "getEulerZ"+ face.getEulerZ());
+
                 int type = landmark.getType();
                 switch (type) { // get x and y for every dot
                     case Landmark.BOTTOM_MOUTH:

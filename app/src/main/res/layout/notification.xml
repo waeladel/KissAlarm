@@ -115,22 +115,56 @@
         android:background="@android:color/transparent"
         android:color="#66FF0000"
 
-        />
+        android:saveEnabled="false" />
 
-    <SurfaceView
+    <!--<SurfaceView
         android:id="@+id/surfaceView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight=".1"
         android:gravity="fill_vertical|fill_horizontal|center"
         android:scaleType="matrix"
-        android:visibility="gone" />
+        android:visibility="gone" />-->
 
-
+      <TextureView
+          android:id="@+id/textureView"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:gravity="fill_vertical|fill_horizontal|center"
+          android:scaleType="matrix"
+          android:visibility="gone" />
   </FrameLayout>
+
+
 
   <io.github.carlorodriguez.alarmon.Slider
       android:id="@+id/dismiss_slider"
       android:layout_width="fill_parent"
       android:layout_height="wrap_content" />
+
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/topLayout"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:keepScreenOn="true"
+
+        >
+
+        <io.github.carlorodriguez.alarmon.CameraSourcePreview
+            android:id="@+id/preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <io.github.carlorodriguez.alarmon.GraphicOverlay
+                android:id="@+id/faceOverlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </io.github.carlorodriguez.alarmon.CameraSourcePreview>
+
+    </LinearLayout>
+
 </LinearLayout>
