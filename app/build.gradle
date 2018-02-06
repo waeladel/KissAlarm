@@ -46,6 +46,8 @@ dependencies {
     compile 'com.afollestad.material-dialogs:commons:0.9.6.0' // for dialog
     compile 'com.github.adrielcafe:AndroidAudioRecorder:0.2.0'// for audio recording
     compile 'com.google.android.gms:play-services-vision:11.0.4'// face detector
+    compile 'com.theartofdev.edmodo:android-image-cropper:2.6.0' // Image Cropper
+
 }
 
 play {

@@ -16,6 +16,8 @@
 package io.github.carlorodriguez.alarmon;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -33,6 +35,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.nfc.Tag;
@@ -49,6 +52,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.text.format.DateFormat;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -62,8 +66,10 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.theartofdev.edmodo.cropper.CropImage;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 import com.yanzhenjie.album.Action;
@@ -74,6 +80,10 @@ import cafe.adriel.androidaudiorecorder.AndroidAudioRecorder;
 import cafe.adriel.androidaudiorecorder.model.AudioChannel;
 import cafe.adriel.androidaudiorecorder.model.AudioSampleRate;
 import cafe.adriel.androidaudiorecorder.model.AudioSource;
+
+import static com.theartofdev.edmodo.cropper.CropImage.getActivityResult;
+import static io.github.carlorodriguez.alarmon.App.getContext;
+import static io.github.carlorodriguez.alarmon.R.id.cropImageView;
 
 
 /**
@@ -98,6 +108,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
     private static final int SELECT_MULTIMEDIA = 2;
     private ArrayList<AlbumFile> mMediaFiles;
     private File mOutputFile;
+    private File mCroppdImage;
 
 
     public static final String EXTRAS_ALARM_ID = "alarm_id";
@@ -121,6 +132,10 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
 
 
     private static final String SETTINGS_DAYS_OF_WEEK_KEY = "SETTINGS_DAYS_OF_WEEK_KEY";
+
+    private int mMediaType ;
+    private String  mMediaName ;
+    private Uri mMediaUri  ;
 
   private enum SettingType {
     TIME,
@@ -465,6 +480,22 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                 // Oops! User has canceled the recording
                 Log.d(TAG, "Oops! User has canceled the recording");
             }
+        }else if(requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
+            Log.d(TAG, "CROP_PICTURE requestCode="+ requestCode);
+            CropImage.ActivityResult result =  CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                Uri MediaUri = result.getUri();
+                Log.d(TAG, "CROP_PICTURE getUri="+ MediaUri);
+                settings.setMedia(MediaUri,mMediaName  ,getResources().getString(R.string.media_photo));// Set photo url on media
+                settingsAdapter.notifyDataSetChanged();
+
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+                Toast.makeText(ActivityAlarmSettings.this, error.toString(),
+                        Toast.LENGTH_LONG).show();
+                Log.d(TAG, "CROP_PICTURE error ="+ result.getError());
+
+            }
         }
     }
 
@@ -705,31 +736,33 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                         // TODO accept the result.
                         mMediaFiles = result;
                         AlbumFile albumFile =mMediaFiles.get(0);
-                        int MediaType = albumFile.getMediaType();
-                        String  MediaName = albumFile.getName();
+                        mMediaType = albumFile.getMediaType();
+                        mMediaName  = albumFile.getName();
                         Uri MediaUri = Uri.parse(albumFile.getPath()) ;
 
                         Log.d(TAG, "MediaType" +albumFile.getMediaType());
                         Log.d(TAG, "Name" +albumFile.getName());
                         Log.d(TAG, "Path" +albumFile.getPath());
+                        Log.d(TAG, "MediaUri" +MediaUri);
+
+
+                        if (mMediaName.length() == 0) {
+                            mMediaName = getString(R.string.unknown_name);
+                        }
+
+                        if (mMediaType == AlbumFile.TYPE_IMAGE){
+
+                            cropImage(MediaUri);
+                        }else {
+                            settings.setMedia(MediaUri,mMediaName ,getResources().getString(R.string.media_video));// Set photo url on media
+                            settings.setTone(MediaUri, mMediaName);// Set video url on tone
+                            settingsAdapter.notifyDataSetChanged();
+                        }
 
                         if (progressDialog != null) {
                             progressDialog.dismiss();
                             progressDialog = null;
                         }
-
-                        if (MediaName.length() == 0) {
-                            MediaName = getString(R.string.unknown_name);
-                        }
-
-                        if (MediaType == AlbumFile.TYPE_IMAGE){
-                            settings.setMedia(MediaUri,MediaName ,getResources().getString(R.string.media_photo));// Set photo url on media
-                        }else {
-                            settings.setMedia(MediaUri,MediaName ,getResources().getString(R.string.media_video));// Set photo url on media
-                            settings.setTone(MediaUri, MediaName);// Set video url on tone
-                        }
-                        settingsAdapter.notifyDataSetChanged();
-
                     }
                 })
                 .onCancel(new Action<String>() {
@@ -745,6 +778,31 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                 })
                 .start();
     }
+
+    private void cropImage(Uri mediaUri) {
+
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int width = size.x;
+        int height = size.y;
+        Log.d(TAG, "width= " +width + "height= "+height);
+
+        CropImage.activity(Uri.fromFile(new File(mediaUri.toString())))
+                //.setGuidelines(CropImageView.Guidelines.ON)
+                //.setOutputUri(Uri.parse(mCroppdImage.getPath()))
+                .setAspectRatio(width,height)
+                .setAllowRotation(true)
+                .setAutoZoomEnabled(true)
+                //.setFixAspectRatio(true)
+                .setMultiTouchEnabled(true)
+                //.setMaxCropResultSize(width, height)
+                .setMinCropResultSize(260,260)
+                .setRequestedSize(width,height) //resize
+                .start(ActivityAlarmSettings.this);
+    }
+
+
 
     private void showProgressDialog() {
         progressDialog = ProgressDialog.show(ActivityAlarmSettings.this,

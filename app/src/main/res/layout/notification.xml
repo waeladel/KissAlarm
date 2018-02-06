@@ -32,19 +32,22 @@
       android:layout_height="fill_parent"
   </LinearLayout>/>-->
 
-  <DigitalClock android:id="@+id/clock"
-    android:gravity="center"
-    android:textSize="56sp"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content" />
+  <DigitalClock
+      android:id="@+id/clock"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center"
+      android:textSize="56sp"
+      android:visibility="gone" />
 
   <Button
-    android:id="@+id/notify_snooze"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:elevation="1dp"
-    android:text="@string/snooze"
-    android:textSize="32sp" />
+      android:id="@+id/notify_snooze"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:elevation="1dp"
+      android:text="@string/snooze"
+      android:textSize="32sp"
+      android:visibility="gone" />
 
 
   <!--<TextView android:id="@+id/volume"
@@ -69,7 +72,7 @@
       android:id="@+id/partner_frame"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:layout_weight=".1">
+      >
 
 
     <!--<ImageView
@@ -114,8 +117,7 @@
         android:alpha="50"
         android:background="@android:color/transparent"
         android:color="#66FF0000"
-
-        android:saveEnabled="false" />
+        />
 
     <!--<SurfaceView
         android:id="@+id/surfaceView"
@@ -126,45 +128,44 @@
         android:scaleType="matrix"
         android:visibility="gone" />-->
 
-      <TextureView
-          android:id="@+id/textureView"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          android:gravity="fill_vertical|fill_horizontal|center"
-          android:scaleType="matrix"
-          android:visibility="gone" />
+    <TextureView
+        android:id="@+id/textureView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="fill_vertical|fill_horizontal|center"
+        android:scaleType="fitCenter"
+        android:visibility="gone" />
   </FrameLayout>
-
 
 
   <io.github.carlorodriguez.alarmon.Slider
       android:id="@+id/dismiss_slider"
       android:layout_width="fill_parent"
-      android:layout_height="wrap_content" />
+      android:layout_height="wrap_content"
+      android:visibility="gone" />
 
 
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/topLayout"
-        android:orientation="vertical"
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+      android:id="@+id/topLayout"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:keepScreenOn="true"
+      android:orientation="vertical"
+
+      android:visibility="gone">
+
+    <io.github.carlorodriguez.alarmon.CameraSourcePreview
+        android:id="@+id/preview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:keepScreenOn="true"
+        android:layout_height="match_parent">
 
-        >
+      <io.github.carlorodriguez.alarmon.GraphicOverlay
+          android:id="@+id/faceOverlay"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent" />
 
-        <io.github.carlorodriguez.alarmon.CameraSourcePreview
-            android:id="@+id/preview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+    </io.github.carlorodriguez.alarmon.CameraSourcePreview>
 
-            <io.github.carlorodriguez.alarmon.GraphicOverlay
-                android:id="@+id/faceOverlay"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-        </io.github.carlorodriguez.alarmon.CameraSourcePreview>
-
-    </LinearLayout>
+  </LinearLayout>
 
 </LinearLayout>

@@ -54,6 +54,9 @@
         android:name=".AboutTabbedActivity"
         android:theme="@style/AppThemeDark">
     </activity>
+    <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+        android:theme="@style/Base.Theme.AppCompat">
+    </activity>
     <service android:name="io.github.carlorodriguez.alarmon.AlarmClockService"/>
     <service android:name="io.github.carlorodriguez.alarmon.NotificationService"/>
     <receiver android:name="io.github.carlorodriguez.alarmon.ReceiverAlarm"/>

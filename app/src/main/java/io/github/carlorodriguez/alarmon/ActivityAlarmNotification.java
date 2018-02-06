@@ -50,6 +50,7 @@ import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -64,6 +65,7 @@ import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -141,6 +143,11 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         }
 
         super.onCreate(savedInstanceState);
+
+        // remove title
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.notification);
 
@@ -333,8 +340,15 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                         mTextureView.setVisibility(View.INVISIBLE);
 
                         //mImageView.setImageURI(service.getPhotoUri());
-                        mBitmap = BitmapFactory.decodeFile(service.getPhotoUri().toString());
-                        new FaceDetectorAsyncTask().execute(mBitmap);
+                        //mBitmap = BitmapFactory.decodeFile(service.getPhotoUri().toString());
+
+                        try {
+                            InputStream stream = getContentResolver().openInputStream(service.getPhotoUri());
+                            mBitmap = BitmapFactory.decodeStream(stream);
+                            new FaceDetectorAsyncTask().execute(mBitmap);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
 
                         //mBitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(),R.mipmap.girl);
                         //mBitmap = BitmapFactory.decodeStream(stream);
@@ -345,7 +359,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
                     }else{
                         mSurfaceView.setVisibility(View.INVISIBLE);
-                        mBitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(),R.mipmap.girl);
+                            mBitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(),R.mipmap.girl);
                         new FaceDetectorAsyncTask().execute(mBitmap);
                     }
                     Log.d(TAG, "getMediaType= "+service.getMediaType()+ service.getPhotoUri());
