@@ -345,6 +345,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                         try {
                             InputStream stream = getContentResolver().openInputStream(service.getPhotoUri());
                             mBitmap = BitmapFactory.decodeStream(stream);
+                            Log.d(TAG, "stream= "+stream+"mBitmap= "+mBitmap);
                             new FaceDetectorAsyncTask().execute(mBitmap);
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
@@ -646,8 +647,9 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
             mDetector = new FaceDetector.Builder(getApplicationContext())
                     .setTrackingEnabled(false)
                     .setLandmarkType(FaceDetector.ALL_LANDMARKS)
-                    .setMode(FaceDetector.FAST_MODE )
+                    .setMode(FaceDetector.ACCURATE_MODE )
                     .setProminentFaceOnly(true)
+                    .setClassificationType(FaceDetector.NO_CLASSIFICATIONS)
                     .build();
             Log.d(TAG, "FaceDetector built.");
 

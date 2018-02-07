@@ -202,6 +202,7 @@ public class NotificationService extends Service {
     // Use the notification activity explicitly in this intent just in case the
     // activity can't be viewed via the root activity.
     Intent intent = new Intent(getApplicationContext(), ActivityAlarmNotification.class);
+    //intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
     notificationActivity = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
 
     // Setup a self-scheduling event loops.
