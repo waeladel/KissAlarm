@@ -3,8 +3,10 @@ package io.github.carlorodriguez.alarmon;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 
 import com.google.android.gms.vision.face.Face;
+import com.google.android.gms.vision.face.Landmark;
 
 /**
  * Graphic instance for rendering face position, orientation, and landmarks within an associated
@@ -75,6 +77,7 @@ class FaceGraphic extends GraphicOverlay.Graphic {
     @Override
     public void draw(Canvas canvas) {
         Face face = mFace;
+        canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), mBoxPaint);
         if (face == null) {
             return;
         }
@@ -84,10 +87,10 @@ class FaceGraphic extends GraphicOverlay.Graphic {
         float y = translateY(face.getPosition().y + face.getHeight() / 2);
         canvas.drawCircle(x, y, FACE_POSITION_RADIUS, mFacePositionPaint);
         canvas.drawText("id: " + mFaceId, x + ID_X_OFFSET, y + ID_Y_OFFSET, mIdPaint);
-        canvas.drawText("happiness: " + String.format("%.2f", face.getIsSmilingProbability()), x - ID_X_OFFSET, y - ID_Y_OFFSET, mIdPaint);
+        /*canvas.drawText("happiness: " + String.format("%.2f", face.getIsSmilingProbability()), x - ID_X_OFFSET, y - ID_Y_OFFSET, mIdPaint);
         canvas.drawText("right eye: " + String.format("%.2f", face.getIsRightEyeOpenProbability()), x + ID_X_OFFSET * 2, y + ID_Y_OFFSET * 2, mIdPaint);
         canvas.drawText("left eye: " + String.format("%.2f", face.getIsLeftEyeOpenProbability()), x - ID_X_OFFSET*2, y - ID_Y_OFFSET*2, mIdPaint);
-
+        */
         // Draws a bounding box around the face.
         float xOffset = scaleX(face.getWidth() / 2.0f);
         float yOffset = scaleY(face.getHeight() / 2.0f);
@@ -96,5 +99,30 @@ class FaceGraphic extends GraphicOverlay.Graphic {
         float right = x + xOffset;
         float bottom = y + yOffset;
         canvas.drawRect(left, top, right, bottom, mBoxPaint);
+
+        drawFaceAnnotations(canvas);
+
+    }
+
+    /**
+     * Draws a small circle for each detected landmark, centered at the detected landmark position.
+     * <p>
+     *
+     * Note that eye landmarks are defined to be the midpoint between the detected eye corner
+     * positions, which tends to place the eye landmarks at the lower eyelid rather than at the
+     * pupil position.
+     */
+    private void drawFaceAnnotations(Canvas canvas) {
+
+        mIdPaint = new Paint();
+        mIdPaint.setColor(Color.GREEN);
+        mIdPaint.setStyle(Paint.Style.STROKE);
+        mIdPaint.setStrokeWidth(5);
+
+            for (Landmark landmark : mFace.getLandmarks()) {
+                    int cx = (int) (landmark.getPosition().x );
+                    int cy = (int) (landmark.getPosition().y );
+                    canvas.drawCircle(cx, cy, 3, mIdPaint);
+            }
     }
 }

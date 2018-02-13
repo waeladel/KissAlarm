@@ -78,8 +78,8 @@ public class NotificationServiceInterfaceStub extends NotificationServiceInterfa
     }
   }
 
-  public void releasePlayerSurfaceHolder (Surface surface) throws RemoteException {
-    service.releasePlayerSurfaceHolderOnService(surface);
+  public void releaseSurfaceHolder () throws RemoteException {
+    service.releasePlayerSurface();
   }
 
   @Override

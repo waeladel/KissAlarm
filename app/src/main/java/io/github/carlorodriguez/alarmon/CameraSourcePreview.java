@@ -50,6 +50,9 @@ public class CameraSourcePreview extends ViewGroup {
 
     public void start(CameraSource cameraSource, GraphicOverlay overlay) throws IOException {
         mOverlay = overlay;
+        Log.d(TAG, "GraphicOverlay overlay="+ overlay);
+        Log.d(TAG, "CameraSource="+ cameraSource);
+
         start(cameraSource);
     }
 
@@ -73,6 +76,8 @@ public class CameraSourcePreview extends ViewGroup {
                 Size size = mCameraSource.getPreviewSize();
                 int min = Math.min(size.getWidth(), size.getHeight());
                 int max = Math.max(size.getWidth(), size.getHeight());
+                Log.d(TAG, "getCameraFacing="+ mCameraSource.getCameraFacing());
+
                 if (isPortraitMode()) {
                     // Swap width and height sizes when in portrait, since it will be rotated by
                     // 90 degrees

@@ -19,10 +19,6 @@ import android.view.ViewGroup;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.Landmark;
 
-
-import static io.github.carlorodriguez.alarmon.ActivityAlarmNotification.foreheadLayout;
-import static io.github.carlorodriguez.alarmon.ActivityAlarmNotification.lipLayout;
-
 /**
  * View which displays a bitmap containing a face along with overlay graphics that identify the
  * locations of detected facial landmarks.
@@ -72,13 +68,12 @@ public class FaceView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        Log.d(TAG, "mFaces= " +mFaces);
         if ((mBitmap != null) && (mFaces != null)) {
             Log.d(TAG, "mFaces= " +mFaces +"mFaces size= "+ mFaces.size());
-            double scale = drawBitmap(canvas);
-            drawFaceAnnotations(canvas, scale);
-            drawFaceLips(canvas, scale);
-            drawFaceForehead(canvas, scale);
+            double scale = drawBitmap(canvas);// draw original image
+            drawFaceAnnotations(canvas, scale); // draw face's landmarks
+            drawFaceLips(canvas, scale);// draw lip's button
+            drawFaceForehead(canvas, scale); // draw forehead's button
         }
     }
 
@@ -100,7 +95,7 @@ public class FaceView extends View {
         Rect destBounds = new Rect(0, 0, (int)(imageWidth * scale), (int)(imageHeight * scale));
 
         mPaint = new Paint();
-        mPaint.setAlpha(40); //you can set your transparent value here
+        //mPaint.setAlpha(40); //you can set your transparent value here
 
         canvas.drawBitmap(mBitmap, null, destBounds, mPaint);
         return scale;

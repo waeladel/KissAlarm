@@ -36,6 +36,7 @@ import android.os.IBinder;
 import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -347,11 +348,17 @@ public class NotificationService extends Service {
 
   public void setPlayerSurfaceOnService(Surface surface) {
     MediaSingleton.INSTANCE.mediaPlayer.setSurface(surface);
+      Log.d("mama2", "mediaPlayer.setSurface ");
+
   }
 
-  public void releasePlayerSurfaceHolderOnService(Surface surface) {
+  public void releasePlayerSurface() {
 
     MediaSingleton.INSTANCE.mediaPlayer.setDisplay(null);
+    //MediaSingleton.INSTANCE.mediaPlayer.stop();
+    //MediaSingleton.INSTANCE.mediaPlayer.reset();
+    //MediaSingleton.INSTANCE.mediaPlayer.release();
+      Log.d("mama2", "mediaPlayer.released from service");
   }
 
   public void acknowledgeCurrentNotification(int snoozeMinutes) throws NoAlarmsException {

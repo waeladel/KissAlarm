@@ -9,7 +9,7 @@ interface NotificationServiceInterface {
   String getMediaType();
   void acknowledgeCurrentNotification(int snoozeMinutes);
   void setPlayerSurface(in Surface surface);
-  void releasePlayerSurfaceHolder(in Surface surface);
+  void releaseSurfaceHolder();
 
 
 }

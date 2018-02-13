@@ -27,11 +27,18 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -54,7 +61,9 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.os.Process;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -69,6 +78,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static android.R.attr.data;
 
 
 /**
@@ -79,7 +89,7 @@ import java.io.InputStream;
  * more than once at the same time. (ie, it assumes
  * android:launchMode="singleInstance" is set in the manifest file).
  */
-public final class ActivityAlarmNotification extends AppCompatActivity implements SurfaceHolder.Callback , TextureView.SurfaceTextureListener{
+public final class ActivityAlarmNotification extends AppCompatActivity implements TextureView.SurfaceTextureListener{
 
     private static String TAG = ActivityAlarmNotification.class.getSimpleName();
 
@@ -93,7 +103,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
     private Runnable timeTick;
     //private VideoView mVideoView;
     private SurfaceView mSurfaceView;
-    private TextureView mTextureView;
+    private volatile TextureView mTextureView;
     private GraphicOverlay mGraphicOverlay;
     private CameraSourcePreview mPreview;
     private CameraSource mCameraSource = null;
@@ -107,24 +117,28 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
     private SurfaceHolder mSurfaceHolder;
     private Surface mSurface;
     private FaceView overlay;
-   //private ImageView mImageView;
+   private ImageView mImageView;
 
     private InputStream mStream ;
-    private Bitmap mBitmap ;
+    private volatile Bitmap mBitmap ;
     private SparseArray<Face> mFaces;
     private FaceDetector mDetector;
     private Frame mFrame ;
     private static ProgressDialog progressDialog;
-    public static Button lipButton;// lip button for onClick listener
-    public static LinearLayout lipLayout; // lip button layout to control it's width and height
+    public static  Button lipButton;// lip button for onClick listener
 
     public static Button foreheadButton;// lip button for onClick listener
-    public static LinearLayout foreheadLayout; // lip button layout to control it's width and height
+    public  static Button snoozeButton;
+
+    // Original video size
+    private volatile float mVideoWidth;
+    private volatile float mVideoHeight;
 
     //private FrameLayout fl_surfaceview_container;
 
     // Dialog state
     int snoozeMinutes;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -198,29 +212,25 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         mSurfaceView = new SurfaceView(this);
         fl_surfaceview_container.addView(mSurfaceView);*/
 
-        //mImageView = findViewById(R.id.imageView);
+        mImageView = findViewById(R.id.imageView);
         //the layout on which you are working
         lipButton = findViewById(R.id.lip_button);
-        lipLayout = (LinearLayout) findViewById(R.id.lip_Layout);
-
         foreheadButton = findViewById(R.id.forehead_button);
-        foreheadLayout = (LinearLayout) findViewById(R.id.forehead_Layout);
 
         overlay = findViewById(R.id.faceView);
         //mSurfaceView = findViewById(R.id.surfaceView);
         mTextureView = findViewById(R.id.textureView);
         mGraphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);
-        mPreview = (CameraSourcePreview) findViewById(R.id.preview);
 
-        // Check for the camera permission before accessing the camera.  If the
+        /*// Check for the camera permission before accessing the camera.  If the
         // permission is not granted yet, request permission.
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (rc == PackageManager.PERMISSION_GRANTED) {
-            createCameraSource();
+            //createCameraSource();
         } else {
             requestCameraPermission();
         }
-
+*/
 
         mTextureView.setSurfaceTextureListener(this);
         /*mSurfaceHolder = mSurfaceView.getHolder();
@@ -252,7 +262,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
             }
         });*/
 
-        final Button snoozeButton = (Button) findViewById(R.id.notify_snooze);
+        snoozeButton = (Button) findViewById(R.id.notify_snooze);
 
         snoozeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -316,6 +326,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
             }
         });
 
+
         final Slider dismiss = (Slider) findViewById(R.id.dismiss_slider);
 
         dismiss.setOnCompleteListener(new Slider.OnCompleteListener() {
@@ -327,16 +338,35 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
             }
         });
 
+        dismiss.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "dismiss clicked ");
+                //detectCurrentBitmap();
+                mImageView.setVisibility(View.VISIBLE);
+                mTextureView.setVisibility(View.INVISIBLE);
+                mBitmap = mTextureView.getBitmap();
+
+                Bitmap Originalbitmap = Bitmap.createBitmap( mBitmap, 0, 0, mBitmap.getWidth(), mBitmap.getHeight(), mTextureView.getTransform( null ), true );
+                Bitmap cropedBitmab = cropCenter(Originalbitmap);
+                mImageView.setImageBitmap(mBitmap);
+
+            }
+        });
+
         notifyService.call(new NotificationServiceBinder.ServiceCallback() {
             public void run(NotificationServiceInterface service) {
                 try {
                     if(service.getMediaType().equalsIgnoreCase("Video")){
-                        //mImageView.setVisibility(View.INVISIBLE);
-                        mTextureView.setVisibility(View.VISIBLE);
+                        /*//mImageView.setVisibility(View.INVISIBLE);
+                        mTextureView.setVisibility(View.VISIBLE);*/
 
+                        //overlay.setVisibility(View.INVISIBLE);
+                        mTextureView.setVisibility(View.VISIBLE);
 
                     }else if(service.getMediaType().equalsIgnoreCase("Photo")){
                         //mImageView.setVisibility(View.VISIBLE);
+                        //overlay.setVisibility(View.VISIBLE);
                         mTextureView.setVisibility(View.INVISIBLE);
 
                         //mImageView.setImageURI(service.getPhotoUri());
@@ -359,8 +389,12 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
 
                     }else{
-                        mSurfaceView.setVisibility(View.INVISIBLE);
-                            mBitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(),R.mipmap.girl);
+                        //mSurfaceView.setVisibility(View.INVISIBLE);
+
+                        //overlay.setVisibility(View.VISIBLE);
+                        mTextureView.setVisibility(View.INVISIBLE);
+
+                        mBitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(),R.mipmap.girl);
                         new FaceDetectorAsyncTask().execute(mBitmap);
                     }
                     Log.d(TAG, "getMediaType= "+service.getMediaType()+ service.getPhotoUri());
@@ -377,7 +411,6 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         handler.post(timeTick);
         redraw();
         Log.d(TAG, "mamaMediaPlayer= onResume");
-        startCameraSource();
     }
 
     @Override
@@ -391,9 +424,15 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        releaseSurfaceHolder();
         db.closeConnections();
         notifyService.unbind();
         Log.d(TAG, "mamaMediaPlayer= onDestroy");
+
+        if (mDetector!= null){
+            mDetector.release();
+            Log.d(TAG, "mDetector released onDestroy");
+        }
     }
 
     @Override
@@ -490,7 +529,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         dialog.show(getFragmentManager(), "ActivityDialogFragment");
     }
 
-    @Override
+    /*@Override
     public void surfaceCreated(SurfaceHolder holder) {
         notifyService.call(new NotificationServiceBinder.ServiceCallback() {
             public void run(NotificationServiceInterface service) {
@@ -502,8 +541,8 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
             }
         });
 
-        /*mMediaPlayer = NotificationService.MediaSingleton.INSTANCE.mediaPlayer;
-        mMediaPlayer.setDisplay(mSurfaceHolder);*/
+        *//*mMediaPlayer = NotificationService.MediaSingleton.INSTANCE.mediaPlayer;
+        mMediaPlayer.setDisplay(mSurfaceHolder);*//*
         Log.d(TAG, "mamaMediaPlayer surfaceCreated + MediaPlayer=" + mMediaPlayer);
 
     }
@@ -527,23 +566,20 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
             }
         });
         Log.d(TAG, "mamaMediaPlayer= surfaceDestroyed");
-    }
+    }*/
 
     //=============================================================================================
-    // Activity Methods
+    // Activity Methods Texture view overrride
     //==============================================================================================
 
     @Override
-    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+    public void onSurfaceTextureAvailable(SurfaceTexture surface, final int width, final int height) {
         mSurface = new Surface(surface);
         notifyService.call(new NotificationServiceBinder.ServiceCallback() {
             public void run(NotificationServiceInterface service) {
                 try {
-                    service.setPlayerSurface(mSurface);
-                    mBitmap = mTextureView.getBitmap();
-                    //new FaceDetectorAsyncTask().execute(mBitmap);
-                    createCameraSource();
-
+                    service.setPlayerSurface(mSurface);// attach media player to SurfaceTexture
+                    calculateVideoSize(service.currentTone());// get  video's with and height
                 } catch (RemoteException e) {
                     //return;
                 }
@@ -553,6 +589,51 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         mMediaPlayer.setDisplay(mSurfaceHolder);*/
         Log.d(TAG, "mamaMediaPlayer surfaceCreated + MediaPlayer=" + mMediaPlayer);
         //startCameraSource();
+
+        Log.d(TAG, "mVideoWidth="+ mVideoWidth+ "mVideoHeight="+mVideoHeight);
+
+        //adjustAspectRatio((int) mVideoWidth,(int) mVideoHeight);// function to preserve fixed aspect ratio
+        //updateTextureViewSize(mTextureView.getWidth(), mTextureView.getHeight());
+        updateTextureViewSize(width, height); //function to center crop the video
+        
+        //mBitmap = mTextureView.getBitmap();
+        //new FaceDetectorAsyncTask().execute(mBitmap);
+        createDetector();
+
+        /*//wait 4 seconds
+           Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    //detectCurrentBitmap();
+
+                    Mat currentFrame = new Mat(height + height / 2, width + width/2, CvType.CV_8UC1);
+                    Mat yuvMat = new Mat(height + height / 2, width + width/2, CvType.CV_8UC1);
+
+                    yuvMat.put(0, 0, data);
+
+                    //Imgproc.cvtColor(yuvMat, currentFrame, Imgproc.COLOR_YUV420sp2RGB);
+                    //Imgproc.cvtColor(currentFrame, currentFrame, Imgproc.COLOR_BGR2GRAY);
+                    try {
+                        //Imgproc.cvtColor(seedsImage, tmp, Imgproc.COLOR_RGB2BGRA);
+                        //Imgproc.cvtColor(RGBmat, grayMat, Imgproc.COLOR_BGR2GRAY);
+
+                        Bitmap bitmap = Bitmap.createBitmap(currentFrame.cols(), currentFrame.rows(), Bitmap.Config.ARGB_8888);
+                        Utils.matToBitmap(currentFrame, bitmap);
+                        mImageView.setImageBitmap(bitmap);
+                    }
+                    catch (CvException e){
+                        Log.d("Exception",e.getMessage());
+                    }
+                    mImageView.setVisibility(View.VISIBLE);
+                    mTextureView.setVisibility(View.INVISIBLE);
+                }
+            }, 4000);*/
+
+    }
+
+    @Override
+    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+
     }
 
     @Override
@@ -562,22 +643,11 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        notifyService.call(new NotificationServiceBinder.ServiceCallback() {
-            public void run(NotificationServiceInterface service) {
-                try {
-                    service.releasePlayerSurfaceHolder(null);
-                } catch (RemoteException e) {
-                    //return;
-                }
-            }
-        });
-        Log.d(TAG, "mamaMediaPlayer= surfaceDestroyed");
-        return false;
-    }
-
-    @Override
-    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-
+        mSurface = new Surface(surface);
+        //releaseSurfaceHolder();
+        mTextureView.setSurfaceTextureListener(null);
+        Log.d(TAG, "mama2 onSurfaceTextureDestroyed= surfaceDestroyed");
+        return true;
     }
 
 
@@ -636,11 +706,17 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
         @Override
         protected void onPreExecute() {
-            showProgressDialog();
+            //showProgressDialog();
         }
 
         @Override
         protected SparseArray<Face> doInBackground(Bitmap... bitmapParams) {
+
+            // his should not use AsyncTask.  The AsyncTask worker thread is run at
+            // a lower priority, making it unsuitable for benchmarks.  We can counteract
+            // it in the current implementation, but this is not guaranteed to work in
+            // future releases.
+            Process.setThreadPriority(Process.THREAD_PRIORITY_FOREGROUND);
 
             // By default, landmark detection is not enabled since it increases detection time.  We
             // enable it here in order to visualize detected landmarks.
@@ -667,10 +743,12 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                 }
             }
 
-            // Create a frame from the bitmap and run face detection on the frame.
-            mFrame = new Frame.Builder().setBitmap(bitmapParams[0]).build();
-            mFaces = mDetector.detect(mFrame);
-            Log.d(TAG, "faces frame.");
+            if (bitmapParams[0] != null) {
+                // Create a frame from the bitmap and run face detection on the frame.
+                mFrame = new Frame.Builder().setBitmap(bitmapParams[0]).build();
+                mFaces = mDetector.detect(mFrame);
+                Log.d(TAG, "faces frame.");
+            }
 
             return mFaces;
         }
@@ -680,13 +758,13 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
             overlay.setVisibility(View.VISIBLE);
             Log.d(TAG, "mBitmap getWidth= " +mBitmap.getWidth());
-            overlay.setContent(mBitmap, faces);
+            overlay.setContent(mBitmap, faces); // draw original bitmap and face buttons
             Log.d(TAG, "overlay setContent.");
 
             // Although detector may be used multiple times for different images, it should be released
             // when it is no longer needed in order to free native resources.
-
             mDetector.release();
+
             Log.d(TAG, "detector released.");
 
             if (progressDialog != null) {
@@ -697,6 +775,60 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         }
     }
 
+    public class VideoFaceDetectorAsyncTask extends AsyncTask<Bitmap, Void, Bitmap> {
+
+        @Override
+        protected void onPreExecute() {
+            //showProgressDialog();
+        }
+
+        @Override
+        protected Bitmap doInBackground(Bitmap... bitmapParams) {
+
+            // his should not use AsyncTask.  The AsyncTask worker thread is run at
+            // a lower priority, making it unsuitable for benchmarks.  We can counteract
+            // it in the current implementation, but this is not guaranteed to work in
+            // future releases.
+            Process.setThreadPriority(Process.THREAD_PRIORITY_FOREGROUND);
+
+            Log.d(TAG, "Before mFrame Builder="+ mFrame);
+            if (bitmapParams[0] != null) {
+                mFrame = new Frame.Builder()
+                        .setBitmap(bitmapParams[0])
+                        .build();
+                Log.d(TAG, "After mFrame Builder="+ mFrame);
+
+                //mDetector.detect(mFrame);
+                Log.d(TAG, "Before Detector.receiveFrame="+ mFrame);
+                mDetector.receiveFrame(mFrame);// feed the detector with bitmap
+                Log.d(TAG, "After Detector.receiveFrame="+ mFrame);
+            }
+
+            return bitmapParams[0];
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmapParams) {
+
+            if (bitmapParams != null) {
+                detectCurrentBitmap(); // loop for detecting another frame
+            }else{
+                if (mDetector!= null){
+                    mDetector.release();
+                    Log.d(TAG, "mDetector released onDestroy");
+                }
+            }
+            //wait 1o seconds
+           /* Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    //detectCurrentBitmap();
+                }
+            }, 2000);*/
+        }
+    }
+
+
     private void showProgressDialog() {
         progressDialog = ProgressDialog.show(ActivityAlarmNotification.this,
                 getString(R.string.Scaning),
@@ -704,54 +836,30 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
     }
 
-    /**
-     * Handles the requesting of the camera permission.  This includes
-     * showing a "Snackbar" message of why the permission is needed then
-     * sending the request.
-     */
-    private void requestCameraPermission() {
-        Log.w(TAG, "Camera permission is not granted. Requesting permission");
 
-        final String[] permissions = new String[]{Manifest.permission.CAMERA};
-
-        if (!ActivityCompat.shouldShowRequestPermissionRationale(this,
-                Manifest.permission.CAMERA)) {
-            ActivityCompat.requestPermissions(this, permissions, RC_HANDLE_CAMERA_PERM);
-            return;
-        }
-
-        final Activity thisActivity = this;
-
-        View.OnClickListener listener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ActivityCompat.requestPermissions(thisActivity, permissions,
-                        RC_HANDLE_CAMERA_PERM);
-            }
-        };
-
-        Snackbar.make(mGraphicOverlay, R.string.permission_camera_rationale,
-                Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.ok, listener)
-                .show();
-    }
     /**
      * Creates and starts the camera.  Note that this uses a higher resolution in comparison
      * to other detection examples to enable the barcode detector to detect small barcodes
      * at long distances.
      */
-    private void createCameraSource() {
+    private void createDetector() {
 
         Context context = getApplicationContext();
-        FaceDetector detector = new FaceDetector.Builder(context)
-                .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
+        mDetector = new FaceDetector.Builder(context)
+                //.setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
+                .setTrackingEnabled(true)
+                .setLandmarkType(FaceDetector.NO_LANDMARKS)
+                .setClassificationType(FaceDetector.NO_CLASSIFICATIONS)
+                .setMode(FaceDetector.FAST_MODE)
+                .setProminentFaceOnly(false)
+                .setMinFaceSize(0.3f)
                 .build();
 
-        detector.setProcessor(
+        mDetector.setProcessor(
                 new MultiProcessor.Builder<>(new GraphicFaceTrackerFactory())
                         .build());
 
-        if (!detector.isOperational()) {
+        if (!mDetector.isOperational()) {
             Log.d(TAG, "Face detector dependencies are not yet available.");
             // Check for low storage.  If there is low storage, the native library will not be
             // downloaded, so detection will not become operational.
@@ -764,47 +872,306 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
             }
         }
 
-        mCameraSource = new CameraSource.Builder(context, detector)
+        /*mCameraSource = new CameraSource.Builder(context, mDetector)
                 //.setRequestedPreviewSize(640, 480)
                 .setFacing(CameraSource.CAMERA_FACING_FRONT)
                 .setRequestedFps(30.0f)
-                .build();
+                .build();*/
 
-        // Create a frame from the bitmap and run face detection on the frame.
-        //mFrame = new Frame.Builder().setBitmap(bitmap).build();
-        //mFaces = mDetector.detect(mFrame);
+        // Create a frame from the bitmap and run face detection on the frame
+
+        //wait 1o seconds
+       /* Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+            }
+        }, 6000);*/
+
+        Log.d(TAG, "Before getBitmap mTextureView mBitmap="+ mBitmap);
+        //mBitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(),R.mipmap.girl);
+        mBitmap = mTextureView.getBitmap();
+        Log.d(TAG, "After getBitmap mTextureView mBitmap="+ mBitmap);
+        new VideoFaceDetectorAsyncTask().execute(mBitmap);
+
+        //startCameraSource();
+
+            /*// new Thread Start new thread for face detector and bitmaps
+            new Thread(new Runnable() {
+                @Override public void run() {
+                }
+            }).start();*/
     }
-
-    //==============================================================================================
-    // Camera Source Preview
-    //==============================================================================================
 
     /**
-     * Starts or restarts the camera source, if it exists.  If the camera source doesn't exist yet
-     * (e.g., because onResume was called before the camera source was created), this will be called
-     * again when the camera source is created.
+     * detect the newest Bitmap
      */
-    private void startCameraSource() {
 
-        // check that the device has play services available.
-        int code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(
-                getApplicationContext());
-        if (code != ConnectionResult.SUCCESS) {
-            Dialog dlg =
-                    GoogleApiAvailability.getInstance().getErrorDialog(this, code, RC_HANDLE_GMS);
-            dlg.show();
-        }
+    private void detectCurrentBitmap() {
+        Log.d(TAG, "Before getBitmap mTextureView mBitmap="+ mBitmap);
+        mBitmap = mTextureView.getBitmap();
+        //mTextureView.getMatrix();
 
-        if (mCameraSource != null) {
-            try {
-                mPreview.start(mCameraSource, mGraphicOverlay);
-            } catch (IOException e) {
-                Log.e(TAG, "Unable to start camera source.", e);
-                mCameraSource.release();
-                mCameraSource = null;
-            }
+        /*Matrix bitmapMatrix = new Matrix();
+        mTextureView.getTransform(bitmapMatrix);*/
+
+        if(mBitmap != null){
+            //get hte bitmap's transformation from the TextureView
+            Bitmap TransformBitmap = Bitmap.createBitmap( mBitmap, 0, 0, mBitmap.getWidth(), mBitmap.getHeight(), mTextureView.getTransform(null), true );
+            //TransformBitmap= cropCenter(TransformBitmap);
+            new VideoFaceDetectorAsyncTask().execute(cropCenter(TransformBitmap));
         }
     }
+
+    /**
+     * get the video's original width and height
+     */
+
+    private void calculateVideoSize( Uri toneUri) {
+        try {
+            //AssetFileDescriptor afd = getAssets().openFd(FILE_NAME);
+            MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
+            //metaRetriever.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            metaRetriever.setDataSource(toneUri.toString());
+
+            String height = metaRetriever
+                    .extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+
+            String width = metaRetriever
+                    .extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+
+            mVideoHeight = Float.parseFloat(height);
+            mVideoWidth = Float.parseFloat(width);
+
+        } catch (NumberFormatException e) {
+            Log.d(TAG, e.getMessage());
+        }
+    }
+
+    /**
+     * crop the TextureView to make it center crop
+     */
+
+    private void updateTextureViewSize(int viewWidth, int viewHeight) {
+        float scaleX = 1.0f;
+        float scaleY = 1.0f;
+        Log.d(TAG, "cropCenter updateTextureViewSize: viewWidth= "+ viewWidth + " viewHeight= "+viewHeight);
+        Log.d(TAG, "cropCenter updateTextureViewSize: videoWidth= "+ mVideoWidth + " VideoHeight= "+mVideoHeight);
+
+        if (mVideoWidth > viewWidth && mVideoHeight > viewHeight) {
+            scaleX = mVideoWidth / viewWidth;
+            scaleY = mVideoHeight / viewHeight;
+            Log.d(TAG, "cropCenter updateTextureViewSize: Video is bigger than view. scaleX= "+ scaleX + " scaleY= "+scaleY);
+        } else if (mVideoWidth < viewWidth && mVideoHeight < viewHeight) {
+            scaleY = viewWidth / mVideoWidth;
+            scaleX = viewHeight / mVideoHeight;
+            Log.d(TAG, "cropCenter updateTextureViewSize: Video is smaller than view. scaleX= "+ scaleX + " scaleY= "+scaleY);
+        } else if (viewWidth > mVideoWidth) {
+            scaleY = (viewWidth / mVideoWidth) / (viewHeight / mVideoHeight);
+            Log.d(TAG, "cropCenter updateTextureViewSize: Video width is smaller than view width. scaleX= "+ scaleX + " scaleY= "+scaleY);
+        } else if (viewHeight > mVideoHeight) {
+            scaleX = (viewHeight / mVideoHeight) / (viewWidth / mVideoWidth);
+            Log.d(TAG, "cropCenter updateTextureViewSize: Video Height is smaller than view Height. scaleX= "+ scaleX + " scaleY= "+scaleY);
+        }
+
+        // Calculate pivot points, in our case crop from center
+        int pivotPointX = viewWidth / 2;
+        int pivotPointY = viewHeight / 2;
+
+        Matrix matrix = new Matrix();
+        matrix.setScale(scaleX, scaleY, pivotPointX, pivotPointY);
+
+        mTextureView.setTransform(matrix);
+        mTextureView.setLayoutParams(new FrameLayout.LayoutParams(viewWidth, viewHeight));
+    }
+
+    /**
+     * crop the TextureView's bitmap, as it doesn't look like the cropped TextureView
+     */
+
+    public Bitmap cropCenter(Bitmap bitmap) {
+        /*int dimension = Math.min(bmp.getWidth(), bmp.getHeight());
+        return ThumbnailUtils.extractThumbnail(bmp, dimension, dimension);*/
+        float scaleX = 1.0f;
+        float scaleY = 1.0f;
+        float imageWidth = bitmap.getWidth();
+        float imageHeight = bitmap.getHeight();
+        int viewWidth = mTextureView.getWidth();
+        int viewHeight = mTextureView.getHeight();
+        
+        /*Log.d(TAG, "cropCenter: viewWidth= "+ viewWidth + " viewHeight= "+viewHeight);
+        Log.d(TAG, "cropCenter: VideoWidth= "+ mVideoWidth + " VideoHeight= "+mVideoHeight);
+        Log.d(TAG, "cropCenter: ImageWidth= "+ imageWidth + " ImageHeight= "+ imageHeight);
+
+        if (imageWidth > viewWidth && imageHeight > viewHeight) {
+            scaleX = imageWidth / viewWidth;
+            scaleY = imageHeight / viewHeight;
+            Log.d(TAG, "cropCenter: Image is bigger than view. scaleX= "+ scaleX + " scaleY= "+scaleY);
+        } else if (imageWidth < viewWidth && imageHeight < viewHeight) {
+            scaleY = viewWidth / imageWidth;
+            scaleX = viewHeight / imageHeight;
+            Log.d(TAG, "cropCenter: Image is smaller than view. scaleX= "+ scaleX + " scaleY= "+scaleY);
+        } else if (viewWidth > imageWidth) {
+            scaleY = (viewWidth / imageWidth) / (viewHeight / imageHeight);
+            Log.d(TAG, "cropCenter: Image width is smaller than view width. scaleX= "+ scaleX + " scaleY= "+scaleY);
+        } else if (viewHeight > imageHeight) {
+            scaleX = (viewHeight / imageHeight) / (viewWidth / imageWidth);
+            Log.d(TAG, "cropCenter: Image Height is smaller than view Height. scaleX= "+ scaleX + " scaleY= "+scaleY);
+        }else if(imageWidth == viewWidth && imageHeight == viewHeight){
+            Log.d(TAG, "cropCenter: Image and view are identical");
+        }
+        // Calculate pivot points, in our case crop from center
+        int pivotPointX = viewWidth / 2;
+        int pivotPointY = viewHeight / 2;
+        Log.d(TAG, "cropCenter: pivotPointX= "+ pivotPointX + " pivotPointY= "+pivotPointY);
+*/
+        int imagePivotPointX = (int) ((imageWidth/2)- (viewWidth / 2));
+        int imagePivotPointY = (int) ((imageHeight/2)- (viewHeight / 2));
+
+
+        Log.d(TAG, "cropCenter: imagePivotPointX= "+ imagePivotPointX);
+
+
+        Bitmap scaledBitmap;
+        scaledBitmap = Bitmap.createBitmap(bitmap, imagePivotPointX, imagePivotPointY, viewWidth ,
+                viewHeight);
+
+        /*scaledBitmap = Bitmap.createBitmap(bitmap, 426, 0, 480 ,
+                bitmap.getHeight()-35, matrix, true);*/
+
+        /*scaledBitmap = Bitmap.createScaledBitmap(scaledBitmap,viewWidth,
+                viewHeight, false);*/
+
+        //mCompassHud.setImageBitmap(scaledBitmap);
+
+      /*  Bitmap scaledBitmap = Bitmap.createBitmap (viewWidth, viewHeight, Bitmap.Config.ARGB_8888);
+
+        Canvas offscreenCanvas = new Canvas (scaledBitmap);
+        offscreenCanvas.setMatrix (matrix);
+        offscreenCanvas.drawBitmap (bitmap, 0, 0, new Paint(Paint.DITHER_FLAG));*/
+        /*RectF imageRect = new RectF(0, 0, imageWidth, imageHeight);
+        RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
+        matrix.setRectToRect(imageRect, viewRect, Matrix.ScaleToFit.FILL);
+
+        Bitmap scaledBitmap ;
+        scaledBitmap = Bitmap.createBitmap(
+                    bitmap,
+                    0,
+                    0,
+                    bitmap.getWidth(),
+                    bitmap.getHeight(),
+                    matrix,
+                    true
+        );*/
+
+        /*if (bitmap.getWidth() >= bitmap.getHeight()){
+
+            scaledBitmap = Bitmap.createBitmap(
+                    bitmap,
+                    bitmap.getWidth()/2 - bitmap.getHeight()/2,
+                    0,
+                    bitmap.getHeight(),
+                    viewHeight
+            );
+
+        }else{
+
+            scaledBitmap = Bitmap.createBitmap(
+                    bitmap,
+                    0,
+                    bitmap.getHeight()/2 - bitmap.getWidth()/2,
+                    bitmap.getWidth(),
+                    bitmap.getWidth()
+            );
+        }*/
+
+        //mTextureView.setLayoutParams(new FrameLayout.LayoutParams(viewWidth, viewHeight));
+
+        return scaledBitmap;
+        //return bitmap;
+    }
+
+    /**
+     * transform the bitmap to greyscale for quicker detection (not really significant and needs opencv)
+     */
+
+    /*private Bitmap greyscale (Bitmap bitmap) {
+
+        Mat rgbMat = new Mat(mTextureView.getHeight() + mTextureView.getHeight() / 2, mTextureView.getWidth(), CvType.CV_8UC3);
+        Mat greyMat = new Mat(mTextureView.getHeight() + mTextureView.getHeight() / 2, mTextureView.getWidth(), CvType.CV_8UC1);
+
+        Utils.bitmapToMat(bitmap, rgbMat);
+        //greyMat.put(0, 0, data);
+
+        //Imgproc.cvtColor(yuvMat, currentFrame, Imgproc.COLOR_YUV420sp2RGB);
+        Imgproc.cvtColor(rgbMat, greyMat, Imgproc.COLOR_BGR2GRAY);
+
+        try {
+            //Imgproc.cvtColor(seedsImage, tmp, Imgproc.COLOR_RGB2BGRA);
+            //Imgproc.cvtColor(RGBmat, grayMat, Imgproc.COLOR_BGR2GRAY);
+
+            Bitmap greyBitmap = Bitmap.createBitmap(greyMat.cols(), greyMat.rows(), Bitmap.Config.RGB_565);
+            Utils.matToBitmap(greyMat, greyBitmap);
+            return greyBitmap;
+
+        }
+        catch (CvException e){
+            Log.d("Exception",e.getMessage());
+            return null;
+        }
+    }*/
+
+    /**
+     * Sets the TextureView transform to preserve the aspect ratio of the video.
+     */
+    private void adjustAspectRatio(int videoWidth, int videoHeight) {
+        int viewWidth = mTextureView.getWidth();
+        int viewHeight = mTextureView.getHeight();
+
+        double aspectRatio = (double) videoHeight  / videoWidth;
+
+        int newWidth, newHeight;
+        if (viewHeight > (int) (viewWidth * aspectRatio)) {
+            // limited by narrow width; restrict height
+            newWidth = viewWidth;
+            newHeight = (int) (viewWidth * aspectRatio);
+        } else {
+            // limited by short height; restrict width
+            newWidth = (int) (viewHeight / aspectRatio);
+            newHeight = viewHeight;
+        }
+        int xoff = (viewWidth - newWidth) / 2;
+        int yoff = (viewHeight - newHeight) / 2;
+        Log.d(TAG, "video=" + videoWidth + "x" + videoHeight +
+                " view=" + viewWidth + "x" + viewHeight +
+                " newView=" + newWidth + "x" + newHeight +
+                " off=" + xoff + "," + yoff);
+
+        Matrix txform = new Matrix();
+        mTextureView.getTransform(txform);
+        txform.setScale((float) newWidth / viewWidth, (float) newHeight / viewHeight);
+        //txform.setScale((float) newWidth / viewWidth, (float) 1.4);
+        //txform.postRotate(10);          // just for fun
+        txform.postTranslate(xoff, yoff);
+        mTextureView.setTransform(txform);
+    }
+
+    private void releaseSurfaceHolder() {
+
+        notifyService.call(new NotificationServiceBinder.ServiceCallback() {
+            public void run(NotificationServiceInterface service) {
+                try {
+                    service.releaseSurfaceHolder();
+                    Log.d("mama2", "releaseSurfaceHolder= "+mSurface);
+                } catch (RemoteException e) {
+                    Log.d("mama2", "surface error= "+e.getMessage());
+                    //return;
+                }
+
+            }
+        });
+    }
+
+
 
     //==============================================================================================
     // Graphic Face Tracker
@@ -817,6 +1184,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
     private class GraphicFaceTrackerFactory implements MultiProcessor.Factory<Face> {
         @Override
         public Tracker<Face> create(Face face) {
+            Log.d(TAG, "GraphicFaceTrackerFactory  face=" + face);
             return new GraphicFaceTracker(mGraphicOverlay);
         }
     }
@@ -831,6 +1199,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
         GraphicFaceTracker(GraphicOverlay overlay) {
             mOverlay = overlay;
+            Log.d(TAG, "GraphicFaceTracker mOverlay= " + mOverlay);
             mFaceGraphic = new FaceGraphic(overlay);
         }
 
@@ -840,6 +1209,9 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         @Override
         public void onNewItem(int faceId, Face item) {
             mFaceGraphic.setId(faceId);
+            Log.d(TAG, "GraphicFaceTracker onNewItem faceId= " + faceId);
+            //detectCurrentBitmap();
+
         }
 
         /**
@@ -849,6 +1221,8 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         public void onUpdate(FaceDetector.Detections<Face> detectionResults, Face face) {
             mOverlay.add(mFaceGraphic);
             mFaceGraphic.updateFace(face);
+            Log.d(TAG, "GraphicFaceTracker onUpdate face= " + face);
+            //detectCurrentBitmap();
         }
 
         /**
@@ -859,6 +1233,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         @Override
         public void onMissing(FaceDetector.Detections<Face> detectionResults) {
             mOverlay.remove(mFaceGraphic);
+            Log.d(TAG, "GraphicFaceTracker onMissing");
         }
 
         /**
@@ -868,7 +1243,10 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         @Override
         public void onDone() {
             mOverlay.remove(mFaceGraphic);
+            Log.d(TAG, "GraphicFaceTracker onDone");
+
         }
     }
+
 
 }

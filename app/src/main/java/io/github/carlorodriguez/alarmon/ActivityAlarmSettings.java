@@ -791,7 +791,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
         CropImage.activity(Uri.fromFile(new File(mediaUri.toString())))
                 //.setGuidelines(CropImageView.Guidelines.ON)
                 //.setOutputUri(Uri.parse(mCroppdImage.getPath()))
-                //.setAspectRatio(width,height)
+                .setAspectRatio(width,height)
                 .setAllowRotation(true)
                 .setAutoZoomEnabled(true)
                 //.setFixAspectRatio(true)
