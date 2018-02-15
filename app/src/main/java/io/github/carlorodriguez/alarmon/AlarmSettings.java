@@ -34,6 +34,8 @@ public final class AlarmSettings {
   private String toneName;
   private int snoozeMinutes;
   private boolean vibrate;
+    private boolean toggled;
+    private boolean shown ;
   private int volumeStartPercent;
   private int volumeEndPercent;
   private int volumeChangeTimeSec;
@@ -48,6 +50,8 @@ public final class AlarmSettings {
     values.put(DbHelper.SETTINGS_COL_TONE_NAME, toneName);
     values.put(DbHelper.SETTINGS_COL_SNOOZE, snoozeMinutes);
     values.put(DbHelper.SETTINGS_COL_VIBRATE, vibrate);
+      values.put(DbHelper.SETTINGS_COL_TOGGLED, toggled);
+      values.put(DbHelper.SETTINGS_COL_SHOWN, shown);
     values.put(DbHelper.SETTINGS_COL_VOLUME_STARTING, volumeStartPercent);
     values.put(DbHelper.SETTINGS_COL_VOLUME_ENDING, volumeEndPercent);
     values.put(DbHelper.SETTINGS_COL_VOLUME_TIME, volumeChangeTimeSec);
@@ -64,6 +68,8 @@ public final class AlarmSettings {
       DbHelper.SETTINGS_COL_TONE_NAME,
       DbHelper.SETTINGS_COL_SNOOZE,
       DbHelper.SETTINGS_COL_VIBRATE,
+         DbHelper.SETTINGS_COL_TOGGLED,
+         DbHelper.SETTINGS_COL_SHOWN,
       DbHelper.SETTINGS_COL_VOLUME_STARTING,
       DbHelper.SETTINGS_COL_VOLUME_ENDING,
       DbHelper.SETTINGS_COL_VOLUME_TIME
@@ -79,6 +85,8 @@ public final class AlarmSettings {
     toneName = "Default";
     snoozeMinutes = 10;
     vibrate = false;
+      toggled = false;
+      shown = false;
     volumeStartPercent = 0;
     volumeEndPercent = 100;
     volumeChangeTimeSec = 20;
@@ -92,6 +100,8 @@ public final class AlarmSettings {
     toneName = rhs.toneName;
     snoozeMinutes = rhs.snoozeMinutes;
     vibrate = rhs.vibrate;
+      toggled = rhs.toggled;
+      shown = rhs.shown;
     volumeStartPercent = rhs.volumeStartPercent;
     volumeEndPercent = rhs.volumeEndPercent;
     volumeChangeTimeSec = rhs.volumeChangeTimeSec;
@@ -106,6 +116,8 @@ public final class AlarmSettings {
     toneName = cursor.getString(cursor.getColumnIndex(DbHelper.SETTINGS_COL_TONE_NAME));
     snoozeMinutes = cursor.getInt(cursor.getColumnIndex(DbHelper.SETTINGS_COL_SNOOZE));
     vibrate = cursor.getInt(cursor.getColumnIndex(DbHelper.SETTINGS_COL_VIBRATE)) == 1;
+      toggled = cursor.getInt(cursor.getColumnIndex(DbHelper.SETTINGS_COL_TOGGLED)) == 1;
+      shown = cursor.getInt(cursor.getColumnIndex(DbHelper.SETTINGS_COL_SHOWN)) == 1;
     volumeStartPercent = cursor.getInt(cursor.getColumnIndex(DbHelper.SETTINGS_COL_VOLUME_STARTING));
     volumeEndPercent = cursor.getInt(cursor.getColumnIndex(DbHelper.SETTINGS_COL_VOLUME_ENDING));
     volumeChangeTimeSec = cursor.getInt(cursor.getColumnIndex(DbHelper.SETTINGS_COL_VOLUME_TIME));
@@ -124,6 +136,8 @@ public final class AlarmSettings {
       && toneName.equals(rhs.toneName)
       && snoozeMinutes == rhs.snoozeMinutes
       && vibrate == rhs.vibrate
+            && toggled == rhs.toggled
+            && shown == rhs.shown
       && volumeStartPercent == rhs.volumeStartPercent
       && volumeEndPercent == rhs.volumeEndPercent
       && volumeChangeTimeSec == rhs.volumeChangeTimeSec;
@@ -171,9 +185,23 @@ public final class AlarmSettings {
     this.snoozeMinutes = minutes;
   }
 
-  public boolean getVibrate() {
-    return vibrate;
-  }
+    public boolean getToggled() {
+        return toggled;
+    }
+    public void setToggled(boolean toggle) {
+        this.toggled = toggle;
+    }
+
+    public boolean getShown() {
+        return shown;
+    }
+    public void setShown(boolean show) {
+        this.shown = show;
+    }
+
+    public boolean getVibrate() {
+        return vibrate;
+    }
 
   public void setVibrate(boolean vibrate) {
     this.vibrate = vibrate;

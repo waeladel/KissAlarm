@@ -64,6 +64,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.os.Process;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -395,6 +396,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                         mTextureView.setVisibility(View.INVISIBLE);
 
                         mBitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(),R.mipmap.girl);
+                        Log.d(TAG, "mama mBitmap= "+mBitmap);
                         new FaceDetectorAsyncTask().execute(mBitmap);
                     }
                     Log.d(TAG, "getMediaType= "+service.getMediaType()+ service.getPhotoUri());
@@ -723,9 +725,9 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
             mDetector = new FaceDetector.Builder(getApplicationContext())
                     .setTrackingEnabled(false)
                     .setLandmarkType(FaceDetector.ALL_LANDMARKS)
-                    .setMode(FaceDetector.ACCURATE_MODE )
-                    .setProminentFaceOnly(true)
                     .setClassificationType(FaceDetector.NO_CLASSIFICATIONS)
+                    .setMode(FaceDetector.ACCURATE_MODE )
+                    .setProminentFaceOnly(false)
                     .build();
             Log.d(TAG, "FaceDetector built.");
 
@@ -770,6 +772,11 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
             if (progressDialog != null) {
                 progressDialog.dismiss();
                 progressDialog = null;
+            }
+            Log.d(TAG, "wael faces ="+faces.size());
+            if(faces.size() == 0){
+                Toast.makeText(ActivityAlarmNotification.this,(R.string.Toast_cant_detect_face),
+                        Toast.LENGTH_LONG).show();
             }
 
         }
@@ -818,6 +825,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                     Log.d(TAG, "mDetector released onDestroy");
                 }
             }
+
             //wait 1o seconds
            /* Handler handler = new Handler();
             handler.postDelayed(new Runnable() {

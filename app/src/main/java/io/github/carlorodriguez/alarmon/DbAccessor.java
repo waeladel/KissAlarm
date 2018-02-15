@@ -162,10 +162,12 @@ public final class DbAccessor {
             buffer.append("tone_url = "+ cursor.getString(4)+"\n");
             buffer.append("tone_name = "+ cursor.getString(5)+"\n");
             buffer.append("snooze = "+ cursor.getString(6)+"\n");
-            buffer.append("vibrate = "+ cursor.getString(7)+"\n");
-            buffer.append("vol_start = "+ cursor.getString(8)+"\n");
-            buffer.append("vol_end = "+ cursor.getString(9)+"\n");
-            buffer.append("vol_time = "+ cursor.getString(10)+"\n\n");
+            buffer.append("TOGGLED = "+ cursor.getString(7)+"\n");
+            buffer.append("SHOWN = "+ cursor.getString(8)+"\n");
+            buffer.append("vibrate = "+ cursor.getString(9)+"\n");
+            buffer.append("vol_start = "+ cursor.getString(10)+"\n");
+            buffer.append("vol_end = "+ cursor.getString(11)+"\n");
+            buffer.append("vol_time = "+ cursor.getString(12)+"\n\n");
         }
         return buffer;
     }

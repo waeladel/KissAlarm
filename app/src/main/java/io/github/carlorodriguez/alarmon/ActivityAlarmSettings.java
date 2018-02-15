@@ -130,6 +130,10 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
     private static final String SETTINGS_MEDIA_NAME_KEY = "SETTINGS_MEDIA_NAME_KEY";
     private static final String SETTINGS_MEDIA_TYPE_KEY = "SETTINGS_MEDIA_TYPE_KEY";
 
+    private static final String SETTINGS_BUTTON_TOGGLED_KEY = "SETTINGS_BUTTON_TOGGLED_KEY";
+    private static final String SETTINGS_BUTTON_SHOWN_KEY = "SETTINGS_BUTTON_SHOWN_KEY";
+
+
 
     private static final String SETTINGS_DAYS_OF_WEEK_KEY = "SETTINGS_DAYS_OF_WEEK_KEY";
 
@@ -141,7 +145,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
     TIME,
     NAME,
     DAYS_OF_WEEK,
-    TONE,MEDIA, SNOOZE,
+    TONE,MEDIA, SNOOZE,TOGGLED,SHOWN,
     VIBRATE,
     VOLUME_FADE
   }
@@ -185,7 +189,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
           actionBar.setDisplayHomeAsUpEnabled(true);
       }
 
-      // Step 4: Set output file
+      // Step 4: Set output file for audio
       mOutputFile = CameraHelper.getOutputMediaFile(CameraHelper.MEDIA_TYPE_Audio);
 
     // An alarm id is required in the extras bundle.
@@ -250,6 +254,20 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                       SETTINGS_VIBRATE_KEY));
               Log.d(TAG, "setVibrate= "+ savedInstanceState.getBoolean(
                       SETTINGS_VIBRATE_KEY));
+          }
+
+          if (savedInstanceState.containsKey(SETTINGS_BUTTON_TOGGLED_KEY)) {
+              settings.setToggled(savedInstanceState.getBoolean(
+                      SETTINGS_BUTTON_TOGGLED_KEY));
+              Log.d(TAG, "setToggle= "+ savedInstanceState.getBoolean(
+                      SETTINGS_BUTTON_TOGGLED_KEY));
+          }
+
+          if (savedInstanceState.containsKey(SETTINGS_BUTTON_SHOWN_KEY)) {
+              settings.setShown(savedInstanceState.getBoolean(
+                      SETTINGS_BUTTON_SHOWN_KEY));
+              Log.d(TAG, "setShow= "+ savedInstanceState.getBoolean(
+                      SETTINGS_BUTTON_SHOWN_KEY));
           }
 
           if (savedInstanceState.containsKey(SETTINGS_VOLUME_START_PERCENT_KEY)
@@ -347,26 +365,52 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
       @Override
       public SettingType type() { return SettingType.TONE; }
     });
-    // The snooze duration for this alarm.
-    settingsObjects.add(new Setting() {
-      @Override
-      public String name() { return getString(R.string.snooze_minutes); }
-      @Override
-      public String value() { return "" + settings.getSnoozeMinutes(); }
-      @Override
-      public SettingType type() { return SettingType.SNOOZE; }
-    });
-    // The vibrator setting for this alarm.
-    settingsObjects.add(new Setting() {
-      @Override
-      public String name() { return getString(R.string.vibrate); }
-      @Override
-      public String value() { return settings.getVibrate() ?
-          getString(R.string.enabled) : getString(R.string.disabled); }
-      @Override
-      public SettingType type() { return SettingType.VIBRATE; }
-    });
-    // How the volume should be controlled while this alarm is triggering.
+
+
+      // The toggle lips/forehead buttons setting for this alarm.
+      settingsObjects.add(new Setting() {
+          @Override
+          public String name() { return getString(R.string.toggle_button); }
+          @Override
+          public String value() { return getString(R.string.toggle_button_hint); }
+          //settings.getToggled() ? getString(R.string.enabled) : getString(R.string.disabled);
+          @Override
+          public SettingType type() { return SettingType.TOGGLED; }
+      });
+
+      // The show semitransparent lips/forehead buttons setting for this alarm.
+      settingsObjects.add(new Setting() {
+          @Override
+          public String name() { return getString(R.string.show_button); }
+          @Override
+          public String value() { return getString(R.string.show_button_hint); }
+          //settings.getShown() ? getString(R.string.enabled) : getString(R.string.disabled);
+          @Override
+          public SettingType type() { return SettingType.SHOWN; }
+      });
+
+      // The snooze duration for this alarm.
+      settingsObjects.add(new Setting() {
+          @Override
+          public String name() { return getString(R.string.snooze_minutes); }
+          @Override
+          public String value() { return "" + settings.getSnoozeMinutes(); }
+          @Override
+          public SettingType type() { return SettingType.SNOOZE; }
+      });
+
+      // The vibrator setting for this alarm.
+      settingsObjects.add(new Setting() {
+          @Override
+          public String name() { return getString(R.string.vibrate); }
+          @Override
+          public String value() { return settings.getVibrate() ?
+                  getString(R.string.enabled) : getString(R.string.disabled); }
+          @Override
+          public SettingType type() { return SettingType.VIBRATE; }
+      });
+
+      // How the volume should be controlled while this alarm is triggering.
     settingsObjects.add(new Setting() {
       @Override
       public String name() { return getString(R.string.alarm_fade); }
@@ -521,6 +565,8 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
         super.onSaveInstanceState(outState);
 
         outState.putBoolean(SETTINGS_VIBRATE_KEY, settings.getVibrate());
+        outState.putBoolean(SETTINGS_BUTTON_TOGGLED_KEY, settings.getToggled());
+        outState.putBoolean(SETTINGS_BUTTON_SHOWN_KEY, settings.getShown());
 
         outState.putInt(SETTINGS_SNOOZE_KEY, settings.getSnoozeMinutes());
 
@@ -795,7 +841,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                 .setAllowRotation(true)
                 .setAutoZoomEnabled(true)
                 //.setFixAspectRatio(true)
-                .setMultiTouchEnabled(true)
+                //.setMultiTouchEnabled(true)
                 //.setMaxCropResultSize(width, height)
                 .setMinCropResultSize(260,260)
                 .setRequestedSize(width,height) //resize
@@ -846,6 +892,13 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                     equalsIgnoreCase(getString(R.string.vibrate))) {
                 convertView = inflater.inflate(R.layout.vibrate_settings_item, parent,
                         false);
+            }else if(settingsObjects.get(position).name().
+                    equalsIgnoreCase(getString(R.string.toggle_button))){
+                convertView = inflater.inflate(R.layout.toggled_settings_item, parent,false);
+            }else if (settingsObjects.get(position).name().
+                    equalsIgnoreCase(getString(R.string.show_button))){
+                convertView = inflater.inflate(R.layout.button_shown_settings_item, parent,false);
+
             } else {
                 convertView = inflater.inflate(R.layout.settings_item, parent,
                         false);
@@ -906,6 +959,64 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                         }
                     }
                 });
+            }else if(setting.name().equalsIgnoreCase(getString(R.string.toggle_button))) {
+
+                ((TextView) row.findViewById(R.id.setting_value)).
+                        setText(setting.value());
+
+                SwitchCompat toggleSwitch = (SwitchCompat) row.findViewById(
+                        R.id.setting_toggle_sc);
+
+                if (settings.getToggled()) {
+                    toggleSwitch.setChecked(true);
+                    Log.d(TAG, "toggleSwitch = " + settings.getToggled());
+
+                } else {
+                    toggleSwitch.setChecked(false);
+                    Log.d(TAG, "toggleSwitch = " + settings.getToggled());
+                }
+
+                toggleSwitch.setOnCheckedChangeListener(
+                        new CompoundButton.OnCheckedChangeListener() {
+                            @Override
+                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                if (isChecked) {
+                                    settings.setToggled(true);
+                                    Log.d(TAG, "toggleSwitch = " + true);
+
+                                } else {
+                                    settings.setToggled(false);
+                                    Log.d(TAG, "toggleSwitch = " + false);
+                                }
+                            }
+                        });
+
+            }else if(setting.name().equalsIgnoreCase(getString(R.string.show_button))) {
+
+                ((TextView) row.findViewById(R.id.setting_value)).
+                        setText(setting.value());
+
+                SwitchCompat showSwitch = (SwitchCompat) row.findViewById(
+                        R.id.setting_show_button_sc);
+
+                if (settings.getShown()) {
+                    showSwitch.setChecked(true);
+                } else {
+                    showSwitch.setChecked(false);
+                }
+
+                showSwitch.setOnCheckedChangeListener(
+                        new CompoundButton.OnCheckedChangeListener() {
+                            @Override
+                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                if (isChecked) {
+                                    settings.setShown(true);
+                                } else {
+                                    settings.setShown(false);
+                                }
+                            }
+                        });
+
             } else {
                 ((TextView) row.findViewById(R.id.setting_value)).
                         setText(setting.value());

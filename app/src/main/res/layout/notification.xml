@@ -105,7 +105,7 @@
             android:layout_height="match_parent"
             android:alpha="50"
             android:background="@android:color/transparent"
-            android:visibility="visible" />
+            android:visibility="invisible" />
 
         <!--<SurfaceView
         android:id="@+id/surfaceView"

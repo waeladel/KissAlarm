@@ -15,6 +15,8 @@
 
   <string name="Scaning">Scaning</string>
   <string name="detecting_you_partner_face">Detecting your partner\'s face</string>
+  <string name="Toast_cant_detect_face">Sorry, couldn\'t detect your partner\'s face, try to use a clearer photo for his/her face.</string>
+
 
   <string name="app_name">AlarmOn</string>
   <string name="add_alarm">Add alarm</string>
@@ -31,10 +33,18 @@
   <string name="tone">Partner\'s Voice</string>
   <string name="alarm_tone">Alarm tone</string>
   <string name="snooze_minutes">Snooze (minutes)</string>
+
   <string name="vibrate">Vibrate</string>
   <string name="enabled">Enabled</string>
   <string name="disabled">Disabled</string>
-  <string name="alarm_fade">Alarm volume fade</string>
+
+    <string name="toggle_button">Toggle Snooze/Dismiss</string>
+    <string name="toggle_button_hint">If enabled, lips will snooze and forehead will dismiss the alarm.</string>
+
+    <string name="show_button">Show buttons</string>
+    <string name="show_button_hint">Display the clickable boundaries around lips and forehead.</string>
+
+    <string name="alarm_fade">Alarm volume fade</string>
   <string name="fade_description">From %1$d%% to %2$d%% over %3$d seconds.</string>
   <string name="unknown_name">Unknown name</string>
   <string name="volume_start">Start volume (percent)</string>
