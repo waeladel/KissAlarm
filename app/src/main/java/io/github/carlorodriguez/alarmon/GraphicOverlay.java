@@ -4,6 +4,8 @@ package io.github.carlorodriguez.alarmon;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.google.android.gms.vision.CameraSource;
@@ -30,6 +32,9 @@ import java.util.Set;
  * </ol>
  */
 public class GraphicOverlay extends View {
+
+    private static String TAG = GraphicOverlay.class.getSimpleName();
+
     private final Object mLock = new Object();
     private int mPreviewWidth;
     private float mWidthScaleFactor = 1.0f;
@@ -168,5 +173,43 @@ public class GraphicOverlay extends View {
                 graphic.draw(canvas);
             }
         }
+    }
+
+    /**
+     * onTouchEvent for face lip and forehead.
+     */
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+        int x = (int) event.getX();
+        int y = (int) event.getY();
+        switch(event.getAction()){
+
+            case MotionEvent.ACTION_DOWN:
+                //Check if the x and y position of the touch is inside the bitmap
+                if(FaceGraphic.foreheadRect.contains(x, y)){
+                    //BITMAP TOUCHED
+                    if(!ActivityAlarmNotification.isToggled){
+                        ActivityAlarmNotification.foreheadButton.callOnClick();
+                        Log.d(TAG,"forehead TOUCHED so we will snooze");
+                    }else {
+                        ActivityAlarmNotification.lipButton.callOnClick();
+                        Log.d(TAG, "forehead TOUCHED but we will dismiss");
+                    }
+
+                }else if(FaceGraphic.lipRect.contains(x, y)){
+
+                    if(!ActivityAlarmNotification.isToggled){
+                        ActivityAlarmNotification.lipButton.callOnClick();
+                        Log.d(TAG,"lip TOUCHED so we will dismiss");
+                    }else{
+                        ActivityAlarmNotification.foreheadButton.callOnClick();
+                        Log.d(TAG,"lip TOUCHED so but we will snooze");
+                    }
+                }
+                return true;
+        }
+        return false;
     }
 }

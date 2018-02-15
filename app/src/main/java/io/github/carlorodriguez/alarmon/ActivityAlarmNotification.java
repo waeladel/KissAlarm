@@ -34,6 +34,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.media.MediaMetadataRetriever;
@@ -134,6 +135,11 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
     // Original video size
     private volatile float mVideoWidth;
     private volatile float mVideoHeight;
+
+    public static boolean isToggled;
+    public static boolean isShown;
+
+
 
     //private FrameLayout fl_surfaceview_container;
 
@@ -400,6 +406,19 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                         new FaceDetectorAsyncTask().execute(mBitmap);
                     }
                     Log.d(TAG, "getMediaType= "+service.getMediaType()+ service.getPhotoUri());
+                } catch (RemoteException e) {
+                }
+            }
+        });
+
+        notifyService.call(new NotificationServiceBinder.ServiceCallback() {
+            public void run(NotificationServiceInterface service) {
+                long alarmId;
+
+                try {
+                    alarmId = service.currentAlarmId();
+                    isToggled = db.readAlarmSettings(alarmId).getToggled();
+                    isShown = db.readAlarmSettings(alarmId).getShown();
                 } catch (RemoteException e) {
                 }
             }
@@ -708,7 +727,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
         @Override
         protected void onPreExecute() {
-            //showProgressDialog();
+            showProgressDialog();
         }
 
         @Override
@@ -1218,8 +1237,10 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         public void onNewItem(int faceId, Face item) {
             mFaceGraphic.setId(faceId);
             Log.d(TAG, "GraphicFaceTracker onNewItem faceId= " + faceId);
+            PointF point = item.getPosition();
+            Log.d(TAG, "GraphicFaceTracker onNewItem Face Position= " + item.getPosition()+ "x="
+            + point.x+ "y= "+ point.y);
             //detectCurrentBitmap();
-
         }
 
         /**

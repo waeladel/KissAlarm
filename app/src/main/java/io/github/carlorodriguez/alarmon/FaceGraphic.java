@@ -3,7 +3,10 @@ package io.github.carlorodriguez.alarmon;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.util.Log;
+import android.view.MotionEvent;
 
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.Landmark;
@@ -31,12 +34,24 @@ class FaceGraphic extends GraphicOverlay.Graphic {
     private static int mCurrentColorIndex = 0;
 
     private Paint mFacePositionPaint;
-    private Paint mIdPaint;
-    private Paint mBoxPaint;
+    private Paint mForeheadPaint;
+    private Paint mLipsPaint;
 
     private volatile Face mFace;
     private int mFaceId;
     private float mFaceHappiness;
+    private float x ;
+    private float y ;
+
+    private float xOffset ;
+    private float yOffset;
+    private float left ;
+    private float top ;
+    private float right ;
+    private float bottom ;
+
+    public static RectF lipRect;
+    public static RectF foreheadRect;
 
     FaceGraphic(GraphicOverlay overlay) {
         super(overlay);
@@ -45,16 +60,31 @@ class FaceGraphic extends GraphicOverlay.Graphic {
         final int selectedColor = COLOR_CHOICES[mCurrentColorIndex];
 
         mFacePositionPaint = new Paint();
-        mFacePositionPaint.setColor(selectedColor);
+        //mFacePositionPaint.setColor(selectedColor);
+        mFacePositionPaint.setColor(Color.CYAN);
 
-        mIdPaint = new Paint();
-        mIdPaint.setColor(selectedColor);
-        mIdPaint.setTextSize(ID_TEXT_SIZE);
+        mForeheadPaint = new Paint();
+        //mIdPaint.setColor(selectedColor);
+        mForeheadPaint.setStyle(Paint.Style.STROKE);
+        mForeheadPaint.setColor(Color.CYAN);
+        mForeheadPaint.setStrokeWidth(BOX_STROKE_WIDTH);
+        if(ActivityAlarmNotification.isShown){
+            mForeheadPaint.setAlpha(50); //set transparent value: 0 fully transparent
+        }else{
+            mForeheadPaint.setAlpha(0); //set transparent value: 0 fully transparent
+        }
 
-        mBoxPaint = new Paint();
-        mBoxPaint.setColor(selectedColor);
-        mBoxPaint.setStyle(Paint.Style.STROKE);
-        mBoxPaint.setStrokeWidth(BOX_STROKE_WIDTH);
+
+        mLipsPaint = new Paint();
+        //mBoxPaint.setColor(selectedColor);
+        mLipsPaint.setColor(Color.MAGENTA);
+        mLipsPaint.setStyle(Paint.Style.STROKE);
+        mLipsPaint.setStrokeWidth(BOX_STROKE_WIDTH);
+        if(ActivityAlarmNotification.isShown){
+            mLipsPaint.setAlpha(50); //set transparent value: 0 fully transparent
+        }else{
+            mLipsPaint.setAlpha(0); //set transparent value: 0 fully transparent
+        }
     }
 
     void setId(int id) {
@@ -77,30 +107,65 @@ class FaceGraphic extends GraphicOverlay.Graphic {
     @Override
     public void draw(Canvas canvas) {
         Face face = mFace;
-        canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), mBoxPaint);
+        //canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), mBoxPaint);
         if (face == null) {
             return;
         }
 
         // Draws a circle at the position of the detected face, with the face's track id below.
-        float x = translateX(face.getPosition().x + face.getWidth() / 2);
-        float y = translateY(face.getPosition().y + face.getHeight() / 2);
+        x = translateX(face.getPosition().x + face.getWidth() / 2);
+        y = translateY(face.getPosition().y + face.getHeight() / 2);
         canvas.drawCircle(x, y, FACE_POSITION_RADIUS, mFacePositionPaint);
-        canvas.drawText("id: " + mFaceId, x + ID_X_OFFSET, y + ID_Y_OFFSET, mIdPaint);
+        //canvas.drawText("id: " + mFaceId, x + ID_X_OFFSET, y + ID_Y_OFFSET, mFacePositionPaint);
         /*canvas.drawText("happiness: " + String.format("%.2f", face.getIsSmilingProbability()), x - ID_X_OFFSET, y - ID_Y_OFFSET, mIdPaint);
         canvas.drawText("right eye: " + String.format("%.2f", face.getIsRightEyeOpenProbability()), x + ID_X_OFFSET * 2, y + ID_Y_OFFSET * 2, mIdPaint);
         canvas.drawText("left eye: " + String.format("%.2f", face.getIsLeftEyeOpenProbability()), x - ID_X_OFFSET*2, y - ID_Y_OFFSET*2, mIdPaint);
         */
         // Draws a bounding box around the face.
-        float xOffset = scaleX(face.getWidth() / 2.0f);
-        float yOffset = scaleY(face.getHeight() / 2.0f);
-        float left = x - xOffset;
-        float top = y - yOffset;
-        float right = x + xOffset;
-        float bottom = y + yOffset;
-        canvas.drawRect(left, top, right, bottom, mBoxPaint);
+        xOffset = scaleX(face.getWidth() / 2.0f);
+        yOffset = scaleY(face.getHeight() / 2.0f);
+        left = x - xOffset;
+        top = y - yOffset;
+        right = x + xOffset;
+        bottom = y + yOffset;
+        //canvas.drawRect(left, top, right, bottom, mBoxPaint);
+        //drawFaceAnnotations(canvas);
+        drawFaceLips(canvas);// draw lip's button
+        drawFaceForehead(canvas); // draw forehead's button
+    }
 
-        drawFaceAnnotations(canvas);
+
+    private void drawFaceForehead(Canvas canvas) {
+
+        //canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), mBoxPaint);
+        if (mFace == null) {
+            return;
+        }
+        // Draws a bounding box around the forehead.
+        xOffset = scaleX(mFace.getWidth() / 2.0f);
+        yOffset = scaleY(mFace.getHeight() / 2.0f);
+        left = x - xOffset;
+        top = y - yOffset;
+        right = x + xOffset;
+        bottom = y ;
+        foreheadRect = new RectF(left, top, right, bottom);
+        canvas.drawRect(foreheadRect, mForeheadPaint);
+    }
+
+    private void drawFaceLips(Canvas canvas) {
+        //canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), mBoxPaint);
+        if (mFace == null) {
+            return;
+        }
+        // Draws a bounding box around the lips.
+        xOffset = scaleX(mFace.getWidth() / 2.0f);
+        yOffset = scaleY(mFace.getHeight() / 2.0f);
+        left = x - xOffset;
+        top = y + (yOffset/3);
+        right = x + xOffset;
+        bottom = y + yOffset+ (yOffset/3);
+        lipRect = new RectF(left, top, right, bottom);
+        canvas.drawRect(lipRect, mLipsPaint);
 
     }
 
@@ -114,15 +179,17 @@ class FaceGraphic extends GraphicOverlay.Graphic {
      */
     private void drawFaceAnnotations(Canvas canvas) {
 
-        mIdPaint = new Paint();
-        mIdPaint.setColor(Color.GREEN);
-        mIdPaint.setStyle(Paint.Style.STROKE);
-        mIdPaint.setStrokeWidth(5);
+        mFacePositionPaint = new Paint();
+        mFacePositionPaint.setColor(Color.GREEN);
+        mFacePositionPaint.setStyle(Paint.Style.STROKE);
+        mFacePositionPaint.setStrokeWidth(5);
 
             for (Landmark landmark : mFace.getLandmarks()) {
                     int cx = (int) (landmark.getPosition().x );
                     int cy = (int) (landmark.getPosition().y );
-                    canvas.drawCircle(cx, cy, 3, mIdPaint);
+                    canvas.drawCircle(cx, cy, 3, mFacePositionPaint);
             }
     }
+
+
 }

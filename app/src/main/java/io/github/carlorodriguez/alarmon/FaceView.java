@@ -41,12 +41,17 @@ public class FaceView extends View {
     private Rect mLipBounds;
     private Rect mForeheadBounds;
     private Paint mPaint;
+    private Paint mForeheadPaint;
+    private Paint mLipsPaint;
+
     private Path mForHeadPath;
     private Path mLipPath;
     private Region mForHeadregion ;
     private Region mLipRegion;
     private float mLipsDistance;
     private double mAngle = 90;
+    private static final float BOX_STROKE_WIDTH = 5.0f;
+
 
     public FaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -71,7 +76,7 @@ public class FaceView extends View {
         if ((mBitmap != null) && (mFaces != null)) {
             Log.d(TAG, "mFaces= " +mFaces +"mFaces size= "+ mFaces.size());
             double scale = drawBitmap(canvas);// draw original image
-            drawFaceAnnotations(canvas, scale); // draw face's landmarks
+            //drawFaceAnnotations(canvas, scale); // draw face's landmarks
             drawFaceLips(canvas, scale);// draw lip's button
             drawFaceForehead(canvas, scale); // draw forehead's button
         }
@@ -121,12 +126,9 @@ public class FaceView extends View {
             for (Landmark landmark : face.getLandmarks()) {
                 Log.d(TAG, "landmark getType= " +landmark.getType());
                 int type = landmark.getType();
-
-                if (type == Landmark.LEFT_MOUTH){
-                    int cx = (int) (landmark.getPosition().x * scale);
-                    int cy = (int) (landmark.getPosition().y * scale);
-                    canvas.drawCircle(cx, cy, 10, mPaint);
-                }
+                int cx = (int) (landmark.getPosition().x * scale);
+                int cy = (int) (landmark.getPosition().y * scale);
+                canvas.drawCircle(cx, cy, 10, mPaint);
 
             }
         }
@@ -137,10 +139,16 @@ public class FaceView extends View {
      */
 
     private void drawFaceForehead(Canvas canvas, double scale) {
-        mPaint = new Paint();
-        mPaint.setColor(Color.GREEN);
-        mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeWidth(5);
+        mForeheadPaint = new Paint();
+        //mIdPaint.setColor(selectedColor);
+        mForeheadPaint.setStyle(Paint.Style.STROKE);
+        mForeheadPaint.setColor(Color.CYAN);
+        mForeheadPaint.setStrokeWidth(BOX_STROKE_WIDTH);
+        if(ActivityAlarmNotification.isShown){
+            mForeheadPaint.setAlpha(50); //set transparent value: 0 fully transparent
+        }else{
+            mForeheadPaint.setAlpha(0); //set transparent value: 0 fully transparent
+        }
 
         for (int i = 0; i < mFaces.size(); ++i) {
             Face face = mFaces.valueAt(i);
@@ -148,7 +156,7 @@ public class FaceView extends View {
                 //Log.d(TAG, "landmark getType= " +landmark.getType());
                 int cx = (int) (landmark.getPosition().x * scale);
                 int cy = (int) (landmark.getPosition().y * scale);
-                canvas.drawCircle(cx, cy, 10, mPaint);
+                //canvas.drawCircle(cx, cy, 10, mPaint);
                 int type = landmark.getType();
                 switch (type) { // get x and y for every dot
                     case Landmark.NOSE_BASE:
@@ -230,7 +238,7 @@ public class FaceView extends View {
         mForHeadPath.lineTo(RightlinePts [2], RightlinePts [3]);
         mForHeadPath.lineTo(RightlinePts [0], RightlinePts [1]);
         mForHeadPath.close();
-        canvas.drawPath(mForHeadPath,mPaint);
+        canvas.drawPath(mForHeadPath,mForeheadPaint);
 
         //create a region to make the path clickable
         RectF rectF = new RectF();
@@ -244,10 +252,16 @@ public class FaceView extends View {
      */
 
     private void drawFaceLips(Canvas canvas, double scale) {
-        mPaint = new Paint();
-        mPaint.setColor(Color.RED);
-        mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeWidth(5);
+        mLipsPaint = new Paint();
+        //mBoxPaint.setColor(selectedColor);
+        mLipsPaint.setColor(Color.MAGENTA);
+        mLipsPaint.setStyle(Paint.Style.STROKE);
+        mLipsPaint.setStrokeWidth(BOX_STROKE_WIDTH);
+        if(ActivityAlarmNotification.isShown){
+            mLipsPaint.setAlpha(50); //set transparent value: 0 fully transparent
+        }else{
+            mLipsPaint.setAlpha(0); //set transparent value: 0 fully transparent
+        }
 
         for (int i = 0; i < mFaces.size(); ++i) {
             Face face = mFaces.valueAt(i);
@@ -333,7 +347,7 @@ public class FaceView extends View {
         mLipPath.lineTo(BottomlinePts [2], BottomlinePts [3]);
         mLipPath.lineTo(ToplinePts [0], ToplinePts [1]);
         mLipPath.close();
-        canvas.drawPath(mLipPath,mPaint);
+        canvas.drawPath(mLipPath,mLipsPaint);
 
         //create a region to make the path clickable
         RectF lipRectF = new RectF();
@@ -358,11 +372,21 @@ public class FaceView extends View {
                 //Check if the x and y position of the touch is inside the bitmap
                 if(mForHeadregion.contains(x, y)){
                     //BITMAP TOUCHED
-                    Log.d(TAG,"forehead TOUCHED");
-                    ActivityAlarmNotification.foreheadButton.callOnClick();
+                    if(!ActivityAlarmNotification.isToggled){
+                        ActivityAlarmNotification.foreheadButton.callOnClick();
+                        Log.d(TAG,"forehead TOUCHED so we will snooze");
+                    }else {
+                        ActivityAlarmNotification.lipButton.callOnClick();
+                        Log.d(TAG, "forehead TOUCHED but we will dismiss");
+                    }
                 }else if(mLipRegion.contains(x, y)){
-                    Log.d(TAG,"lip TOUCHED");
-                    ActivityAlarmNotification.lipButton.callOnClick();
+                    if(!ActivityAlarmNotification.isToggled){
+                        ActivityAlarmNotification.lipButton.callOnClick();
+                        Log.d(TAG,"lip TOUCHED so we will dismiss");
+                    }else{
+                        ActivityAlarmNotification.foreheadButton.callOnClick();
+                        Log.d(TAG,"lip TOUCHED so but we will snooze");
+                    }
                 }
                 return true;
         }
