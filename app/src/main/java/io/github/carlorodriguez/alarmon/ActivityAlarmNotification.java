@@ -131,6 +131,11 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
     public static Button foreheadButton;// lip button for onClick listener
     public  static Button snoozeButton;
+    public Slider dismiss;
+
+
+    private Boolean shouldhideButtons;
+    private Boolean toastExecuted;
 
     // Original video size
     private volatile float mVideoWidth;
@@ -238,6 +243,8 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
             requestCameraPermission();
         }
 */
+        shouldhideButtons = false;
+        toastExecuted = false;
 
         mTextureView.setSurfaceTextureListener(this);
         /*mSurfaceHolder = mSurfaceView.getHolder();
@@ -334,7 +341,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         });
 
 
-        final Slider dismiss = (Slider) findViewById(R.id.dismiss_slider);
+        dismiss = (Slider) findViewById(R.id.dismiss_slider);
 
         dismiss.setOnCompleteListener(new Slider.OnCompleteListener() {
             @Override
@@ -345,21 +352,12 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
             }
         });
 
-        dismiss.setOnClickListener(new View.OnClickListener() {
+        /*dismiss.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "dismiss clicked ");
-                //detectCurrentBitmap();
-                mImageView.setVisibility(View.VISIBLE);
-                mTextureView.setVisibility(View.INVISIBLE);
-                mBitmap = mTextureView.getBitmap();
-
-                Bitmap Originalbitmap = Bitmap.createBitmap( mBitmap, 0, 0, mBitmap.getWidth(), mBitmap.getHeight(), mTextureView.getTransform( null ), true );
-                Bitmap cropedBitmab = cropCenter(Originalbitmap);
-                mImageView.setImageBitmap(mBitmap);
-
             }
-        });
+        });*/
 
         notifyService.call(new NotificationServiceBinder.ServiceCallback() {
             public void run(NotificationServiceInterface service) {
@@ -746,7 +744,8 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                     .setLandmarkType(FaceDetector.ALL_LANDMARKS)
                     .setClassificationType(FaceDetector.NO_CLASSIFICATIONS)
                     .setMode(FaceDetector.ACCURATE_MODE )
-                    .setProminentFaceOnly(false)
+                    .setProminentFaceOnly(true)
+                    .setMinFaceSize(0.3f)
                     .build();
             Log.d(TAG, "FaceDetector built.");
 
@@ -759,7 +758,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                 boolean hasLowStorage = registerReceiver(null, lowstorageFilter) != null;
 
                 if (hasLowStorage) {
-                    //Toast.makeText(this, R.string.low_storage_error, Toast.LENGTH_LONG).show();
+                    Toast.makeText(ActivityAlarmNotification.this, R.string.low_storage_error, Toast.LENGTH_LONG).show();
                     Log.d(TAG, getString(R.string.tone));
                 }
             }
@@ -796,6 +795,8 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
             if(faces.size() == 0){
                 Toast.makeText(ActivityAlarmNotification.this,(R.string.Toast_cant_detect_face),
                         Toast.LENGTH_LONG).show();
+            }else{
+                hideButtons();
             }
 
         }
@@ -844,6 +845,18 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                     Log.d(TAG, "mDetector released onDestroy");
                 }
             }
+
+            if (shouldhideButtons){
+                hideButtons();
+            }
+
+            /*else{
+                if(!toastExecuted) {
+                    Toast.makeText(ActivityAlarmNotification.this,(R.string.Toast_cant_detect_face),
+                            Toast.LENGTH_LONG).show();
+                    toastExecuted = true;
+                }
+            }*/
 
             //wait 1o seconds
            /* Handler handler = new Handler();
@@ -894,7 +907,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
             boolean hasLowStorage = registerReceiver(null, lowstorageFilter) != null;
 
             if (hasLowStorage) {
-                //Toast.makeText(this, R.string.low_storage_error, Toast.LENGTH_LONG).show();
+                Toast.makeText(ActivityAlarmNotification.this, R.string.low_storage_error, Toast.LENGTH_LONG).show();
                 Log.d(TAG, getString(R.string.tone));
             }
         }
@@ -1198,7 +1211,11 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         });
     }
 
+    private void hideButtons() {
 
+        snoozeButton.setVisibility(View.GONE);
+        dismiss.setVisibility(View.GONE);
+    }
 
     //==============================================================================================
     // Graphic Face Tracker
@@ -1236,11 +1253,14 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         @Override
         public void onNewItem(int faceId, Face item) {
             mFaceGraphic.setId(faceId);
-            Log.d(TAG, "GraphicFaceTracker onNewItem faceId= " + faceId);
+
+            shouldhideButtons = true;
+
+            /*Log.d(TAG, "GraphicFaceTracker onNewItem faceId= " + faceId);
             PointF point = item.getPosition();
             Log.d(TAG, "GraphicFaceTracker onNewItem Face Position= " + item.getPosition()+ "x="
             + point.x+ "y= "+ point.y);
-            //detectCurrentBitmap();
+            //detectCurrentBitmap();*/
         }
 
         /**
@@ -1250,7 +1270,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         public void onUpdate(FaceDetector.Detections<Face> detectionResults, Face face) {
             mOverlay.add(mFaceGraphic);
             mFaceGraphic.updateFace(face);
-            Log.d(TAG, "GraphicFaceTracker onUpdate face= " + face);
+            //Log.d(TAG, "GraphicFaceTracker onUpdate face= " + face);
             //detectCurrentBitmap();
         }
 
@@ -1262,7 +1282,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         @Override
         public void onMissing(FaceDetector.Detections<Face> detectionResults) {
             mOverlay.remove(mFaceGraphic);
-            Log.d(TAG, "GraphicFaceTracker onMissing");
+            //Log.d(TAG, "GraphicFaceTracker onMissing");
         }
 
         /**
@@ -1272,10 +1292,12 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         @Override
         public void onDone() {
             mOverlay.remove(mFaceGraphic);
-            Log.d(TAG, "GraphicFaceTracker onDone");
+            //Log.d(TAG, "GraphicFaceTracker onDone");
 
         }
     }
+
+
 
 
 }

@@ -41,15 +41,6 @@
         android:textSize="56sp"
         android:visibility="gone" />
 
-    <Button
-        android:id="@+id/notify_snooze"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:elevation="1dp"
-        android:text="@string/snooze"
-        android:textSize="32sp"
-        android:visibility="gone" />
-
 
     <!--<TextView android:id="@+id/volume"
     android:visibility="gone"
@@ -107,6 +98,37 @@
             android:background="@android:color/transparent"
             android:visibility="invisible" />
 
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <Button
+                android:id="@+id/notify_snooze"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:background="@drawable/slider_background"
+                android:text="@string/snooze"
+                android:textSize="32sp"
+                android:visibility="visible" />
+
+            <io.github.carlorodriguez.alarmon.Slider
+                android:id="@+id/dismiss_slider"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"/>
+
+
+        </RelativeLayout>
+
         <!--<SurfaceView
         android:id="@+id/surfaceView"
         android:layout_width="match_parent"
@@ -119,12 +141,6 @@
 
     </FrameLayout>
 
-
-    <io.github.carlorodriguez.alarmon.Slider
-        android:id="@+id/dismiss_slider"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:visibility="visible" />
 
     <Button
         android:id="@+id/lip_button"

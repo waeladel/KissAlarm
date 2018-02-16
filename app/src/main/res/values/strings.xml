@@ -43,6 +43,9 @@
 
     <string name="show_button">Show buttons</string>
     <string name="show_button_hint">Display the clickable boundaries around lips and forehead.</string>
+  <string name="low_storage_error">Sorry, there isn\'t enough storage.</string>
+
+
 
     <string name="alarm_fade">Alarm volume fade</string>
   <string name="fade_description">From %1$d%% to %2$d%% over %3$d seconds.</string>
