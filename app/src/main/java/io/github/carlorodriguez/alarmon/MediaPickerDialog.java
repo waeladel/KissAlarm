@@ -44,8 +44,8 @@ public class MediaPickerDialog extends AlertDialog {
     void onMediaPick(String name, Uri media);
   }
 
-  private final String ARTISTS_TAB = "artists";
-  private final String ALBUMS_TAB = "albums";
+  //private final String ARTISTS_TAB = "artists";
+  //private final String ALBUMS_TAB = "albums";
 
   private String selectedName;
   private Uri selectedUri;
@@ -67,8 +67,8 @@ public class MediaPickerDialog extends AlertDialog {
     final String ALL_SONGS_TAB = "songs";
 
     tabs.addTab(tabs.newTabSpec(INTERNAL_TAB).setContent(R.id.media_picker_internal).setIndicator(context.getString(R.string.internal)));
-    tabs.addTab(tabs.newTabSpec(ARTISTS_TAB).setContent(R.id.media_picker_artists).setIndicator(context.getString(R.string.artists)));
-    tabs.addTab(tabs.newTabSpec(ALBUMS_TAB).setContent(R.id.media_picker_albums).setIndicator(context.getString(R.string.albums)));
+    //tabs.addTab(tabs.newTabSpec(ARTISTS_TAB).setContent(R.id.media_picker_artists).setIndicator(context.getString(R.string.artists)));
+    //tabs.addTab(tabs.newTabSpec(ALBUMS_TAB).setContent(R.id.media_picker_albums).setIndicator(context.getString(R.string.albums)));
     tabs.addTab(tabs.newTabSpec(ALL_SONGS_TAB).setContent(R.id.media_picker_songs).setIndicator(context.getString(R.string.songs)));
 
     final TextView lastSelected = (TextView) body_view.findViewById(R.id.media_picker_status);
@@ -94,7 +94,7 @@ public class MediaPickerDialog extends AlertDialog {
     songsList.setMediaPlayer(mediaPlayer);
     songsList.setMediaPickListener(listener);
 
-    final ViewFlipper artistsFlipper = (ViewFlipper) body_view.findViewById(R.id.media_picker_artists);
+    /*final ViewFlipper artistsFlipper = (ViewFlipper) body_view.findViewById(R.id.media_picker_artists);
     final MediaArtistsView artistsList = new MediaArtistsView(context);
     artistsList.setCursorManager(context);
     artistsList.addToFlipper(artistsFlipper);
@@ -119,7 +119,7 @@ public class MediaPickerDialog extends AlertDialog {
           albumsFlipper.setDisplayedChild(0);
         }
       }
-    });
+    });*/
 
     super.setButton(BUTTON_POSITIVE, getContext().getString(R.string.ok),
       new OnClickListener() {
