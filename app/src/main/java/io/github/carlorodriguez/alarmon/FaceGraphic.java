@@ -62,6 +62,11 @@ class FaceGraphic extends GraphicOverlay.Graphic {
         mFacePositionPaint = new Paint();
         //mFacePositionPaint.setColor(selectedColor);
         mFacePositionPaint.setColor(Color.CYAN);
+        if(ActivityAlarmNotification.isShown){
+            mFacePositionPaint.setAlpha(50); //set transparent value: 0 fully transparent
+        }else{
+            mFacePositionPaint.setAlpha(0); //set transparent value: 0 fully transparent
+        }
 
         mForeheadPaint = new Paint();
         //mIdPaint.setColor(selectedColor);
