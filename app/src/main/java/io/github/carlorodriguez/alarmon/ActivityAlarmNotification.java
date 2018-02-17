@@ -143,6 +143,8 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
     public static boolean isToggled;
     public static boolean isShown;
+    public static int visibility;
+
 
 
 
@@ -417,6 +419,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                     alarmId = service.currentAlarmId();
                     isToggled = db.readAlarmSettings(alarmId).getToggled();
                     isShown = db.readAlarmSettings(alarmId).getShown();
+                    visibility = db.readAlarmSettings(alarmId).getVisibility();
                 } catch (RemoteException e) {
                 }
             }

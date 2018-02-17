@@ -164,10 +164,11 @@ public final class DbAccessor {
             buffer.append("snooze = "+ cursor.getString(6)+"\n");
             buffer.append("TOGGLED = "+ cursor.getString(7)+"\n");
             buffer.append("SHOWN = "+ cursor.getString(8)+"\n");
-            buffer.append("vibrate = "+ cursor.getString(9)+"\n");
-            buffer.append("vol_start = "+ cursor.getString(10)+"\n");
-            buffer.append("vol_end = "+ cursor.getString(11)+"\n");
-            buffer.append("vol_time = "+ cursor.getString(12)+"\n\n");
+            buffer.append("visibility = "+ cursor.getString(9)+"\n");
+            buffer.append("vibrate = "+ cursor.getString(10)+"\n");
+            buffer.append("vol_start = "+ cursor.getString(11)+"\n");
+            buffer.append("vol_end = "+ cursor.getString(12)+"\n");
+            buffer.append("vol_time = "+ cursor.getString(13)+"\n\n");
         }
         return buffer;
     }

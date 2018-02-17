@@ -51,6 +51,7 @@ public class FaceView extends View {
     private float mLipsDistance;
     private double mAngle = 90;
     private static final float BOX_STROKE_WIDTH = 5.0f;
+    private double mVisibility;
 
 
     public FaceView(Context context, AttributeSet attrs) {
@@ -114,7 +115,7 @@ public class FaceView extends View {
      * positions, which tends to place the eye landmarks at the lower eyelid rather than at the
      * pupil position.
      */
-    private void drawFaceAnnotations(Canvas canvas, double scale) {
+    /*private void drawFaceAnnotations(Canvas canvas, double scale) {
         mPaint = new Paint();
         mPaint.setColor(Color.GREEN);
         mPaint.setStyle(Paint.Style.STROKE);
@@ -132,7 +133,7 @@ public class FaceView extends View {
 
             }
         }
-    }
+    }*/
 
     /**
      * Draws the forehead's button from associated face landmarks.
@@ -145,7 +146,7 @@ public class FaceView extends View {
         mForeheadPaint.setColor(Color.CYAN);
         mForeheadPaint.setStrokeWidth(BOX_STROKE_WIDTH);
         if(ActivityAlarmNotification.isShown){
-            mForeheadPaint.setAlpha(50); //set transparent value: 0 fully transparent
+            mForeheadPaint.setAlpha(ActivityAlarmNotification.visibility); //set transparent value: 0 fully transparent
         }else{
             mForeheadPaint.setAlpha(0); //set transparent value: 0 fully transparent
         }
@@ -258,7 +259,7 @@ public class FaceView extends View {
         mLipsPaint.setStyle(Paint.Style.STROKE);
         mLipsPaint.setStrokeWidth(BOX_STROKE_WIDTH);
         if(ActivityAlarmNotification.isShown){
-            mLipsPaint.setAlpha(50); //set transparent value: 0 fully transparent
+            mLipsPaint.setAlpha(ActivityAlarmNotification.visibility); //set transparent value: 0 fully transparent
         }else{
             mLipsPaint.setAlpha(0); //set transparent value: 0 fully transparent
         }

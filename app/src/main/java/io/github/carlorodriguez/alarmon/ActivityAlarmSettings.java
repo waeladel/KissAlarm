@@ -132,8 +132,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
 
     private static final String SETTINGS_BUTTON_TOGGLED_KEY = "SETTINGS_BUTTON_TOGGLED_KEY";
     private static final String SETTINGS_BUTTON_SHOWN_KEY = "SETTINGS_BUTTON_SHOWN_KEY";
-
-
+    private static final String SETTINGS_BUTTON_VISIBILITY_KEY = "SETTINGS_BUTTON_VISIBILITY _KEY";
 
     private static final String SETTINGS_DAYS_OF_WEEK_KEY = "SETTINGS_DAYS_OF_WEEK_KEY";
 
@@ -145,7 +144,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
     TIME,
     NAME,
     DAYS_OF_WEEK,
-    TONE,MEDIA, SNOOZE,TOGGLED,SHOWN,
+    TONE,MEDIA, SNOOZE,TOGGLED,SHOWN,VISIBILITY ,
     VIBRATE,
     VOLUME_FADE
   }
@@ -270,6 +269,13 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                       SETTINGS_BUTTON_SHOWN_KEY));
           }
 
+          if (savedInstanceState.containsKey(SETTINGS_BUTTON_VISIBILITY_KEY)) {
+              settings.setVisibility(savedInstanceState.getInt(
+                      SETTINGS_BUTTON_VISIBILITY_KEY));
+              Log.d(TAG, "setShow= "+ savedInstanceState.getBoolean(
+                      SETTINGS_BUTTON_VISIBILITY_KEY));
+          }
+
           if (savedInstanceState.containsKey(SETTINGS_VOLUME_START_PERCENT_KEY)
                   && savedInstanceState.containsKey(SETTINGS_VOLUME_END_PERCENT_KEY)
                   && savedInstanceState.containsKey(SETTINGS_VOLUME_CHANGE_TIME_SEC_KEY)) {
@@ -387,6 +393,17 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
           //settings.getShown() ? getString(R.string.enabled) : getString(R.string.disabled);
           @Override
           public SettingType type() { return SettingType.SHOWN; }
+      });
+
+      // The show visibility sitting for lips/forehead buttons
+      settingsObjects.add(new Setting() {
+          @Override
+          public String name() { return getString(R.string.visibility_button); }
+          @Override
+          public String value() { return "" + settings.getVisibility(); }
+          //settings.getShown() ? getString(R.string.enabled) : getString(R.string.disabled);
+          @Override
+          public SettingType type() { return SettingType.VISIBILITY; }
       });
 
       // The snooze duration for this alarm.
@@ -567,6 +584,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
         outState.putBoolean(SETTINGS_VIBRATE_KEY, settings.getVibrate());
         outState.putBoolean(SETTINGS_BUTTON_TOGGLED_KEY, settings.getToggled());
         outState.putBoolean(SETTINGS_BUTTON_SHOWN_KEY, settings.getShown());
+        outState.putInt(SETTINGS_BUTTON_VISIBILITY_KEY, settings.getVisibility());
 
         outState.putInt(SETTINGS_SNOOZE_KEY, settings.getSnoozeMinutes());
 
@@ -899,7 +917,11 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                     equalsIgnoreCase(getString(R.string.show_button))){
                 convertView = inflater.inflate(R.layout.button_shown_settings_item, parent,false);
 
-            } else {
+            }else if (settingsObjects.get(position).name().
+                    equalsIgnoreCase(getString(R.string.visibility_button))){
+                convertView = inflater.inflate(R.layout.visibility_settings_item, parent,false);
+
+            }else {
                 convertView = inflater.inflate(R.layout.settings_item, parent,
                         false);
             }
@@ -919,6 +941,17 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                 }
             }
 
+            /*if (settingsObjects.get(position).name().
+                    equalsIgnoreCase(getString(R.string.visibility_button))) {
+
+                if(settings.getShown()){
+                    convertView.setAlpha(1);
+                }else {
+                    convertView.setAlpha(0.2f);
+                    //holder.row.setAlpha(0.2f);
+                }
+            }*/
+
 			holder.populateFrom(settingsObjects.get(position));
 
 			return(convertView);
@@ -930,7 +963,10 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
 
         private View row;
 
-		ViewHolder(View row) {
+        private SeekBar seekBar;
+
+
+        ViewHolder(View row) {
             this.row = row;
 		}
 
@@ -999,6 +1035,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                 SwitchCompat showSwitch = (SwitchCompat) row.findViewById(
                         R.id.setting_show_button_sc);
 
+
                 if (settings.getShown()) {
                     showSwitch.setChecked(true);
                 } else {
@@ -1009,17 +1046,62 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                         new CompoundButton.OnCheckedChangeListener() {
                             @Override
                             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                SeekBar disSeekBar = findViewById(R.id.setting_seekBar_sc); // to disable visibility seek bar
+
                                 if (isChecked) {
                                     settings.setShown(true);
+                                    disSeekBar.setEnabled(true);
                                 } else {
                                     settings.setShown(false);
+                                    disSeekBar.setEnabled(false);
                                 }
                             }
                         });
 
-            } else {
+            } else if(setting.name().equalsIgnoreCase(getString(R.string.visibility_button))){
+
                 ((TextView) row.findViewById(R.id.setting_value)).
                         setText(setting.value());
+
+                SeekBar seekBar =  row.findViewById(R.id.setting_seekBar_sc);
+
+                if (settings.getShown()) {
+                    seekBar.setEnabled(true);
+                } else {
+                    seekBar.setEnabled(false);
+                }
+
+                seekBar.setProgress(settings.getVisibility());
+
+                seekBar.setOnSeekBarChangeListener(
+                        new SeekBar.OnSeekBarChangeListener() {
+                            int progressValue;
+
+                            @Override
+                            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                                progressValue = progress;
+                                settings.setVisibility(progressValue);
+                                ((TextView) row.findViewById(R.id.setting_value)).
+                                        setText(""+progressValue);
+
+                            }
+
+                            @Override
+                            public void onStartTrackingTouch(SeekBar seekBar) {
+
+                            }
+
+                            @Override
+                            public void onStopTrackingTouch(SeekBar seekBar) {
+                                settings.setVisibility(progressValue);
+                            }
+                        }
+                );
+
+            }else {
+                ((TextView) row.findViewById(R.id.setting_value)).
+                        setText(setting.value());
+
             }
 		}
 

@@ -37,6 +37,8 @@ public final class DbHelper extends SQLiteOpenHelper {
     public static final String SETTINGS_COL_MEDIA_NAME= "media_name";
     public static final String SETTINGS_COL_TOGGLED = "toggled";
     public static final String SETTINGS_COL_SHOWN = "shown";
+    public static final String SETTINGS_COL_visibility = "visibility";
+
 
   public static final String SETTINGS_COL_TONE_URL = "tone_url";
   public static final String SETTINGS_COL_TONE_NAME = "tone_name";
@@ -62,8 +64,8 @@ public final class DbHelper extends SQLiteOpenHelper {
         + ALARMS_COL_DAY_OF_WEEK + " UNSIGNED INTEGER (0, 127), "
         + ALARMS_COL_TIME + " UNSIGNED INTEGER (0, 86399),"
         + ALARMS_COL_ENABLED + " UNSIGNED INTEGER (0, 1))");
-    // |(primary) | (string)  |  (string)  | (string)  |(string) | (string)  | (1 to 60) |(boolean)|(boolean)| (boolean) | (0 to 100) | (0 to 100) | (0 to 60) |
-    // |   id     | media_url | media_name |media_type |tone_url | tone_name |   snooze  | Toggled |  Shown  |  vibrate  |  vol_start |  vol_end   | vol_time  |
+    // |(primary) | (string)  |  (string)  | (string)  |(string) | (string)  | (1 to 60) |(boolean)|(boolean)| (0 to 100) | (boolean) | (0 to 100) | (0 to 100) | (0 to 60) |
+    // |   id     | media_url | media_name |media_type |tone_url | tone_name |   snooze  | Toggled |  Shown  | visibility | vibrate  |  vol_start |  vol_end   | vol_time  |
     // snooze is in minutes.
     db.execSQL("CREATE TABLE " + DB_TABLE_SETTINGS + " (" 
         + SETTINGS_COL_ID + " INTEGER PRIMARY KEY, "
@@ -75,6 +77,7 @@ public final class DbHelper extends SQLiteOpenHelper {
         + SETTINGS_COL_SNOOZE + " UNSIGNED INTEGER (1, 60),"
             + SETTINGS_COL_TOGGLED + " UNSIGNED INTEGER (0, 1),"
             + SETTINGS_COL_SHOWN + " UNSIGNED INTEGER (0, 1),"
+            + SETTINGS_COL_visibility + " UNSIGNED INTEGER (0, 100),"
         + SETTINGS_COL_VIBRATE + " UNSIGNED INTEGER (0, 1),"
         + SETTINGS_COL_VOLUME_STARTING + " UNSIGNED INTEGER (1, 100),"
         + SETTINGS_COL_VOLUME_ENDING + " UNSIGNED INTEGER (1, 100),"

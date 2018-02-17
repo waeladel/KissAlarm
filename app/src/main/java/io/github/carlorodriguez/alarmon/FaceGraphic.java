@@ -63,7 +63,7 @@ class FaceGraphic extends GraphicOverlay.Graphic {
         //mFacePositionPaint.setColor(selectedColor);
         mFacePositionPaint.setColor(Color.CYAN);
         if(ActivityAlarmNotification.isShown){
-            mFacePositionPaint.setAlpha(50); //set transparent value: 0 fully transparent
+            mFacePositionPaint.setAlpha(ActivityAlarmNotification.visibility); //set transparent value: 0 fully transparent
         }else{
             mFacePositionPaint.setAlpha(0); //set transparent value: 0 fully transparent
         }
@@ -74,7 +74,7 @@ class FaceGraphic extends GraphicOverlay.Graphic {
         mForeheadPaint.setColor(Color.CYAN);
         mForeheadPaint.setStrokeWidth(BOX_STROKE_WIDTH);
         if(ActivityAlarmNotification.isShown){
-            mForeheadPaint.setAlpha(50); //set transparent value: 0 fully transparent
+            mForeheadPaint.setAlpha(ActivityAlarmNotification.visibility); //set transparent value: 0 fully transparent
         }else{
             mForeheadPaint.setAlpha(0); //set transparent value: 0 fully transparent
         }
@@ -86,7 +86,7 @@ class FaceGraphic extends GraphicOverlay.Graphic {
         mLipsPaint.setStyle(Paint.Style.STROKE);
         mLipsPaint.setStrokeWidth(BOX_STROKE_WIDTH);
         if(ActivityAlarmNotification.isShown){
-            mLipsPaint.setAlpha(50); //set transparent value: 0 fully transparent
+            mLipsPaint.setAlpha(ActivityAlarmNotification.visibility); //set transparent value: 0 fully transparent
         }else{
             mLipsPaint.setAlpha(0); //set transparent value: 0 fully transparent
         }

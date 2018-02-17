@@ -43,6 +43,8 @@
 
     <string name="show_button">Show buttons</string>
     <string name="show_button_hint">Display the clickable boundaries around lips and forehead.</string>
+  <string name="visibility_button">Buttons\' visibility</string>
+
   <string name="low_storage_error">Sorry, there isn\'t enough storage.</string>
 
 

@@ -36,6 +36,7 @@ public final class AlarmSettings {
   private boolean vibrate;
     private boolean toggled;
     private boolean shown ;
+    private int visibility;
   private int volumeStartPercent;
   private int volumeEndPercent;
   private int volumeChangeTimeSec;
@@ -52,6 +53,7 @@ public final class AlarmSettings {
     values.put(DbHelper.SETTINGS_COL_VIBRATE, vibrate);
       values.put(DbHelper.SETTINGS_COL_TOGGLED, toggled);
       values.put(DbHelper.SETTINGS_COL_SHOWN, shown);
+      values.put(DbHelper.SETTINGS_COL_visibility, visibility);
     values.put(DbHelper.SETTINGS_COL_VOLUME_STARTING, volumeStartPercent);
     values.put(DbHelper.SETTINGS_COL_VOLUME_ENDING, volumeEndPercent);
     values.put(DbHelper.SETTINGS_COL_VOLUME_TIME, volumeChangeTimeSec);
@@ -70,6 +72,7 @@ public final class AlarmSettings {
       DbHelper.SETTINGS_COL_VIBRATE,
          DbHelper.SETTINGS_COL_TOGGLED,
          DbHelper.SETTINGS_COL_SHOWN,
+         DbHelper.SETTINGS_COL_visibility,
       DbHelper.SETTINGS_COL_VOLUME_STARTING,
       DbHelper.SETTINGS_COL_VOLUME_ENDING,
       DbHelper.SETTINGS_COL_VOLUME_TIME
@@ -87,6 +90,7 @@ public final class AlarmSettings {
     vibrate = false;
       toggled = false;
       shown = false;
+      visibility = 0;
     volumeStartPercent = 0;
     volumeEndPercent = 100;
     volumeChangeTimeSec = 20;
@@ -102,6 +106,7 @@ public final class AlarmSettings {
     vibrate = rhs.vibrate;
       toggled = rhs.toggled;
       shown = rhs.shown;
+    visibility = rhs.visibility;
     volumeStartPercent = rhs.volumeStartPercent;
     volumeEndPercent = rhs.volumeEndPercent;
     volumeChangeTimeSec = rhs.volumeChangeTimeSec;
@@ -118,6 +123,7 @@ public final class AlarmSettings {
     vibrate = cursor.getInt(cursor.getColumnIndex(DbHelper.SETTINGS_COL_VIBRATE)) == 1;
       toggled = cursor.getInt(cursor.getColumnIndex(DbHelper.SETTINGS_COL_TOGGLED)) == 1;
       shown = cursor.getInt(cursor.getColumnIndex(DbHelper.SETTINGS_COL_SHOWN)) == 1;
+    visibility = cursor.getInt(cursor.getColumnIndex(DbHelper.SETTINGS_COL_visibility));
     volumeStartPercent = cursor.getInt(cursor.getColumnIndex(DbHelper.SETTINGS_COL_VOLUME_STARTING));
     volumeEndPercent = cursor.getInt(cursor.getColumnIndex(DbHelper.SETTINGS_COL_VOLUME_ENDING));
     volumeChangeTimeSec = cursor.getInt(cursor.getColumnIndex(DbHelper.SETTINGS_COL_VOLUME_TIME));
@@ -138,6 +144,7 @@ public final class AlarmSettings {
       && vibrate == rhs.vibrate
             && toggled == rhs.toggled
             && shown == rhs.shown
+            && visibility == rhs.visibility
       && volumeStartPercent == rhs.volumeStartPercent
       && volumeEndPercent == rhs.volumeEndPercent
       && volumeChangeTimeSec == rhs.volumeChangeTimeSec;
@@ -192,12 +199,24 @@ public final class AlarmSettings {
         this.toggled = toggle;
     }
 
-    public boolean getShown() {
-        return shown;
+    public int getVisibility() {
+        return visibility;
     }
-    public void setShown(boolean show) {
-        this.shown = show;
+    public void setVisibility(int visibility) {
+      if (visibility < 0) {
+        visibility = 0;
+      } else if (visibility > 100) {
+        visibility = 100;
+      }
+        this.visibility = visibility;
     }
+
+  public boolean getShown() {
+    return shown;
+  }
+  public void setShown(boolean show) {
+    this.shown = show;
+  }
 
     public boolean getVibrate() {
         return vibrate;
