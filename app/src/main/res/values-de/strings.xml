@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Translation by Sebastian Dörner <sdoerner@st.ovgu.de> -->
 <resources>
-  <string name="app_name">AlarmOn</string>
-  <string name="add_alarm">Weckzeit hinzufügen</string>
+    <string name="add_alarm">Weckzeit hinzufügen</string>
   <string name="default_settings">Vorgegebene Weckeinstellungen</string>
   <string name="app_settings">Anwendungseinstellungen</string>
   <string name="delete_all">Alle löschen</string>
@@ -88,4 +87,5 @@
   <string name="time_out_title">Wecker-Time-out</string>
   <string name="time_out_error">ACHTUNG: Diese Weckzeit hat ihren Time-Out erreicht.</string>
   <string name="time_out_summary">Nach so vielen Minuten wird ein klingelnder Weckton automatisch abgestellt.</string>
+    <string name="app_name">Kiss Alarm</string>
 </resources>

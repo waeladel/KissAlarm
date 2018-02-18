@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Translation by Daniele Ottorogo <daniele.ottorogo@gmail.com> -->
 <resources>
-  <string name="app_name">AlarmOn</string>
-  <string name="add_alarm">Aggiungi Sveglia</string>
+    <string name="add_alarm">Aggiungi Sveglia</string>
   <string name="default_settings">Impostazioni Base Sveglia</string>
   <string name="app_settings">Preferenze</string>
   <string name="delete_all">Elimina Tutto</string>
@@ -88,4 +87,5 @@
   <string name="time_out_title">Time Out Allarme</string>
   <string name="time_out_error">ATTENZIONE: Questo Allarme è scaduto aspettando informazioni.</string>
   <string name="time_out_summary">Un Allarme attivo sarà automaticamente disattivato dopo questi minuti.</string>
+  <string name="app_name">Kiss Alarm</string>
 </resources>

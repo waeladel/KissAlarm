@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Translation by Ilija Milicevic <engr3337@gmail.com> -->
 <resources>
-  <string name="app_name">AlarmOn</string>
-  <string name="add_alarm">Novi budilnik</string>
+    <string name="add_alarm">Novi budilnik</string>
   <string name="default_settings">Standardne Opcije za Budilnike</string>
   <string name="app_settings">Podešavanje Aplikacije</string>
   <string name="delete_all">Briši Sve</string>
@@ -88,4 +87,5 @@
   <string name="time_out_title">Vreme gašenja budilnika</string>
   <string name="time_out_error">UPOZORENJE: Budilnik se ugasio čekajući vašu komandu.</string>
   <string name="time_out_summary">Uključeni budilnik se automatski gasi posle toliko minuta</string>
+  <string name="app_name">Kiss Alarm</string>
 </resources>

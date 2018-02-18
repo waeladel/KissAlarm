@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Translation by Ilija Milicevic <engr3337@gmail.com> -->
 <resources>
-  <string name="app_name">AlarmOn</string>
-  <string name="add_alarm">Agregar alarma</string>
+    <string name="add_alarm">Agregar alarma</string>
   <string name="default_settings">Opciones de alarma por defecto</string>
   <string name="app_settings">Configuración</string>
   <string name="delete_all">Borrar todo</string>
@@ -130,4 +129,5 @@
   <string name="alarm_deleted">Alarma eliminada</string>
   <string name="undo">DESHACER</string>
   <string name="swipe_right_to_delete">Hola! desliza hacia la derecha este elemento y ve lo que sucede.</string>
+    <string name="app_name">Kiss Alarm</string>
 </resources>

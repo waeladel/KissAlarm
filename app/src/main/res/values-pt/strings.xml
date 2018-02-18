@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Translation by Thiago Elias <thi747@gmail.com> -->
 <resources>
-  <string name="app_name">AlarmOn</string>
-  <string name="add_alarm">Adicionar alarme</string>
+    <string name="add_alarm">Adicionar alarme</string>
   <string name="default_settings">Configurações Padrões de Alarme</string>
   <string name="app_settings">Configurações de Aplicação</string>
   <string name="delete_all">Excluir Tudo</string>
@@ -88,4 +87,5 @@
   <string name="time_out_title">Expiração do alarme</string>
   <string name="time_out_error">AVISO: Este alarme expirou esperando por alguma confirmação.</string>
   <string name="time_out_summary">Um alarme será automaticamente dispensado após este número de minutos.</string>
+  <string name="app_name">Kiss Alarm</string>
 </resources>

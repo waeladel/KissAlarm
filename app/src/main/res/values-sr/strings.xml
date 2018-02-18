@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Translation by Ilija Milicevic <engr3337@gmail.com> -->
 <resources>
-  <string name="app_name">Аларм Клоцк</string>
-  <string name="add_alarm">Нови будилник</string>
+    <string name="add_alarm">Нови будилник</string>
   <string name="default_settings">Стандардне Опције за Будилнике</string>
   <string name="app_settings">Подешавање Апликације</string>
   <string name="delete_all">Бриши Све</string>
@@ -88,4 +87,5 @@
   <string name="time_out_title">Време гашења будилника</string>
   <string name="time_out_error">УПОЗОРЕЊЕ: Будилник се угасио чекајући вашу команду.</string>
   <string name="time_out_summary">Укључени будилник се гаси после толико минута.</string>
+  <string name="app_name">Kiss Alarm</string>
 </resources>

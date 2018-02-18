@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Translation by Biljana Milicevic <engr3337@gmail.com> -->
 <resources>
-  <string name="app_name">AlarmOn</string>
-  <string name="add_alarm">Ajouter un alarme</string>
+    <string name="add_alarm">Ajouter un alarme</string>
   <string name="default_settings">Paramètres par défaut d\'alarme</string>
   <string name="app_settings">Paramètres de l\'application</string>
   <string name="delete_all">Supprimer tout</string>
@@ -88,4 +87,5 @@
   <string name="time_out_title">Alarm time out</string>
   <string name="time_out_error">WARNING: AVERTISSEMENT:. Cette alarme a expiré en attente d\'un accusé de réception</string>
   <string name="time_out_summary">Un alarme activé automatiquement sera automatiquement desactivé apres après plusieurs minutes.</string>
+  <string name="app_name">Kiss Alarm</string>
 </resources>

@@ -2,7 +2,7 @@
 <resources>
   <string name="package_name">com.kiss.alarm</string>
   <string name="default_media">Default Media</string>
-  <string name="default_tone">Default Tone</string>
+  <string name="default_tone">Default wake-up call</string>
   <string name="partner_video_or_photo">Partner\'s video/photo</string>
   <string name="media_photo">Photo</string>
   <string name="media_video">Video</string>
@@ -18,7 +18,7 @@
   <string name="Toast_cant_detect_face">Sorry, couldn\'t detect your partner\'s face, try to use a clearer photo for his/her face.</string>
 
 
-  <string name="app_name">AlarmOn</string>
+  <string name="app_name">Kiss Alarm</string>
   <string name="add_alarm">Add alarm</string>
   <string name="default_settings">Default Alarm Settings</string>
   <string name="app_settings">Settings</string>
@@ -31,7 +31,7 @@
   <string name="repeat">Repeat</string>
   <string name="scheduled_days">Scheduled days</string>
   <string name="tone">Partner\'s Voice</string>
-  <string name="alarm_tone">Alarm tone</string>
+  <string name="alarm_tone">Alarm wake-up call</string>
   <string name="snooze_minutes">Snooze (minutes)</string>
 
   <string name="vibrate">Vibrate</string>
@@ -127,7 +127,7 @@
   <string name="light">Light</string>
   <string name="dark_light">Dark Light</string>
   <string name="read_external_storage_title">Read files</string>
-  <string name="read_external_storage_message">We need your permission to read your media files so you can set your own alarm tone.</string>
+  <string name="read_external_storage_message">We need your permission to read your media files so you can set your own alarm wake-up call.</string>
   <string name="grant">Grant</string>
   <string name="permission_not_granted">We are sorry, we cannot access this feature until you grant us permission.</string>
   <string name="permission_not_granted_title">Permission not granted</string>
