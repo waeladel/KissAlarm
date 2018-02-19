@@ -12,7 +12,6 @@
   <string name="none">Ninguno</string>
   <string name="repeat">Repetir</string>
   <string name="scheduled_days">Agendar días</string>
-  <string name="tone">Tono</string>
   <string name="alarm_tone">Tono de alarma</string>
   <string name="snooze_minutes">Snooze (minutes)</string>
   <string name="vibrate">Vibrar</string>
@@ -130,4 +129,25 @@
   <string name="undo">DESHACER</string>
   <string name="swipe_right_to_delete">Hola! desliza hacia la derecha este elemento y ve lo que sucede.</string>
     <string name="app_name">Kiss Alarm</string>
+    <string name="Scaning">Comprobando</string>
+  <string name="Toast_cant_detect_face">Lo sentimos, no pudimos detectar la cara de tu compañero, tratamos de usar una foto de la cara más clara.</string>
+  <string name="audio_source">Fuente de audio</string>
+  <string name="btn_choose">Escoger</string>
+    <string name="default_tone">La llamada de activación predeterminada</string>
+  <string name="detecting_you_partner_face">Detectando la cara de tu pareja</string>
+    <string name="low_storage_error">Lo sentimos, no hay suficiente espacio de almacenamiento.</string>
+  <string name="media_photo">Foto</string>
+  <string name="media_video">Vídeo</string>
+  <string name="partner_video_or_photo">Video / foto del socio</string>
+  <string name="pending_alarms">Alertas pendientes</string>
+  <string name="permission_camera_rationale">El acceso a la cámara es necesario para detectar la cara de tu pareja</string>
+    <string name="record">Grabar a través del micrófono</string>
+  <string name="selected_file">Elija archivo</string>
+  <string name="show_button">Mostrar botones</string>
+  <string name="show_button_hint">Muestra los límites clicables alrededor de los labios y la frente.</string>
+    <string name="test_alarm">Alarma de prueba</string>
+    <string name="toggle_button">Alternar repetición / apagar</string>
+  <string name="toggle_button_hint">Si está habilitado, los labios comienzan a dormitar y la frente detiene la alarma.</string>
+  <string name="tone">Voz del socio</string>
+  <string name="visibility_button">Claridad de botones</string>
 </resources>

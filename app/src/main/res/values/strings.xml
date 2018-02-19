@@ -38,7 +38,7 @@
   <string name="enabled">Enabled</string>
   <string name="disabled">Disabled</string>
 
-    <string name="toggle_button">Toggle Snooze/Dismiss</string>
+    <string name="toggle_button">Toggle snooze/dismiss</string>
     <string name="toggle_button_hint">If enabled, lips will snooze and forehead will dismiss the alarm.</string>
 
     <string name="show_button">Show buttons</string>
