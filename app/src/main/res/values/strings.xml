@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="package_name">com.kiss.alarm</string>
+  <string name="package_name" translatable="false">com.kiss.alarm</string>
   <string name="default_media">Default Media</string>
   <string name="default_tone">Default wake-up call</string>
   <string name="partner_video_or_photo">Partner\'s video/photo</string>
@@ -18,7 +18,7 @@
   <string name="Toast_cant_detect_face">Sorry, couldn\'t detect your partner\'s face, try to use a clearer photo for his/her face.</string>
 
 
-  <string name="app_name">Kiss Alarm</string>
+  <string name="app_name" translatable="false">Kiss Alarm</string>
   <string name="add_alarm">Add alarm</string>
   <string name="default_settings">Default Alarm Settings</string>
   <string name="app_settings">Settings</string>

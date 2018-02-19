@@ -86,7 +86,6 @@
   <string name="time_out_title">Време гашења будилника</string>
   <string name="time_out_error">УПОЗОРЕЊЕ: Будилник се угасио чекајући вашу команду.</string>
   <string name="time_out_summary">Укључени будилник се гаси после толико минута.</string>
-  <string name="app_name">Kiss Alarm</string>
     <string name="Scaning">испитивање</string>
     <string name="Toast_cant_detect_face">Oprostite, svojega partnerja ni mogel zaznati, poskusite uporabiti jasnejšo fotografijo obraza.</string>
   <string name="about">О апликацији</string>

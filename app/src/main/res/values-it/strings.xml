@@ -86,7 +86,6 @@
   <string name="time_out_title">Time Out Allarme</string>
   <string name="time_out_error">ATTENZIONE: Questo Allarme è scaduto aspettando informazioni.</string>
   <string name="time_out_summary">Un Allarme attivo sarà automaticamente disattivato dopo questi minuti.</string>
-  <string name="app_name">Kiss Alarm</string>
     <string name="Scaning">esaminare</string>
     <string name="Toast_cant_detect_face">Spiacenti, impossibile rilevare il volto del tuo partner, provare a utilizzare una foto del viso più chiara.</string>
   <string name="about">Informazioni sull\'applicazione</string>

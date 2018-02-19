@@ -86,7 +86,6 @@
   <string name="time_out_title">Wecker-Time-out</string>
   <string name="time_out_error">ACHTUNG: Diese Weckzeit hat ihren Time-Out erreicht.</string>
   <string name="time_out_summary">Nach so vielen Minuten wird ein klingelnder Weckton automatisch abgestellt.</string>
-    <string name="app_name">Kiss Alarm</string>
     <string name="Scaning">Überprüfung</string>
   <string name="Toast_cant_detect_face">Entschuldigung, konnte das Gesicht deines Partners nicht erkennen, versuche ein klareres Gesichtsfoto zu verwenden.</string>
   <string name="about">Über die Anwendung</string>

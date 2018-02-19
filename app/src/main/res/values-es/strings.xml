@@ -128,7 +128,6 @@
   <string name="alarm_deleted">Alarma eliminada</string>
   <string name="undo">DESHACER</string>
   <string name="swipe_right_to_delete">Hola! desliza hacia la derecha este elemento y ve lo que sucede.</string>
-    <string name="app_name">Kiss Alarm</string>
     <string name="Scaning">Comprobando</string>
   <string name="Toast_cant_detect_face">Lo sentimos, no pudimos detectar la cara de tu compañero, tratamos de usar una foto de la cara más clara.</string>
   <string name="audio_source">Fuente de audio</string>
