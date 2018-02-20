@@ -5,18 +5,25 @@ android {
     compileSdkVersion 27
     buildToolsVersion "27.0.3"
 
+    // Load keystore
+    def keystorePropertiesFile = rootProject.file("keystore.properties");
+    def keystoreProperties = new Properties()
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
     defaultConfig {
         applicationId "com.kiss.alarm"
         minSdkVersion 15
         targetSdkVersion 27
+        versionName '1.0.0'
+        versionCode 100
     }
 
     signingConfigs {
         release {
-            storeFile file("release.keystore")
-            storePassword System.getenv("ALARM_KSTOREPWD")
-            keyAlias "alarm"
-            keyPassword System.getenv("ALARM_KEYPWD")
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
         }
     }
 
@@ -27,6 +34,7 @@ android {
             signingConfig signingConfigs.release
         }
     }
+
 
     lintOptions {
         checkReleaseBuilds false
