@@ -37,7 +37,8 @@
         android:name="io.github.carlorodriguez.alarmon.ActivityAlarmNotification"
         android:theme="@style/Theme.AppCompat.NoActionBar"
         android:launchMode="singleInstance"
-        android:screenOrientation="portrait"/>
+        android:screenOrientation="portrait"
+        android:excludeFromRecents="true"/>
     <activity
         android:name="io.github.carlorodriguez.alarmon.ActivityAlarmSettings"
         android:theme="@style/AppThemeDark"
