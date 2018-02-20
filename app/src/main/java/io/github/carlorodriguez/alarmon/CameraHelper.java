@@ -174,7 +174,7 @@ public class CameraHelper {
 
         }else if(type == MEDIA_TYPE_Audio) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "Alarm_recording"+ timeStamp + ".wav");
+                    "Alarm_recording_"+ timeStamp + ".wav");
         }else{
             return null;
         }

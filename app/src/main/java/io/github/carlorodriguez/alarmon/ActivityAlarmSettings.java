@@ -347,10 +347,37 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
           @Override
           public String value() {
               String value = settings.getMediaType();
-              value += ": " + settings.getMediaName();
+
+              /*switch (value) {
+                  case "Video":
+                      value = getString(R.string.media_video);
+                      value += ": " + settings.getMediaName();
+                      if (AppSettings.isDebugMode(getApplicationContext())) {
+                          value += " " + settings.getMediaUri().toString();
+                      }
+                      break;
+                  case "Photo":
+                      value = getString(R.string.media_photo);
+                      value += ": " + settings.getMediaName();
+                      if (AppSettings.isDebugMode(getApplicationContext())) {
+                          value += " " + settings.getMediaUri().toString();
+                      }
+                      break;
+                  default:
+                      value = getString(R.string.debug_default);
+                      break;
+              }*/
+
+              if (value.equalsIgnoreCase("Default")){
+                  value = getString(R.string.debug_default);
+              }else{
+                  value = settings.getMediaName();
+              }
+
               if (AppSettings.isDebugMode(getApplicationContext())) {
                   value += " " + settings.getMediaUri().toString();
               }
+
               return value;
           }
           @Override
@@ -363,6 +390,11 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
       @Override
       public String value() {
         String value = settings.getToneName();
+
+          if (value.equalsIgnoreCase("Default")){
+              value = getString(R.string.debug_default);
+          }
+
         if (AppSettings.isDebugMode(getApplicationContext())) {
           value += " " + settings.getTone().toString();
         }
@@ -535,7 +567,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                 Log.d(TAG, "Great! User has recorded and saved the audio file");
                 Log.d(TAG, "data= "+data);
                 // Great! User has recorded and saved the audio file
-                settings.setTone(Uri.parse(mOutputFile.getPath()), "Alarm Recording: ");// Set video url on tone
+                settings.setTone(Uri.parse(mOutputFile.getPath()), mOutputFile.getName());// Set video url on tone
                 settingsAdapter.notifyDataSetChanged();
             } else if (resultCode == RESULT_CANCELED) {
                 // Oops! User has canceled the recording
@@ -547,7 +579,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
             if (resultCode == RESULT_OK) {
                 Uri MediaUri = result.getUri();
                 Log.d(TAG, "CROP_PICTURE getUri="+ MediaUri);
-                settings.setMedia(MediaUri,mMediaName  ,getResources().getString(R.string.media_photo));// Set photo url on media
+                settings.setMedia(MediaUri,mMediaName  ,"Photo");// Set photo url on media getResources().getString(R.string.media_photo)
                 settingsAdapter.notifyDataSetChanged();
 
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
@@ -818,7 +850,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
 
                             cropImage(MediaUri);
                         }else {
-                            settings.setMedia(MediaUri,mMediaName ,getResources().getString(R.string.media_video));// Set photo url on media
+                            settings.setMedia(MediaUri,mMediaName ,"Video");// Set photo url on media getResources().getString(R.string.media_video)
                             settings.setTone(MediaUri, mMediaName);// Set video url on tone
                             settingsAdapter.notifyDataSetChanged();
                         }
