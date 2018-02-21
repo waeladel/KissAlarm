@@ -166,10 +166,17 @@
   <string name="swipe_right_to_delete">Hi There! Swipe to the right direction to delete the alarm.</string>
   <string name="material_intro_id_alarm_deletion">material_intro_id_119.104</string>
 
-
-
-
-
   <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
+
+  <string name="about_text">Everyday starts by opining your eyes, so nothing will make your day like waking up by your beloved one.\n\nWhy choosing a ringtone while you can wake up everyday by the most thing you adore, your lover\'s voice.\n\n\"kiss alarm\" enables you to choose a recorded video or a voice note accompanied by your partner\'s photo to wake you up, it\'s more like a visual wake-up call but not from a hotel employee. Speaking of visuals, you have to kiss your partner\'s lips to dismiss the alarm, or forehead to snooze.\n\n
+  Features:\n\n
+- You can choose a video of your partner or a photo accompanied by voice note.\n\n
+- Detecting lips and forehead on photos and videos.\n\n
+- Kissing your partner\'s lips dismisses the alarm, while forehead snoozes it.\n\n
+- Toggle between dismiss and snooze, if you want to dismiss the alarm by kissing forehead and vice versa.\n\n
+- Highlights lips and forehead\'s boundaries for easier clicking.\n\n
+- Choosing the highlight\'s transparency, in case you don\'t want to miss your partner\'s details.
+</string>
+
 
 </resources>

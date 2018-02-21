@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.webkit.WebView;
+import android.widget.TextView;
 
 import com.viewpagerindicator.TitlePageIndicator;
 
@@ -107,14 +108,18 @@ public class AboutTabbedActivity extends AppCompatActivity {
             View rootView = inflater.inflate(R.layout.fragment_about_tabbed,
                     container, false);
 
-            WebView webView = (WebView) rootView.findViewById(
+            /*WebView webView = (WebView) rootView.findViewById(
+                    R.id.section_about_wb);*/
+
+            TextView textView = rootView.findViewById(
                     R.id.section_about_wb);
 
             switch (getArguments().getInt(ARG_SECTION_NUMBER)) {
                 case 1:
-                    webView.loadUrl("file:///android_asset/about.html");
+                    //webView.loadUrl("file:///android_asset/about.html");
+                    textView.setText(getText(R.string.about_text));
                     break;
-                case 2:
+                /*case 2:
                     webView.loadUrl("file:///android_asset/license.html");
                     break;
                 case 3:
@@ -128,9 +133,10 @@ public class AboutTabbedActivity extends AppCompatActivity {
                     break;
                 case 6:
                     webView.loadUrl("file:///android_asset/apache_license.html");
-                    break;
+                    break;*/
                 default:
-                    webView.loadUrl("file:///android_asset/about.html");
+                    //webView.loadUrl("file:///android_asset/about.html");
+                    textView.setText(getText(R.string.about_text));
             }
 
             return rootView;
@@ -157,7 +163,8 @@ public class AboutTabbedActivity extends AppCompatActivity {
         @Override
         public int getCount() {
             // Show 6 total pages.
-            return 6;
+            //return 6;
+            return 1;
         }
 
         @Override

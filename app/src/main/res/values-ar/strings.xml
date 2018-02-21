@@ -1,0 +1,165 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+    <string name="add_alarm">اضف تنبيه</string>
+    <string name="default_settings">إعدادات التنبيه الأساسية</string>
+    <string name="app_settings">إعدادات</string>
+    <string name="delete_all">احذف الكل</string>
+    <string name="settings">إعدادات</string>
+    <string name="time">الوقت</string>
+    <string name="Scaning">جار الفحص</string>
+    <string name="Toast_cant_detect_face">نأسف، تعذر التعرف على وجه شريكِك أو شريكتك، حاول استخدام صورة أوضح للوجه.</string>
+    <string name="about">عن التطبيق</string>
+    <string name="alarm_deleted">تم حذف التنبيه</string>
+    <string name="alarm_fade">تلاشي صوت التنبيه</string>
+    <string name="alarm_has_occurred">التنبيه وقع للتو</string>
+    <string name="alarm_label">عنوان التنبيه</string>
+    <string name="alarm_tone">نداء التنبيه</string>
+    <string name="albums">ألبومات الأغاني</string>
+    <string name="am">ص</string>
+    <string name="app_theme_summary">غير ألوان التطبيق</string>
+    <string name="app_theme_title">المظهر</string>
+    <string name="artists">المطربون</string>
+    <string name="audio_source">مصدر الصوت</string>
+    <string name="blue">أزرق</string>
+    <string name="blue_grey">أزرق رمادي</string>
+    <string name="brown">بني</string>
+    <string name="btn_choose">اختر</string>
+    <string name="cancel">إلغاء</string>
+    <string name="confirm_delete">تأكيد الحذف</string>
+    <string name="custom_lock_screen_description" formatted="false">هذا هو النص الذي سيعرض على شاشة القفل. في النص، يمكنك استخدام رمز %c لعرض وقت العد التنازلي أو رمز %t لعرض وقت التنبيه. مثال: مرحبا %t سوف تظهر على النحو التالي: مرحبا 8:00 صباحا.\n\n إذا تم اختيار مربع \"دائم\" الكلمة ستظل على شاشة القفل حتى في حالة عدم جدولة أي تنبيه.</string>
+    <string name="custom_lock_screen_persistent">دائم</string>
+    <string name="custom_lock_screen_text">نص مخصص لشاشة القفل</string>
+    <string name="custom_notification_text">نص مخصص للتنويهات</string>
+    <string name="custom_notification_text_description" formatted="false">هذا هو النص الذي سيعرض في التنويهات. في النص، يمكنك استخدام رمز ${c} لعرض وقت العد التنازلي أو رمز ${t} لعرض وقت التنبيه. مثال: مرحبا ${t} سوف تظهر على النحو التالي: مرحبا 8:00 صباحا.</string>
+    <string name="cyan">أزرق سماوي</string>
+    <string name="dark">داكن</string>
+    <string name="dark_light">داكن X فاتح</string>
+    <string name="day">%d يوم</string>
+    <string name="days">%d أيام</string>
+    <string name="debug_default">الافتراضي</string>
+    <string name="debug_mode_summary">شغل خصائص تصحيح الأخطاء المختلفة</string>
+    <string name="debug_mode_title">وضع التصحيح</string>
+    <string name="debug_off">إيقاف</string>
+    <string name="debug_on">تشغيل</string>
+    <string name="deep_orange">برتقالي داكن</string>
+    <string name="deep_purple">أرجواني داكن</string>
+    <string name="default_media">الفيديو أو الصورة الافتراضية</string>
+    <string name="default_tone">نداء التنبيه الافتراضي</string>
+    <string name="delete">احذف</string>
+    <string name="detecting_you_partner_face">جار فحص وجه شريكك</string>
+    <string name="disabled">غير مُفعل</string>
+    <string name="dismiss">انصرف</string>
+    <string name="dow_fri">الجمعة</string>
+    <string name="dow_fri_short">ج</string>
+    <string name="dow_mon">الاثنين</string>
+    <string name="dow_mon_short">ن</string>
+    <string name="dow_sat">السبت</string>
+    <string name="dow_sat_short">س</string>
+    <string name="dow_sun">الأحد</string>
+    <string name="dow_sun_short">ح</string>
+    <string name="dow_thu">الخميس</string>
+    <string name="dow_thu_short">خ</string>
+    <string name="dow_tue">الثلاثاء</string>
+    <string name="dow_tue_short">ث</string>
+    <string name="dow_wed">الأربعاء</string>
+    <string name="dow_wed_short">ر</string>
+    <string name="enabled">مُفعل</string>
+    <string name="everyday">كل يوم</string>
+    <string name="fade_description">من %1$d%% إلى %2$d%% خلال %3$d ثانية</string>
+    <string name="grant">منح</string>
+    <string name="green">أخضر</string>
+    <string name="grey">رمادي</string>
+    <string name="hour">%d ساعة</string>
+    <string name="hours">%d ساعات</string>
+    <string name="indigo">نيلي</string>
+    <string name="internal">نغمات التنبيه</string>
+    <string name="label">عنوان</string>
+    <string name="light">فاتح</string>
+    <string name="light_blue">أزرق فاتح</string>
+    <string name="light_green">أخضر فاتح</string>
+    <string name="loading">جار التحميل</string>
+    <string name="lock_screen_both">كلاهما</string>
+    <string name="lock_screen_countdown">عد تنازلي</string>
+    <string name="lock_screen_custom">مخصص</string>
+    <string name="lock_screen_nothing">لا شيء</string>
+    <string name="lock_screen_summary">ضبط معلومات التنبيه المعروضة على شاشة القفل</string>
+    <string name="lock_screen_time">وقت التنبيه</string>
+    <string name="lock_screen_title">نص شاشة القفل</string>
+    <string name="low_storage_error">عذرا، لا تتوفر سعة تخزين كافية.</string>
+    <string name="media_photo">صورة</string>
+    <string name="media_video">فيديو</string>
+    <string name="minus_five">-5</string>
+    <string name="minute">%d دقيقة</string>
+    <string name="minutes">%d دقائق</string>
+    <string name="next_alarm">التنبيه المقبل:</string>
+    <string name="no_pending_alarms">لا توجد تنبيهات معلقة</string>
+    <string name="no_repeats">لا يكرر</string>
+    <string name="none">لا شيء</string>
+    <string name="notification_icon_off">لا تعرض أيقونة عند وجود تنبيهات معلقة</string>
+    <string name="notification_icon_on">اعرض أيقونة عند وجود تنبيهات معلقة</string>
+    <string name="notification_icon_title">اعرض أيقونة التنويهات</string>
+    <string name="notification_text_summary">ضبط معلومات التنبيه المعروضة في التنويهات</string>
+    <string name="notification_text_title">نص التنويه</string>
+    <string name="ok">موافق</string>
+    <string name="orange">برتقالي</string>
+    <string name="partner_video_or_photo">صورة أو فيديو الشريك</string>
+    <string name="pending_alarms">التنبيهات المعلقة</string>
+    <string name="permission_camera_rationale">السماح بالوصول للكاميرا ضروري لفحص الوجه</string>
+    <string name="permission_not_granted">عذرا، لا يمكننا الوصول إلى هذه الخاصية حتى تمنحنا الإذن.</string>
+    <string name="permission_not_granted_title">لم يتم منح الإذن</string>
+    <string name="pink">زهري</string>
+    <string name="please_wait">انتظر من فضلك</string>
+    <string name="plus_five">+5</string>
+    <string name="pm">م</string>
+    <string name="purple">أرجواني</string>
+    <string name="read_external_storage_message">نحتاج إذنك لقراءة ملفات الوسائط الخاصة بك حتى تتمكن من ضبط نداء التنبيه.</string>
+    <string name="read_external_storage_title">اقرأ الملفات</string>
+    <string name="record">سجل بواسطة الميكروفون</string>
+    <string name="red">أحمر</string>
+    <string name="repeat">كرر</string>
+    <string name="scheduled_days">الأيام المجدولة</string>
+    <string name="selected">المختار:</string>
+    <string name="selected_file">اختر ملف</string>
+    <string name="show_button">اظهر الأزرار</string>
+    <string name="show_button_hint">عرض الحدود القابلة للنقر حول الشفاه والجبين.</string>
+    <string name="snooze">غفوة</string>
+    <string name="snooze_minutes">مدة الغفوة (دقائق)</string>
+    <string name="songs">ملفات الصوت</string>
+    <string name="swipe_right_to_delete">مرحبا، حرك جهة اليمين لتحذف التنبيه.</string>
+    <string name="teal">أزرق مخضر</string>
+    <string name="test_alarm">تنبيه اختباري</string>
+    <string name="themes">سمات</string>
+    <string name="time_out_summary">التنبيه سيتم إيقافه تلقائيا بعد هذه الدقائق</string>
+    <string name="time_out_error">تحذير: هذا التنبيه قد انتهت مهلته منتظرا الاستلام.</string>
+    <string name="time_out_title">نفاد فترة التنبيه</string>
+    <string name="time_picker_color_summary">حدد لون مُنتقي الوقت</string>
+    <string name="time_picker_color_title">لون مُنتقي الوقت</string>
+    <string name="toggle_button">تبديل الغفوة/الإيقاف</string>
+    <string name="toggle_button_hint">لو نشط، الشفاه تفعل الغفوة والجبين يوقف التنبيه.</string>
+    <string name="tone">صوت الشريك</string>
+    <string name="unknown_name">اسم غير محدد</string>
+    <string name="vibrate">الاهتزاز</string>
+    <string name="visibility_button">وضوح الأزرار</string>
+    <string name="volume_duration">مدة التلاشي (ثوان)</string>
+    <string name="undo">ابْطِل</string>
+    <string name="volume_duration_label">المدة: %1$d ثانية</string>
+    <string name="volume_end">نهاية الصوت (نسبة مئوية)</string>
+    <string name="volume_end_label">مستوى الصوت النهائي: %1$d%%</string>
+    <string name="volume_start">بداية الصوت (نسبة مئوية)</string>
+    <string name="volume_start_label">"مستوى الصوت الأولي: %1$d%%"</string>
+    <string name="weekdays">أيام الأسبوع</string>
+    <string name="weekends">عطلة نهاية الأسبوع</string>
+    <string name="about_text">اليوم الجيد يبدأ من اللحظة اللتي تفتح فيها عينيك، لذلك لا شيء يجعل يومك سعيدا مثل أن تستيقظ بواسطة حبيبك.\n\n
+    لماذا تختار نغمة رنين بينما يمكنك أن تستيقظ كل يوم بواسطة أكثر شيء تعشقه، صوت حبيبك.\n\n
+        تطبيق \"Kiss Alarm\" يتيح لك أن تستيقظ بفيديو مسجل أو تسجيل صوتي مصحوب بصورة شريك حياتك، الأمر أشبه بمكالمة استيقاظ بصرية ولكن ليست من موظف الفندق.\n\n
+        كل ما عليك فعله أن تقبل شفاه شريكك لإيقاف التنبيه أو الجبين لتفعيل الغفوة.\n\n
+  الخصائص:\n\n
+         - يمكنك اختيار فيديو لشريك حياتك أو صورة مصحوبة بتسجيل صوتي.\n\n
+        - التعرف على الشفاه والجبين سواء في الصور أو مقاطع الفيديو.\n\n
+        - تقبيل شفاه شريكك يوقف التنبيه، بينما تقبيل الجبين يفعل الغفوة.\n\n
+        - يمكن التبديل بين الإيقاف والغفوة، لو ترغب أن توقف التنبيه عن طريق تقبيل الجبين والعكس.\n\n
+        - يمكنك اختيار رسم حدود الشفاه والجبين لتسهيل النقر.\n\n
+        - اختيار مدى شفافية الحدود، حتى لا تفوت تفاصيل شريك حياتك.
+    </string>
+
+</resources>
