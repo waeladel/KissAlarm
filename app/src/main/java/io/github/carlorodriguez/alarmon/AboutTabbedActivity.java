@@ -108,16 +108,20 @@ public class AboutTabbedActivity extends AppCompatActivity {
             View rootView = inflater.inflate(R.layout.fragment_about_tabbed,
                     container, false);
 
-            /*WebView webView = (WebView) rootView.findViewById(
-                    R.id.section_about_wb);*/
+            WebView webView = (WebView) rootView.findViewById(
+                    R.id.section_about_wb);
 
             TextView textView = rootView.findViewById(
-                    R.id.section_about_wb);
+                    R.id.section_about_txt);
 
             switch (getArguments().getInt(ARG_SECTION_NUMBER)) {
                 case 1:
                     //webView.loadUrl("file:///android_asset/about.html");
                     textView.setText(getText(R.string.about_text));
+                    webView.setVisibility(View.GONE);
+                    break;
+                case 2:
+                    webView.loadUrl("file:///android_asset/privacy_policy.html");
                     break;
                 /*case 2:
                     webView.loadUrl("file:///android_asset/license.html");
@@ -164,7 +168,7 @@ public class AboutTabbedActivity extends AppCompatActivity {
         public int getCount() {
             // Show 6 total pages.
             //return 6;
-            return 1;
+            return 2;
         }
 
         @Override
@@ -173,7 +177,7 @@ public class AboutTabbedActivity extends AppCompatActivity {
                 case 0:
                     return "ABOUT";
                 case 1:
-                    return "LICENSE";
+                    return "PRIVACY POLICY";
                 case 2:
                     return "SOURCE CODE";
                 case 3:

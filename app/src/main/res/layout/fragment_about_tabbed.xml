@@ -12,12 +12,19 @@
         android:layout_marginTop="40dp">
 
         <TextView
+            android:id="@+id/section_about_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+    </ScrollView>
+
+
+        <WebView
             android:id="@+id/section_about_wb"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
+            android:layout_marginTop="40dp"
             />
-    </ScrollView>
 
 
 </RelativeLayout>

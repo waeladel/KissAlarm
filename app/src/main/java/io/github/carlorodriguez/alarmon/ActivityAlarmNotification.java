@@ -123,6 +123,8 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
     private InputStream mStream ;
     private volatile Bitmap mBitmap ;
+    private volatile Bitmap TransformBitmap;
+    private volatile Bitmap scaledBitmap;
     private SparseArray<Face> mFaces;
     private FaceDetector mDetector;
     private Frame mFrame ;
@@ -762,7 +764,6 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
                 if (hasLowStorage) {
                     Toast.makeText(ActivityAlarmNotification.this, R.string.low_storage_error, Toast.LENGTH_LONG).show();
-                    Log.d(TAG, getString(R.string.tone));
                 }
             }
 
@@ -845,7 +846,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
             }else{
                 if (mDetector!= null){
                     mDetector.release();
-                    Log.d(TAG, "mDetector released onDestroy");
+                    Log.d(TAG, "mDetector released");
                 }
             }
 
@@ -911,7 +912,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
             if (hasLowStorage) {
                 Toast.makeText(ActivityAlarmNotification.this, R.string.low_storage_error, Toast.LENGTH_LONG).show();
-                Log.d(TAG, getString(R.string.tone));
+
             }
         }
 
@@ -959,7 +960,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
         if(mBitmap != null){
             //get hte bitmap's transformation from the TextureView
-            Bitmap TransformBitmap = Bitmap.createBitmap( mBitmap, 0, 0, mBitmap.getWidth(), mBitmap.getHeight(), mTextureView.getTransform(null), true );
+             TransformBitmap = Bitmap.createBitmap( mBitmap, 0, 0, mBitmap.getWidth(), mBitmap.getHeight(), mTextureView.getTransform(null), true );
             //TransformBitmap= cropCenter(TransformBitmap);
             new VideoFaceDetectorAsyncTask().execute(cropCenter(TransformBitmap));
         }
@@ -1074,7 +1075,6 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         Log.d(TAG, "cropCenter: imagePivotPointX= "+ imagePivotPointX);
 
 
-        Bitmap scaledBitmap;
         scaledBitmap = Bitmap.createBitmap(bitmap, imagePivotPointX, imagePivotPointY, viewWidth ,
                 viewHeight);
 
