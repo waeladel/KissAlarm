@@ -163,7 +163,7 @@
   <string name="please_wait">Please wait</string>
   <string name="alarm_deleted">Alarm deleted</string>
   <string name="undo">UNDO</string>
-  <string name="swipe_right_to_delete">Hi There! Swipe to the right direction to delete the alarm.</string>
+  <string name="swipe_right_to_delete">Hi There! Swipe right  to delete an alarm.</string>
   <string name="material_intro_id_alarm_deletion">material_intro_id_119.104</string>
 
   <string name="permission_camera_rationale">Access to the camera is needed for detection</string>

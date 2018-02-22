@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.view.View;
+import android.widget.Toast;
 
 import co.mobiwise.materialintro.shape.Focus;
 import co.mobiwise.materialintro.shape.FocusGravity;
@@ -34,7 +35,7 @@ public class AppIntro {
 
         editor.apply();
 
-        new MaterialIntroView.Builder(activity)
+        /*new MaterialIntroView.Builder(activity)
                 .enableDotAnimation(false)
                 .enableIcon(true)
                 .setFocusGravity(FocusGravity.CENTER)
@@ -46,7 +47,8 @@ public class AppIntro {
                 .setTarget(view)
                 .setUsageId(activity.
                         getString(R.string.material_intro_id_alarm_deletion))
-                .show();
+                .show();*/
+
     }
 
 }

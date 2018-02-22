@@ -40,6 +40,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.wdullaer.materialdatetimepicker.time.*;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
@@ -212,9 +213,11 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
                     if (adapter.getItemCount() >= 1 && alarmList.getChildAt(0) != null) {
                         AppIntro.showcaseAlarmDeletion(ActivityAlarmClock.this,
                                 alarmList.getChildAt(0));
+                        // use Toast better
+                        Toast.makeText(ActivityAlarmClock.this, R.string.swipe_right_to_delete, Toast.LENGTH_LONG).show();
                     }
                 }
-            }, 500);
+            }, 1500);
         }
     }
 
