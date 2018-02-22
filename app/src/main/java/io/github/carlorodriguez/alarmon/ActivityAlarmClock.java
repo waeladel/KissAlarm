@@ -59,6 +59,9 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
         TimePickerDialog.OnTimeSetListener,
         TimePickerDialog.OnTimeChangedListener {
 
+    private static String TAG = ActivityAlarmClock.class.getSimpleName();
+
+
     public static final int DELETE_CONFIRM = 1;
     public static final int DELETE_ALARM_CONFIRM = 2;
 
@@ -199,6 +202,7 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
                 }
 
                 long next = AlarmUtil.millisTillNextInterval(interval);
+                Log.d(TAG, "next = "+next);
 
                 handler.postDelayed(tickCallback, next);
             }
@@ -282,6 +286,9 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
 
             tpd.setOnTimeChangedListener(this);
         }
+
+        Log.d(TAG, "onResume");
+
     }
 
     @Override
@@ -299,6 +306,8 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
         mLastFirstVisiblePosition = ((LinearLayoutManager)
                 alarmList.getLayoutManager()).
                 findFirstCompletelyVisibleItemPosition();
+
+        Log.d(TAG, "onPause");
     }
 
     @Override
@@ -312,6 +321,7 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
         notifyService = null;
 
         cursor.close();
+        Log.d(TAG, "onDestroy");
     }
 
     @Override
@@ -332,8 +342,20 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
         AlarmTime time = new AlarmTime(hourOfDay, minute, second);
 
         service.createAlarm(time);
-
         requery();
+        Log.d(TAG, "onTimeSet");
+        Log.d(TAG, "getItemCount= "+adapter.getItemCount()+ "getChildAt(0)="+alarmList.getChildAt(0));
+
+        if (adapter.getItemCount()==1){ // if it's the first alarm
+
+            // Schedule the next update to be Immediately.
+            handler.removeCallbacks(tickCallback); //Remove any existing callbacks to the handler so we don't get more than one callback event
+            AlarmUtil.Interval interval = AlarmUtil.Interval.SECOND;
+            long next = AlarmUtil.millisTillNextInterval(interval);
+            handler.postDelayed(tickCallback, next);
+            Log.d(TAG, "interval SECOND: "+ next);
+        }
+
     }
 
     @Override
