@@ -147,4 +147,15 @@
   <string name="volume_duration_label">Dauer: %1$d Sekunden</string>
   <string name="volume_end_label">Endgültiges Volumen: %1$d%%</string>
   <string name="volume_start_label">Anfangslautstärke: %1$d%%</string>
+    <string name="deep_link_congratulation">Herzliche Glückwünsche</string>
+  <string name="deep_link_welcome_text">Sie können jetzt die App verwenden.</string>
+  <string name="google_play_services_error">Verbindung fehlgeschlagen.</string>
+  <string name="invitation_cta">Installieren</string>
+  <string name="invitation_failed">Leider konnten wir die Einladung nicht an deine Freunde senden.</string>
+  <string name="invitation_message">Hallo! Diese App ist lustig. Wache mit deinem Video oder deiner Stimme auf</string>
+  <string name="invitation_title">Freunden vorschlagen</string>
+  <string name="invite_dialog_title">Du hast eine Einladung!</string>
+  <string name="menu_invite">Freunde einladen</string>
+  <string name="send_failed">Fehler beim Senden der Einladungen</string>
+  <string name="sent_invitations_fmt">Hat %d Einladungen gesendet</string>
 </resources>

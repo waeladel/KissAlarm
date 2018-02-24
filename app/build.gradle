@@ -14,8 +14,8 @@ android {
         applicationId "com.kiss.alarm"
         minSdkVersion 15
         targetSdkVersion 27
-        versionName '1.0.2'
-        versionCode 102
+        versionName '1.0.3'
+        versionCode 103
     }
 
     signingConfigs {
@@ -43,24 +43,26 @@ android {
 }
 
 dependencies {
+    compile project(':library')
+    // for image and gallery
+    // for dialog
+    // for audio recording
+    // face detector
+    // Image Cropper
     compile 'com.android.support:appcompat-v7:27.0.2'
     compile 'com.android.support:design:27.0.2'
     compile 'org.apache.commons:commons-lang3:3.4'
     compile 'com.android.support:preference-v7:27.0.2'
-    compile project(':library')
     compile 'fr.baloomba:viewpagerindicator:2.4.2'
     compile 'com.android.support:cardview-v7:27.0.2'
     compile 'com.github.iammert:MaterialIntroView:1.5.2'
     compile 'com.yanzhenjie:album:2.0.2'
-    // for image and gallery
     compile 'com.afollestad.material-dialogs:commons:0.9.6.0'
-    // for dialog
     compile 'com.github.adrielcafe:AndroidAudioRecorder:0.2.0'
-    // for audio recording
-    compile 'com.google.android.gms:play-services-vision:11.0.4'
-    // face detector
     compile 'com.theartofdev.edmodo:android-image-cropper:2.6.0'
-    // Image Cropper
+    compile 'com.google.android.gms:play-services-vision:11.8.0'
+    compile 'com.google.firebase:firebase-core:11.8.0'
+    compile 'com.google.firebase:firebase-invites:11.8.0'
 }
 
 play {
@@ -68,3 +70,5 @@ play {
     track = 'production'
     uploadImages = true
 }
+
+apply plugin: 'com.google.gms.google-services'

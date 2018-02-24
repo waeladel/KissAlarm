@@ -149,4 +149,15 @@
   <string name="toggle_button_hint">Si está habilitado, los labios comienzan a dormitar y la frente detiene la alarma.</string>
   <string name="tone">Voz del socio</string>
   <string name="visibility_button">Claridad de botones</string>
+    <string name="deep_link_congratulation">Felicitaciones</string>
+  <string name="deep_link_welcome_text">Ahora puede usar la aplicación.</string>
+  <string name="google_play_services_error">La conexión falló.</string>
+  <string name="invitation_cta">Instalar</string>
+  <string name="invitation_failed">Lo sentimos, no pudimos enviar la invitación a tus amigos.</string>
+  <string name="invitation_message">Hola, esta aplicación es divertida. Despierta con el video o la voz de tu amante</string>
+  <string name="invitation_title">Sugerir a amigos</string>
+  <string name="invite_dialog_title">Tienes una invitación</string>
+  <string name="menu_invite">Invitar a amigos</string>
+  <string name="send_failed">Error al enviar invitaciones</string>
+  <string name="sent_invitations_fmt">Enviado %d invitaciones</string>
 </resources>

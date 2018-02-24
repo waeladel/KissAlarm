@@ -147,4 +147,15 @@
   <string name="volume_duration_label">Duur: %1$d seconden</string>
   <string name="volume_end_label">Laatste volume: %1$d%%</string>
   <string name="volume_start_label">Beginvolume: %1$d%%</string>
+    <string name="deep_link_congratulation">Hartelijk gefeliciteerd</string>
+  <string name="deep_link_welcome_text">U kunt nu de app gebruiken.</string>
+  <string name="google_play_services_error">Verbinding mislukt.</string>
+  <string name="invitation_cta">Installeren</string>
+  <string name="invitation_failed">Sorry, we konden de uitnodiging niet verzenden naar uw vrienden.</string>
+  <string name="invitation_message">Deze app is grappig. Word wakker met de video of stem van je geliefde</string>
+  <string name="invitation_title">Stel voor aan vrienden</string>
+  <string name="invite_dialog_title">Je hebt een uitnodiging!</string>
+  <string name="menu_invite">Nodig vrienden uit</string>
+  <string name="send_failed">Verzenden van uitnodigingen mislukt</string>
+  <string name="sent_invitations_fmt">Verzonden %d uitnodigingen</string>
 </resources>

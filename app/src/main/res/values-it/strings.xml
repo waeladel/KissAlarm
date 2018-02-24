@@ -147,4 +147,15 @@
   <string name="volume_duration_label">Durata: %1$d secondi</string>
   <string name="volume_end_label">Volume finale: %1$d%%</string>
   <string name="volume_start_label">Livello del volume iniziale: %1$d%%</string>
+    <string name="deep_link_congratulation">Complimenti</string>
+  <string name="deep_link_welcome_text">Ora puoi usare l\'app.</string>
+  <string name="google_play_services_error">Connessione fallita.</string>
+  <string name="invitation_cta">Installare</string>
+  <string name="invitation_failed">Siamo spiacenti, non siamo riusciti a inviare l\'invito ai tuoi amici.</string>
+  <string name="invitation_message">Questa app è divertente Svegliati con il video o la voce del tuo amante</string>
+  <string name="invitation_title">Suggerisci agli amici</string>
+  <string name="invite_dialog_title">Hai un invito!</string>
+  <string name="menu_invite">Invita gli amici</string>
+  <string name="send_failed">Impossibile inviare inviti</string>
+  <string name="sent_invitations_fmt">Inviati %d inviti</string>
 </resources>

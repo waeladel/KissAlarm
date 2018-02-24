@@ -147,4 +147,15 @@
   <string name="volume_duration_label">Trajanje: %1$d sekunde</string>
   <string name="volume_end_label">Završni volumen: %1$d%%</string>
   <string name="volume_start_label">Početna razina glasnoće: %1$d%%</string>
+    <string name="deep_link_congratulation">Čestitamo</string>
+  <string name="deep_link_welcome_text">Sada možete upotrebljavati aplikaciju.</string>
+  <string name="google_play_services_error">Veza nije uspjela.</string>
+  <string name="invitation_cta">Instalirati</string>
+  <string name="invitation_failed">Žao nam je, nismo mogli poslati pozivnicu svojim prijateljima.</string>
+  <string name="invitation_message">Ova je aplikacija smiješna. Probudite se videu ili glasu vašeg ljubavnika</string>
+  <string name="invitation_title">Prijedlog za prijatelje</string>
+  <string name="invite_dialog_title">Dobio si poziv!</string>
+  <string name="menu_invite">Pozvati prijatelje</string>
+  <string name="send_failed">Slanje pozivnica nije uspjelo</string>
+  <string name="sent_invitations_fmt">Poslano je %d pozivnica</string>
 </resources>

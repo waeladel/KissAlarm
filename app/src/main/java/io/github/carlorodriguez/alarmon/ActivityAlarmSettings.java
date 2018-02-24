@@ -1192,11 +1192,11 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
 
     private void recordAudio() {
         String filePath = Environment.getExternalStorageDirectory() + "/recorded_audio.wav";
-        int color = getResources().getColor(R.color.blue_grey);
+        int color = getResources().getColor(R.color.teal);
         int requestCode = 4;
         AndroidAudioRecorder.with(this)
                 // Required
-                .setFilePath(mOutputFile.getPath())
+                .setFilePath(mOutputFile.getPath())//
                 .setColor(color)
                 .setRequestCode(requestCode)
 

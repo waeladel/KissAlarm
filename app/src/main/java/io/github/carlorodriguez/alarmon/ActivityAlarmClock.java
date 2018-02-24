@@ -21,6 +21,7 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
@@ -40,7 +41,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
+
+import com.google.android.gms.appinvite.AppInvite;
+import com.google.android.gms.appinvite.AppInviteInvitation;
+import com.google.android.gms.appinvite.AppInviteInvitationResult;
+import com.google.android.gms.appinvite.AppInviteReferral;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
 
 import com.wdullaer.materialdatetimepicker.time.*;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
@@ -57,7 +67,7 @@ import java.util.Calendar;
  */
 public final class ActivityAlarmClock extends AppCompatActivity implements
         TimePickerDialog.OnTimeSetListener,
-        TimePickerDialog.OnTimeChangedListener {
+        TimePickerDialog.OnTimeChangedListener , GoogleApiClient.OnConnectionFailedListener{
 
     private static String TAG = ActivityAlarmClock.class.getSimpleName();
 
@@ -67,6 +77,10 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
 
     public static final int ACTION_TEST_ALARM = 0;
     public static final int ACTION_PENDING_ALARMS = 1;
+    public static final int ACTION_INVITE = 2;
+
+    private static final int REQUEST_INVITE = 0;
+
 
     private TimePickerDialog picker;
     public static ActivityAlarmClock activityAlarmClock;
@@ -80,6 +94,10 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
     private Runnable tickCallback;
     private static RecyclerView alarmList;
     private int mLastFirstVisiblePosition;
+
+    // [START define_variables]
+    private GoogleApiClient mGoogleApiClient;
+    // [END define_variables]
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -223,6 +241,53 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
                 }
             }, 1500);
         }
+
+        // Create an auto-managed GoogleApiClient with access to App Invites.
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(AppInvite.API)
+                .enableAutoManage(this, this)
+                .build();
+
+        // Check for App Invite invitations and launch deep-link activity if possible.
+        // Requires that an Activity is registered in AndroidManifest.xml to handle
+        // deep-link URLs.
+        //boolean autoLaunchDeepLink = true;
+        boolean autoLaunchDeepLink = false;
+        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, this, autoLaunchDeepLink)
+                .setResultCallback(
+                        new ResultCallback<AppInviteInvitationResult>() {
+                            @Override
+                            public void onResult(AppInviteInvitationResult result) {
+                                Log.d(TAG, "getInvitation:onResult:" + result.getStatus());
+                                if (result.getStatus().isSuccess()) {
+                                    // Extract information from the intent
+                                    Intent intent = result.getInvitationIntent();
+                                    String deepLink = AppInviteReferral.getDeepLink(intent);
+                                    String invitationId = AppInviteReferral.getInvitationId(intent);
+                                    Log.d(TAG, "getInvitation:deepLink:" + deepLink);
+                                    Log.d(TAG, "getInvitation:invitationId:" + invitationId);
+
+                                    // Because autoLaunchDeepLink = true we don't have to do anything
+                                    // here, but we could set that to false and manually choose
+                                    // an Activity to launch to handle the deep link here.
+                                    // ...
+                                    Intent congratulationIntent = new Intent(ActivityAlarmClock.this, DeepLinkActivity.class);
+                                    //startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(congratulationIntent);
+                                }
+                            }
+                        });
+
+    }
+    // [END on_create]
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+        //showMessage(getString(R.string.google_play_services_error));
+        Toast.makeText(ActivityAlarmClock.this, getString(R.string.google_play_services_error),
+                Toast.LENGTH_LONG).show();
+        // Sending failed or it was canceled
     }
 
     private void undoAlarmDeletion(AlarmTime alarmTime,
@@ -332,10 +397,34 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
             menu.add(Menu.NONE, ACTION_PENDING_ALARMS, 6, R.string.pending_alarms);
         }
 
+        menu.add(Menu.NONE, ACTION_INVITE, 7, R.string.menu_invite);
+
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         return true;
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult: requestCode=" + requestCode + ", resultCode=" + resultCode);
+
+        if (requestCode == REQUEST_INVITE) {
+            if (resultCode == RESULT_OK) {
+                // Get the invitation IDs of all sent messages
+                String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
+                for (String id : ids) {
+                    Log.d(TAG, "onActivityResult: sent invitation " + id);
+                }
+            } else {
+                Toast.makeText(ActivityAlarmClock.this, getString(R.string.invitation_failed),
+                        Toast.LENGTH_LONG).show();
+                // Sending failed or it was canceled, show failure message to the user
+                // ...
+            }
+        }
+    }
+    // [END on_activity_result]
 
     @Override
     public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute, int second) {
@@ -407,9 +496,23 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
                 startActivity(new Intent(getApplicationContext(),
                         ActivityPendingAlarms.class));
                 break;
+            case ACTION_INVITE:
+                Log.d(TAG, "INVITE clicked ");
+                onInviteClicked();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void onInviteClicked() {
+        Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))
+                .setMessage(getString(R.string.invitation_message))
+                .setDeepLink(Uri.parse(getString(R.string.invitation_deep_link)))
+                //.setCustomImage(Uri.parse(getString(R.string.invitation_custom_image)))
+                .setCallToActionText(getString(R.string.invitation_cta))
+                .build();
+        startActivityForResult(intent, REQUEST_INVITE);
     }
 
     private void showDialogFragment(int id) {

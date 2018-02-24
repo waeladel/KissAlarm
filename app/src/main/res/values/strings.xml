@@ -168,6 +168,28 @@
 
   <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
 
+  <string name="menu_invite">Invite Friends</string>
+    <string name="invitation_title">Suggest to friends</string>
+    <string name="invitation_message">Hi! this app is funny. Wake up to your lover\'s video or voice, kiss to dismiss</string>
+  <string name="invitation_deep_link" translatable="false">https://uf24v.app.goo.gl/kiss</string>
+  <string name="invitation_custom_image" >https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png</string>
+    <string name="invitation_cta">Install</string>
+    <string name="invitation_failed">Sorry, we couldn\'t sent the invitation to your friends.</string>
+    <string name="google_play_services_error">Connection failed.</string>
+
+  <string name="deep_link_fmt" formatted="false">Deep Link: %s</string>
+  <string name="invitation_id_fmt" formatted="false">Invitation ID: %s</string>
+
+  <string name="deep_link_congratulation">Congratulations:</string>
+  <string name="deep_link_welcome_text">You may now try the app.</string>
+
+  <string name="sent_invitations_fmt" formatted="false">Sent %d invitations</string>
+  <string name="send_failed">Sending invitations failed</string>
+  <string name="invite_dialog_title">You got an invitation!</string>
+  <string name="deep_link_default">Deep link not set</string>
+  <string name="invitation_id_default">Invitation ID not set</string>
+
+
   <string name="about_text">Every day starts by opening your eyes, so nothing will make your day like waking up by your beloved one.\n\nWhy choosing a ringtone while you can wake up every day by the most thing you adore, your lover\'s voice.\n\n\"kiss alarm\" enables you to choose a recorded video or a voice note accompanied by your partner\'s photo to wake you up, it\'s more like a visual wake-up call but not from a hotel employee. Speaking of visuals, you have to kiss your partner\'s lips to dismiss the alarm, or forehead to snooze.\n\n
   Features:\n\n
 - You can choose a video of your partner or a photo accompanied by voice note.\n\n

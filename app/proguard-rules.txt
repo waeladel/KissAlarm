@@ -1,1 +1,3 @@
 -dontwarn com.viewpagerindicator.**
+-keepattributes EnclosingMethod
+-keepattributes InnerClasses
