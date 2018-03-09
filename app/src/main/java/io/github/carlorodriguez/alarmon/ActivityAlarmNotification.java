@@ -763,6 +763,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                 boolean hasLowStorage = registerReceiver(null, lowstorageFilter) != null;
 
                 if (hasLowStorage) {
+                    Log.d(TAG, "Sorry, there isn't enough storage.");
                     Toast.makeText(ActivityAlarmNotification.this, R.string.low_storage_error, Toast.LENGTH_LONG).show();
                 }
             }

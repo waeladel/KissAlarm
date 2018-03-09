@@ -167,6 +167,8 @@
   <string name="material_intro_id_alarm_deletion">material_intro_id_119.104</string>
 
   <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
+  <string name="access_mic">Microphone Access</string>
+  <string name="mic_permission_required">Access to the Microphone is required to record a wake-up call and save it.</string>
 
   <string name="menu_invite">Invite Friends</string>
     <string name="invitation_title">Suggest to friends</string>

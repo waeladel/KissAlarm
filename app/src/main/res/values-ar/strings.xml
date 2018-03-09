@@ -173,5 +173,7 @@
     <string name="menu_invite">قل للأصدقاء</string>
     <string name="send_failed">فشل إرسال الدعوات</string>
     <string name="sent_invitations_fmt">تم إرسال %d دعوات</string>
+    <string name="access_mic">إذن الميكروفون</string>
+    <string name="mic_permission_required">مطلوب السماح باستخدام الميكروفون لتسجيل مكالمة الإيقاظ وحفظها.</string>
 
 </resources>

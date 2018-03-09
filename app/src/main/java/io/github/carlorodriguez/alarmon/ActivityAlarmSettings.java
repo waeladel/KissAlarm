@@ -44,6 +44,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -106,6 +107,8 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
 
     private static String TAG = ActivityAlarmSettings.class.getSimpleName();
     private static final int SELECT_MULTIMEDIA = 2;
+    private static final int MIC_PERMISSION_REQUEST_CODE = 7000;
+
     private ArrayList<AlbumFile> mMediaFiles;
     private File mOutputFile;
     private File mCroppdImage;
@@ -114,6 +117,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
     public static final String EXTRAS_ALARM_ID = "alarm_id";
     private static final int MISSING_EXTRAS = -69;
     private static final int READ_EXTERNAL_STORAGE_PERMISSION_REQUEST = 0;
+    private static final int EXPLAIN_MIC_PERMISSION = 43;
     private static final String SETTINGS_VIBRATE_KEY = "SETTINGS_VIBRATE_KEY";
     private static final String SETTINGS_SNOOZE_KEY = "SETTINGS_SNOOZE_KEY";
     private static final String SETTINGS_TIME_HOUR_OF_DAY_KEY = "SETTINGS_TIME_HOUR_OF_DAY_KEY";
@@ -595,18 +599,34 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
     @Override
     public void onRequestPermissionsResult(int requestCode,
             @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == READ_EXTERNAL_STORAGE_PERMISSION_REQUEST) {
-            if (permissions.length == 1 &&
-                    permissions[0].equals(
-                            Manifest.permission.READ_EXTERNAL_STORAGE)
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                showProgressDialog();
 
-                showDialogFragment(TONE_PICKER);
-            } else {
-                showDialogFragment(PERMISSION_NOT_GRANTED);
-            }
+        switch (requestCode) {
+            case READ_EXTERNAL_STORAGE_PERMISSION_REQUEST:
+                if (permissions.length == 1 &&
+                        permissions[0].equals(
+                                Manifest.permission.READ_EXTERNAL_STORAGE)
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    showProgressDialog();
+
+                    showDialogFragment(TONE_PICKER);
+                } else {
+                    showDialogFragment(PERMISSION_NOT_GRANTED);
+                }
+                break;
+            case MIC_PERMISSION_REQUEST_CODE:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the
+                    // init task you need to do.
+                    recordAudio();
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    showDialogFragment(PERMISSION_NOT_GRANTED);
+                }
+                break;
         }
+
     }
 
     @Override
@@ -774,20 +794,13 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
             Log.d(TAG, "type = photo1"+ settings.getMediaType());
             if(!settings.getMediaType().equals("Video")){
                 Log.d(TAG, "type = photo1");
-                if (ContextCompat.checkSelfPermission(ActivityAlarmSettings.this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE)
-                        == PackageManager.PERMISSION_GRANTED) {
-                    String audioSourceTitle = getResources().getString(R.string.audio_source);
-                    String cancelButton = getResources().getString(R.string.cancel);
-                    String[] audioSourceArray = getResources().getStringArray(R.array.audio_source);
+                String audioSourceTitle = getResources().getString(R.string.audio_source);
+                String cancelButton = getResources().getString(R.string.cancel);
+                String[] audioSourceArray = getResources().getStringArray(R.array.audio_source);
 
-                    showAudioDialog(audioSourceTitle,audioSourceArray ,cancelButton );
+                showAudioDialog(audioSourceTitle,audioSourceArray ,cancelButton );
                 /*showProgressDialog();
                 showDialogFragment(TONE_PICKER);*/
-
-                } else {
-                    requestReadExternalStoragePermission();
-                }
             }
             break;
 
@@ -1175,11 +1188,21 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                         Log.d(TAG, "CharSequence= " + text);
                         switch (which) {
                             case 0://Select a file
-                                showProgressDialog();
-                                showDialogFragment(TONE_PICKER);
+
+                                if (ContextCompat.checkSelfPermission(ActivityAlarmSettings.this,
+                                        Manifest.permission.READ_EXTERNAL_STORAGE)
+                                        == PackageManager.PERMISSION_GRANTED) {
+                                    showProgressDialog();
+                                    showDialogFragment(TONE_PICKER);
+                                } else {
+                                    requestReadExternalStoragePermission();
+                                }
+
                                 break;
                             case 1: //Record via microphone
-                                recordAudio();
+                                if(checkMicPermissions()) {
+                                    recordAudio();
+                                }
                                 break;
                         }
 
@@ -1190,8 +1213,53 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                 .show();
     }
 
+    private boolean checkMicPermissions() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)== PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WAKE_LOCK)== PackageManager.PERMISSION_GRANTED) {
+            return true;
+        } else {
+            requestMicPermissions();
+            return false;
+        }
+    }
+
+    private void requestMicPermissions() {
+        // Permission has not been granted and must be requested.
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.RECORD_AUDIO ) ||
+                ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) ||
+                ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.WAKE_LOCK)) {
+            // Provide an additional rationale to the user if the permission was not granted
+            // and the user would benefit from additional context for the use of the permission.
+            // Display a SnackBar with cda button to request the missing permission.
+            showDialogFragment(EXPLAIN_MIC_PERMISSION);
+            /*Snackbar.make(findViewById(R.id.settings ), R.string.mic_permission_required,
+                    Snackbar.LENGTH_INDEFINITE).setAction(R.string.ok, new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // Request the permission
+                    ActivityCompat.requestPermissions(ActivityAlarmSettings.this,
+                            new String[]{android.Manifest.permission.RECORD_AUDIO,
+                                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                    android.Manifest.permission.WAKE_LOCK},
+                            MIC_PERMISSION_REQUEST_CODE);
+                }
+            }).show();*/
+
+        } else {
+            // No explanation needed; request the permission
+            //Snackbar.make(findViewById(R.id.settings), R.string.mic_unavailable, Snackbar.LENGTH_SHORT).show();
+            // Request the permission. The result will be received in onRequestPermissionResult().
+            ActivityCompat.requestPermissions(ActivityAlarmSettings.this,
+                    new String[]{android.Manifest.permission.RECORD_AUDIO,
+                            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            android.Manifest.permission.WAKE_LOCK},
+                    MIC_PERMISSION_REQUEST_CODE);
+        }
+    }
+
     private void recordAudio() {
-        String filePath = Environment.getExternalStorageDirectory() + "/recorded_audio.wav";
+        //String filePath = Environment.getExternalStorageDirectory() + "/recorded_audio.wav";
         int color = getResources().getColor(R.color.teal);
         int requestCode = 4;
         AndroidAudioRecorder.with(this)
@@ -1484,6 +1552,37 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
             });
 
             return builder.create();
+          case EXPLAIN_MIC_PERMISSION:
+              final AlertDialog.Builder micBuilder = new AlertDialog.Builder(
+                      getActivity());
+
+              micBuilder.setTitle(R.string.access_mic);
+
+              micBuilder.setMessage(R.string.mic_permission_required);
+
+              micBuilder.setPositiveButton(R.string.grant,
+                      new DialogInterface.OnClickListener() {
+                          @Override
+                          public void onClick(DialogInterface dialog, int which) {
+                              dismiss();
+                              // Request the permission
+                              ActivityCompat.requestPermissions(getActivity(),
+                                      new String[]{android.Manifest.permission.RECORD_AUDIO,
+                                              android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                              android.Manifest.permission.WAKE_LOCK},
+                                      MIC_PERMISSION_REQUEST_CODE);
+                          }
+                      });
+
+              micBuilder.setNegativeButton(R.string.cancel,
+                      new DialogInterface.OnClickListener() {
+                          @Override
+                          public void onClick(DialogInterface dialog, int which) {
+                              dismiss();
+                          }
+                      });
+
+              return micBuilder.create();
         case PERMISSION_NOT_GRANTED:
             final AlertDialog.Builder permissionBuilder = new AlertDialog.Builder(
                     getActivity());

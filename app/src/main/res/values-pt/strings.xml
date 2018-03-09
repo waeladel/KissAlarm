@@ -158,4 +158,6 @@
   <string name="menu_invite">Convide amigos</string>
   <string name="send_failed">Falha ao enviar convites</string>
   <string name="sent_invitations_fmt">Enviou %d convites</string>
+    <string name="access_mic">Permissão de microfone</string>
+  <string name="mic_permission_required">O acesso ao microfone é necessário para gravar uma chamada de despertador e salvá-la.</string>
 </resources>

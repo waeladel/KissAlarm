@@ -158,4 +158,6 @@
   <string name="menu_invite">Pozvati prijatelje</string>
   <string name="send_failed">Slanje pozivnica nije uspjelo</string>
   <string name="sent_invitations_fmt">Poslano je %d pozivnica</string>
+    <string name="access_mic">Dozvola za mikrofon</string>
+  <string name="mic_permission_required">Pristup mikrofonu potreban je za snimanje poziva za buđenje i spremanje.</string>
 </resources>
