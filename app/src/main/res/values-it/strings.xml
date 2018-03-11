@@ -160,4 +160,5 @@
   <string name="sent_invitations_fmt">Inviati %d inviti</string>
     <string name="access_mic">Autorizzazione al microfono</string>
   <string name="mic_permission_required">L\'accesso al microfono è necessario per registrare una sveglia e salvarlo.</string>
+    <string name="proceed">Procedere</string>
 </resources>

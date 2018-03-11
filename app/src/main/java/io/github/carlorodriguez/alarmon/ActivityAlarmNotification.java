@@ -42,6 +42,7 @@ import android.media.MediaPlayer;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
@@ -453,10 +454,10 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         notifyService.unbind();
         Log.d(TAG, "mamaMediaPlayer= onDestroy");
 
-        if (mDetector!= null){
+        /*if (mDetector!= null){
             mDetector.release();
             Log.d(TAG, "mDetector released onDestroy");
-        }
+        }*/
     }
 
     @Override
@@ -823,17 +824,24 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
             // future releases.
             Process.setThreadPriority(Process.THREAD_PRIORITY_FOREGROUND);
 
-            Log.d(TAG, "Before mFrame Builder="+ mFrame);
-            if (bitmapParams[0] != null) {
-                mFrame = new Frame.Builder()
-                        .setBitmap(bitmapParams[0])
-                        .build();
-                Log.d(TAG, "After mFrame Builder="+ mFrame);
+            if(isCancelled()){
+                Log.d(TAG, "VideoFaceDetectorAsyncTask isCancelled="+ isCancelled());
+            }else{
+                Log.d(TAG, "VideoFaceDetectorAsyncTask isCancelled="+ isCancelled());
+                Log.d(TAG, "Before mFrame Builder="+ mFrame);
+                if (bitmapParams[0] != null) {
+                    mFrame = new Frame.Builder()
+                            .setBitmap(bitmapParams[0])
+                            .build();
+                    Log.d(TAG, "After mFrame Builder="+ mFrame);
 
-                //mDetector.detect(mFrame);
-                Log.d(TAG, "Before Detector.receiveFrame="+ mFrame);
-                mDetector.receiveFrame(mFrame);// feed the detector with bitmap
-                Log.d(TAG, "After Detector.receiveFrame="+ mFrame);
+                    //mDetector.detect(mFrame);
+                    Log.d(TAG, "Before Detector.receiveFrame="+ mFrame+ isCancelled());
+                    if(mDetector != null){
+                        mDetector.receiveFrame(mFrame);// feed the detector with bitmap
+                        Log.d(TAG, "After Detector.receiveFrame="+ mFrame);
+                    }
+                }
             }
 
             return bitmapParams[0];
@@ -986,6 +994,12 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
             mVideoHeight = Float.parseFloat(height);
             mVideoWidth = Float.parseFloat(width);
+
+            if (Build.VERSION.SDK_INT >= 17) {
+                String Rotation = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);
+
+                Log.d(TAG,"updateTextureViewSize:  Rotation"+ Rotation);
+            }
 
         } catch (NumberFormatException e) {
             Log.d(TAG, e.getMessage());

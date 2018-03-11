@@ -128,7 +128,7 @@
   <string name="dark_light">Dark Light</string>
   <string name="read_external_storage_title">Read files</string>
   <string name="read_external_storage_message">We need your permission to read your media files so you can set your own alarm wake-up call.</string>
-  <string name="grant">Grant</string>
+  <string name="proceed">Proceed</string>
   <string name="permission_not_granted">We are sorry, we cannot access this feature until you grant us permission.</string>
   <string name="permission_not_granted_title">Permission not granted</string>
   <string name="notification_text_title">Notification text</string>

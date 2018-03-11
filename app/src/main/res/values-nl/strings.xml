@@ -160,4 +160,5 @@
   <string name="sent_invitations_fmt">Verzonden %d uitnodigingen</string>
     <string name="access_mic">Microfoon toestemming</string>
   <string name="mic_permission_required">Toegang tot de microfoon is vereist om een wake-up-oproep op te nemen en op te slaan.</string>
+    <string name="proceed">Doorgaan</string>
 </resources>

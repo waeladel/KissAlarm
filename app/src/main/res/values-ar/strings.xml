@@ -175,5 +175,6 @@
     <string name="sent_invitations_fmt">تم إرسال %d دعوات</string>
     <string name="access_mic">إذن الميكروفون</string>
     <string name="mic_permission_required">مطلوب السماح باستخدام الميكروفون لتسجيل مكالمة الإيقاظ وحفظها.</string>
+    <string name="proceed">تابع</string>
 
 </resources>

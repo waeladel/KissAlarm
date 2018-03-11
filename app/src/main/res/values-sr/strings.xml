@@ -160,4 +160,5 @@
   <string name="sent_invitations_fmt">Послато је %d позивница</string>
     <string name="access_mic">Дозвола за микрофон</string>
   <string name="mic_permission_required">Приступ микрофону је потребан за снимање позива за буђење и спремање.</string>
+    <string name="proceed">Наставите</string>
 </resources>

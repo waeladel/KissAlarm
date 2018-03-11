@@ -1533,7 +1533,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
 
             builder.setMessage(R.string.read_external_storage_message);
 
-            builder.setPositiveButton(R.string.grant,
+            builder.setPositiveButton(R.string.proceed,
                     new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -1560,7 +1560,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
 
               micBuilder.setMessage(R.string.mic_permission_required);
 
-              micBuilder.setPositiveButton(R.string.grant,
+              micBuilder.setPositiveButton(R.string.proceed,
                       new DialogInterface.OnClickListener() {
                           @Override
                           public void onClick(DialogInterface dialog, int which) {

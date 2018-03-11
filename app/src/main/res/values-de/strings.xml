@@ -160,4 +160,5 @@
   <string name="sent_invitations_fmt">Hat %d Einladungen gesendet</string>
     <string name="access_mic">Mikrofon Erlaubnis</string>
     <string name="mic_permission_required">Der Zugriff auf das Mikrofon ist erforderlich, um einen Weckruf aufzuzeichnen und zu speichern.</string>
+    <string name="proceed">Vorgehen</string>
 </resources>
