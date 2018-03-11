@@ -143,6 +143,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
     // Original video size
     private volatile float mVideoWidth;
     private volatile float mVideoHeight;
+    private volatile String mRotation;
 
     public static boolean isToggled;
     public static boolean isShown;
@@ -996,9 +997,9 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
             mVideoWidth = Float.parseFloat(width);
 
             if (Build.VERSION.SDK_INT >= 17) {
-                String Rotation = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);
+                mRotation = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);
 
-                Log.d(TAG,"updateTextureViewSize:  Rotation"+ Rotation);
+                Log.d(TAG,"updateTextureViewSize:  Rotation"+ mRotation);
             }
 
         } catch (NumberFormatException e) {
@@ -1037,6 +1038,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         int pivotPointY = viewHeight / 2;
 
         Matrix matrix = new Matrix();
+        //matrix.setRotate(-270);
         matrix.setScale(scaleX, scaleY, pivotPointX, pivotPointY);
 
         mTextureView.setTransform(matrix);

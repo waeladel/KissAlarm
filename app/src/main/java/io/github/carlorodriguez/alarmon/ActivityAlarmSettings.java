@@ -116,7 +116,9 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
 
     public static final String EXTRAS_ALARM_ID = "alarm_id";
     private static final int MISSING_EXTRAS = -69;
-    private static final int READ_EXTERNAL_STORAGE_PERMISSION_REQUEST = 0;
+    private static final int READ_EXTERNAL_STORAGE_PERMISSION_REQUEST = 11;
+    private static final int SELECT_Media_REQUEST = 22;
+
     private static final int EXPLAIN_MIC_PERMISSION = 43;
     private static final String SETTINGS_VIBRATE_KEY = "SETTINGS_VIBRATE_KEY";
     private static final String SETTINGS_SNOOZE_KEY = "SETTINGS_SNOOZE_KEY";
@@ -602,6 +604,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
 
         switch (requestCode) {
             case READ_EXTERNAL_STORAGE_PERMISSION_REQUEST:
+                Log.d(TAG, "PERMISSION READ_EXTERNAL_STORAGE");
                 if (permissions.length == 1 &&
                         permissions[0].equals(
                                 Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -805,18 +808,11 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
             break;
 
           case MEDIA:
-
-              if (ContextCompat.checkSelfPermission(ActivityAlarmSettings.this,
-                      Manifest.permission.READ_EXTERNAL_STORAGE)
-                      == PackageManager.PERMISSION_GRANTED) {
-                  showProgressDialog();
-                  Log.d(TAG, "MEDIA clicked");
-                  Log.d(TAG, "type" + type);
-                  Log.d(TAG, "getAllData buffer= "+db.getAllData().toString());
-                  selectMedia();
-              } else {
-                  requestReadExternalStoragePermission();
-              }
+              showProgressDialog();
+              Log.d(TAG, "MEDIA clicked");
+              Log.d(TAG, "type" + type);
+              Log.d(TAG, "getAllData buffer= "+db.getAllData().toString());
+              selectMedia();
               break;
 
         case SNOOZE:
@@ -835,7 +831,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
 
         Album.album(this) // Image and video mix options.
                 .singleChoice() // Multi-Mode, Single-Mode: singleChoice().
-                .requestCode(200) // The request code will be returned in the listener.
+                .requestCode(SELECT_Media_REQUEST) // The request code will be returned in the listener.
                 .columnCount(SELECT_MULTIMEDIA) // The number of columns in the page list.
                 //.selectCount(1)  // Choose up to a few images.
                 .camera(true) // Whether the camera appears in the Item.
