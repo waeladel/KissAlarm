@@ -163,4 +163,5 @@
     <string name="access_mic">Permiso de micrófono</string>
   <string name="mic_permission_required">Se requiere acceso al micrófono para grabar una llamada de despertador y guardarla.</string>
     <string name="proceed">Proceder</string>
+    <string name="aspect_ratio">Relación de aspecto</string>
 </resources>

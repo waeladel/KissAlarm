@@ -161,4 +161,5 @@
     <string name="access_mic">Autorisation de microphone</string>
   <string name="mic_permission_required">L\'accès au microphone est nécessaire pour enregistrer un appel de réveil et le sauvegarder.</string>
     <string name="proceed">Procéder</string>
+    <string name="aspect_ratio">Ratio d\'aspect</string>
 </resources>

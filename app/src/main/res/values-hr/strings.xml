@@ -161,4 +161,5 @@
     <string name="access_mic">Dozvola za mikrofon</string>
   <string name="mic_permission_required">Pristup mikrofonu potreban je za snimanje poziva za buđenje i spremanje.</string>
     <string name="proceed">Postupiti</string>
+    <string name="aspect_ratio">Aspect Ratio</string>
 </resources>

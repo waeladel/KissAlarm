@@ -82,6 +82,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import static android.R.attr.data;
+import static android.R.attr.visible;
 
 
 /**
@@ -134,16 +135,19 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
     public static Button foreheadButton;// lip button for onClick listener
     public  static Button snoozeButton;
+    private Button aspectRatio;
+    private Button aspectRatioWider;
+
     public Slider dismiss;
 
 
-    private Boolean shouldhideButtons;
+    private volatile Boolean shouldhideButtons;
     private Boolean toastExecuted;
 
     // Original video size
     private volatile float mVideoWidth;
     private volatile float mVideoHeight;
-    private volatile String mRotation;
+    private volatile int mRotation;
 
     public static boolean isToggled;
     public static boolean isShown;
@@ -281,6 +285,9 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                 mp.setLooping(true);
             }
         });*/
+
+        aspectRatio = (Button) findViewById(R.id.aspect_ratio);
+        aspectRatioWider = (Button) findViewById(R.id.aspect_ratio_wider);
 
         snoozeButton = (Button) findViewById(R.id.notify_snooze);
 
@@ -987,19 +994,52 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
             //metaRetriever.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
             metaRetriever.setDataSource(toneUri.toString());
 
-            String height = metaRetriever
+            final String height = metaRetriever
                     .extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
 
-            String width = metaRetriever
+            final String width = metaRetriever
                     .extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
 
-            mVideoHeight = Float.parseFloat(height);
-            mVideoWidth = Float.parseFloat(width);
-
-            if (Build.VERSION.SDK_INT >= 17) {
-                mRotation = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);
-
+            Log.d(TAG, "cropCenter updateTextureViewSize: width= "+ width + " height= "+height);
+            if (Build.VERSION.SDK_INT >= 17) {//17
+                mRotation = Integer.parseInt(metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION));
                 Log.d(TAG,"updateTextureViewSize:  Rotation"+ mRotation);
+               if (mRotation == 90 || mRotation == 270){// width and height  are transposed
+                    mVideoWidth = Float.parseFloat(height);
+                    mVideoHeight = Float.parseFloat(width);
+                }else{
+                    mVideoHeight = Float.parseFloat(height);
+                    mVideoWidth = Float.parseFloat(width);
+                }
+            }else{
+                mVideoHeight = Float.parseFloat(height);
+                mVideoWidth = Float.parseFloat(width);
+                aspectRatio.setVisibility(View.VISIBLE);
+                aspectRatio.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.d(TAG, "aspectRatio clicked ");
+                        mVideoWidth = Float.parseFloat(height);
+                        mVideoHeight = Float.parseFloat(width);
+                        updateTextureViewSize(mTextureView.getWidth(), mTextureView.getHeight()); //function to center crop the video
+                        aspectRatio.setVisibility(View.GONE);
+                        aspectRatioWider.setVisibility(View.VISIBLE);
+                        //showButtons();
+                    }
+                });
+
+                aspectRatioWider.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.d(TAG, "aspectRatioWider clicked ");
+                        mVideoHeight = Float.parseFloat(height);
+                        mVideoWidth = Float.parseFloat(width);
+                        updateTextureViewSize(mTextureView.getWidth(), mTextureView.getHeight()); //function to center crop the video
+                        aspectRatio.setVisibility(View.VISIBLE);
+                        aspectRatioWider.setVisibility(View.GONE);
+                        //showButtons();
+                    }
+                });
             }
 
         } catch (NumberFormatException e) {
@@ -1233,9 +1273,15 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
     private void hideButtons() {
 
-        snoozeButton.setVisibility(View.GONE);
-        dismiss.setVisibility(View.GONE);
+        snoozeButton.setVisibility(View.INVISIBLE);
+        dismiss.setVisibility(View.INVISIBLE);
     }
+
+    /*private void showButtons() {
+
+        snoozeButton.setVisibility(View.VISIBLE);
+        dismiss.setVisibility(View.VISIBLE);
+    }*/
 
     //==============================================================================================
     // Graphic Face Tracker
@@ -1263,7 +1309,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
         GraphicFaceTracker(GraphicOverlay overlay) {
             mOverlay = overlay;
-            Log.d(TAG, "GraphicFaceTracker mOverlay= " + mOverlay);
+            //Log.d(TAG, "GraphicFaceTracker mOverlay= " + mOverlay);
             mFaceGraphic = new FaceGraphic(overlay);
         }
 
@@ -1276,7 +1322,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
             shouldhideButtons = true;
 
-            /*Log.d(TAG, "GraphicFaceTracker onNewItem faceId= " + faceId);
+            /*Log.d(TAG, "GraphicFaceTracker onNewItem faceId= " + faceId + shouldhideButtons);
             PointF point = item.getPosition();
             Log.d(TAG, "GraphicFaceTracker onNewItem Face Position= " + item.getPosition()+ "x="
             + point.x+ "y= "+ point.y);
@@ -1290,7 +1336,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         public void onUpdate(FaceDetector.Detections<Face> detectionResults, Face face) {
             mOverlay.add(mFaceGraphic);
             mFaceGraphic.updateFace(face);
-            //Log.d(TAG, "GraphicFaceTracker onUpdate face= " + face);
+            //Log.d(TAG, "GraphicFaceTracker onUpdate face= " + face + shouldhideButtons);
             //detectCurrentBitmap();
         }
 
@@ -1302,7 +1348,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         @Override
         public void onMissing(FaceDetector.Detections<Face> detectionResults) {
             mOverlay.remove(mFaceGraphic);
-            //Log.d(TAG, "GraphicFaceTracker onMissing");
+            //Log.d(TAG, "GraphicFaceTracker onMissing"+ shouldhideButtons);
         }
 
         /**
@@ -1312,7 +1358,9 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         @Override
         public void onDone() {
             mOverlay.remove(mFaceGraphic);
-            //Log.d(TAG, "GraphicFaceTracker onDone");
+            //Log.d(TAG, "GraphicFaceTracker onDone" + shouldhideButtons);
+            //showButtons();
+            //shouldhideButtons = false;
 
         }
     }

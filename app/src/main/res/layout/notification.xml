@@ -90,7 +90,6 @@
             android:visibility="invisible" />
 
 
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -118,6 +117,36 @@
                 android:text="@string/snooze"
                 android:textSize="32sp"
                 android:visibility="visible" />
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/dismiss_slider"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true">
+
+                <Button
+                    android:id="@+id/aspect_ratio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/slider_btn"
+                    android:drawableLeft="@drawable/film_aspect_ratio"
+                    android:drawableStart="@drawable/film_aspect_ratio"
+                    android:text="@string/aspect_ratio"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/aspect_ratio_wider"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/slider_btn"
+                    android:drawableLeft="@drawable/film_aspect_ratio_wider"
+                    android:drawableStart="@drawable/film_aspect_ratio_wider"
+                    android:text="@string/aspect_ratio"
+                    android:visibility="gone" />
+
+            </FrameLayout>
+
 
             <io.github.carlorodriguez.alarmon.Slider
                 android:id="@+id/dismiss_slider"
