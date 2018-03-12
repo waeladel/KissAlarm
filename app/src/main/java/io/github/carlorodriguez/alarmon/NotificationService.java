@@ -77,7 +77,15 @@ public class NotificationService extends Service {
 
     MediaSingleton() {
       mediaPlayer = new MediaPlayer(); //App.getMediaPlayer();
-      mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) { // 21
+        mediaPlayer.setAudioAttributes(
+                new AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_ALARM)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                        .build());
+      } else {
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+      }
     }
 
     // Force the alarm stream to be maximum volume.  This will allow the user
