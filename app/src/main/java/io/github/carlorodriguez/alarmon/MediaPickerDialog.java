@@ -22,15 +22,11 @@ import android.content.DialogInterface;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Message;
-import android.provider.MediaStore.Audio.Albums;
-import android.provider.MediaStore.Audio.Artists;
 import android.provider.MediaStore.Audio.Media;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.view.View;
 import android.widget.TabHost;
 import android.widget.TextView;
-import android.widget.ViewFlipper;
-import android.widget.TabHost.OnTabChangeListener;
 
 /**
  * A dialog which displays all of the audio media available on the phone.

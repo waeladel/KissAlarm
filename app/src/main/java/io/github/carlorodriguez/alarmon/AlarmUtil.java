@@ -17,13 +17,8 @@ package io.github.carlorodriguez.alarmon;
 
 import java.lang.reflect.Field;
 
-import android.content.ContentResolver;
-import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
 
 public final class AlarmUtil {
   static public Uri alarmIdToUri(long alarmId) {

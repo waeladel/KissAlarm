@@ -11,7 +11,7 @@
       android:layout_height="wrap_content"
       />
 
-  <android.support.v7.widget.AppCompatSeekBar
+  <androidx.appcompat.widget.AppCompatSeekBar
       android:id="@+id/volume_start_sb"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
@@ -24,7 +24,7 @@
       android:layout_height="wrap_content"
       />
 
-  <android.support.v7.widget.AppCompatSeekBar
+  <androidx.appcompat.widget.AppCompatSeekBar
       android:id="@+id/volume_end_sb"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         />
 
-    <android.support.v7.widget.AppCompatSeekBar
+    <androidx.appcompat.widget.AppCompatSeekBar
         android:id="@+id/volume_duration_sb"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

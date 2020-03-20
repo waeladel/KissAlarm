@@ -2,8 +2,8 @@ package com.wdullaer.materialdatetimepicker.time;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.IntRange;
-import android.support.annotation.NonNull;
+import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
 
 /**
  * Simple utility class that represents a time in the day up to second precision

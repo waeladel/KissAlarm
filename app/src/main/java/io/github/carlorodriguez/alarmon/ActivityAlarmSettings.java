@@ -16,9 +16,6 @@
 package io.github.carlorodriguez.alarmon;
 
 import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -34,23 +31,19 @@ import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SwitchCompat;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Display;
@@ -81,10 +74,6 @@ import cafe.adriel.androidaudiorecorder.AndroidAudioRecorder;
 import cafe.adriel.androidaudiorecorder.model.AudioChannel;
 import cafe.adriel.androidaudiorecorder.model.AudioSampleRate;
 import cafe.adriel.androidaudiorecorder.model.AudioSource;
-
-import static com.theartofdev.edmodo.cropper.CropImage.getActivityResult;
-import static io.github.carlorodriguez.alarmon.App.getContext;
-import static io.github.carlorodriguez.alarmon.R.id.cropImageView;
 
 
 /**
