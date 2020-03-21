@@ -57,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import com.facebook.FacebookSdk; // for facebook ads app installs
+import com.facebook.appevents.AppEventsLogger; // for facebook analytics
 
 /**
  * This is the main Activity for the application.  It contains a ListView
