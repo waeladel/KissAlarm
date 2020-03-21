@@ -129,6 +129,9 @@ public class FaceView extends View {
                 int type = landmark.getType();
                 int cx = (int) (landmark.getPosition().x * scale);
                 int cy = (int) (landmark.getPosition().y * scale);
+                *//*if(type== Landmark.NOSE_BASE || type== Landmark.LEFT_EYE || type== Landmark.RIGHT_EYE ){
+                    canvas.drawCircle(cx, cy, 10, mPaint);
+                }*//*
                 canvas.drawCircle(cx, cy, 10, mPaint);
 
             }
@@ -179,10 +182,10 @@ public class FaceView extends View {
 
         //coordinates of line (x1,y1) to (x2,y2)
         float x1,y1,x2,y2;
-        x1= rightCx;
-        y1= rightCy;
-        x2= liftCx;
-        y2= liftCy;
+        x2= rightCx;
+        y2= rightCy;
+        x1= liftCx;
+        y1= liftCy;
 
         //get the center of the line
         float centerX = Math.abs((x1+x2)/2);
@@ -229,8 +232,8 @@ public class FaceView extends View {
         //draw the Circles on the rectangle's corners
         /*canvas.drawCircle(BaselinePts [2], BaselinePts [3], 50, mPaint);
         canvas.drawCircle(RightlinePts [0], RightlinePts [1], 20, mPaint);
-        canvas.drawCircle(BaselinePts [0], BaselinePts [1], 30, mPaint);
-        canvas.drawCircle(PolelinePts[0], PolelinePts[1], 10, mPaint);*/
+        canvas.drawCircle(BaselinePts [0], BaselinePts [1], 50, mPaint);
+        canvas.drawCircle(PolelinePts[0], PolelinePts[1], 30, mPaint);*/
 
         //draw the rectangle's Path
         mForHeadPath = new Path();
