@@ -3,7 +3,6 @@ package io.github.carlorodriguez.alarmon;
 import android.app.Application;
 import android.content.Context;
 import android.media.MediaPlayer;
-
 /**
  * Created by hp on 26/12/2017.
  */

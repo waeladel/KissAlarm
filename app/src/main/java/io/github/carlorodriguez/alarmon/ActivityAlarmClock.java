@@ -53,9 +53,10 @@ import com.google.android.gms.common.api.ResultCallback;
 
 import com.wdullaer.materialdatetimepicker.time.*;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
-
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import com.facebook.FacebookSdk; // for facebook ads app installs
 
 /**
  * This is the main Activity for the application.  It contains a ListView
@@ -112,6 +113,9 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
         setSupportActionBar(toolbar);
 
         activityAlarmClock = this;
+
+        //Only use if you need to know the key hash for facebook
+        // printHashKey(getBaseContext());
 
         // Access to in-memory and persistent data structures.
         service = new AlarmClockServiceBinder(getApplicationContext());
@@ -574,6 +578,22 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
 
         setEmptyViewIfEmpty(activity);
     }
+
+    /*public static void printHashKey(Context pContext) {
+        try {
+            PackageInfo info = pContext.getPackageManager().getPackageInfo(pContext.getPackageName(), PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                String hashKey = new String(Base64.encode(md.digest(), 0));
+                Log.i(TAG, "printHashKey() Hash Key: " + hashKey);
+            }
+        } catch (NoSuchAlgorithmException e) {
+            Log.e(TAG, "printHashKey()", e);
+        } catch (Exception e) {
+            Log.e(TAG, "printHashKey()", e);
+        }
+    }*/
 
     public static class ActivityDialogFragment extends DialogFragment {
 
