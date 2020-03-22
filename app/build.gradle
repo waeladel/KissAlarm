@@ -14,8 +14,8 @@ android {
         applicationId "com.kiss.alarm"
         minSdkVersion 16
         targetSdkVersion 29
-        versionName '1.0.6'
-        versionCode 106
+        versionName '1.0.7'
+        versionCode 107
     }
 
     signingConfigs {
