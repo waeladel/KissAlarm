@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/KissAlarm.iml" filepath="$PROJECT_DIR$/KissAlarm.iml" group="KissAlarm" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="KissAlarm/app" />
-      <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" group="KissAlarm/library" />
+      <module fileurl="file://$PROJECT_DIR$/KissAlarm.iml" filepath="$PROJECT_DIR$/KissAlarm.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/KissAlarm.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/KissAlarm.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/library/KissAlarm.library.iml" filepath="$PROJECT_DIR$/.idea/modules/library/KissAlarm.library.iml" />
     </modules>
   </component>
 </project>

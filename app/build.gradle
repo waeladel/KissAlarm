@@ -2,8 +2,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.github.triplet.play'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.2"
+    compileSdkVersion 30
+    buildToolsVersion "30.0.2"
 
     // Load keystore
     def keystorePropertiesFile = rootProject.file("keystore.properties");
@@ -13,7 +13,7 @@ android {
     defaultConfig {
         applicationId "com.kiss.alarm"
         minSdkVersion 16
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionName '1.0.7'
         versionCode 107
     }
