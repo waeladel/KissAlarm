@@ -1,8 +1,15 @@
 package io.github.carlorodriguez.alarmon;
 
 import android.app.Application;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
+import android.media.AudioAttributes;
 import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Build;
+import android.util.Log;
+
 /**
  * Created by hp on 26/12/2017.
  */
@@ -11,6 +18,11 @@ public class App extends Application {
 
     private static Context sApplicationContext;
     private static MediaPlayer sMediaPlayer;
+    private AudioAttributes audioAttributes;
+
+    public static final String ALARM_CHANNEL_ID = "Alarm_channel_id";
+    private final static String TAG = App.class.getSimpleName();
+
 
 
     @Override

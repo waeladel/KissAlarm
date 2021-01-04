@@ -86,8 +86,8 @@
   <string name="time_out_title">Expiração do alarme</string>
   <string name="time_out_error">AVISO: Este alarme expirou esperando por alguma confirmação.</string>
   <string name="time_out_summary">Um alarme será automaticamente dispensado após este número de minutos.</string>
-    <string name="Scaning">examinar</string>
-    <string name="Toast_cant_detect_face">Desculpe, não conseguiu detectar o rosto do seu parceiro, tente usar uma foto de rosto mais clara.</string>
+    <string name="Scanning">examinar</string>
+    <string name="toast_cant_detect_face">Desculpe, não conseguiu detectar o rosto do seu parceiro, tente usar uma foto de rosto mais clara.</string>
   <string name="about">Sobre o aplicativo</string>
   <string name="alarm_deleted">Alarme excluído</string>
   <string name="app_theme_summary">Alterar as cores da aplicação</string>

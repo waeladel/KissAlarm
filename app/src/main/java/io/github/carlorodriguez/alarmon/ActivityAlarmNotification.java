@@ -787,7 +787,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
             }
             Log.d(TAG, "wael faces ="+faces.size());
             if(faces.size() == 0){
-                Toast.makeText(ActivityAlarmNotification.this,(R.string.Toast_cant_detect_face),
+                Toast.makeText(ActivityAlarmNotification.this,(R.string.toast_cant_detect_face),
                         Toast.LENGTH_LONG).show();
             }else{
                 hideButtons();
@@ -853,7 +853,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
             /*else{
                 if(!toastExecuted) {
-                    Toast.makeText(ActivityAlarmNotification.this,(R.string.Toast_cant_detect_face),
+                    Toast.makeText(ActivityAlarmNotification.this,(R.string.toast_cant_detect_face),
                             Toast.LENGTH_LONG).show();
                     toastExecuted = true;
                 }
@@ -872,7 +872,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
     private void showProgressDialog() {
         progressDialog = ProgressDialog.show(ActivityAlarmNotification.this,
-                getString(R.string.Scaning),
+                getString(R.string.Scanning),
                 getString(R.string.detecting_you_partner_face), true, true);
 
     }

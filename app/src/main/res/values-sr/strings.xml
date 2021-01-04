@@ -86,8 +86,8 @@
   <string name="time_out_title">Време гашења будилника</string>
   <string name="time_out_error">УПОЗОРЕЊЕ: Будилник се угасио чекајући вашу команду.</string>
   <string name="time_out_summary">Укључени будилник се гаси после толико минута.</string>
-    <string name="Scaning">испитивање</string>
-    <string name="Toast_cant_detect_face">Oprostite, svojega partnerja ni mogel zaznati, poskusite uporabiti jasnejšo fotografijo obraza.</string>
+    <string name="Scanning">испитивање</string>
+    <string name="toast_cant_detect_face">Oprostite, svojega partnerja ni mogel zaznati, poskusite uporabiti jasnejšo fotografijo obraza.</string>
   <string name="about">О апликацији</string>
   <string name="alarm_deleted">Аларм је избрисан</string>
   <string name="app_theme_summary">Промените боје апликације</string>

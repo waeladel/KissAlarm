@@ -85,8 +85,8 @@
   <string name="time_out_title">Vreme gašenja budilnika</string>
   <string name="time_out_error">UPOZORENJE: Budilnik se ugasio čekajući vašu komandu.</string>
   <string name="time_out_summary">Uključeni budilnik se automatski gasi posle toliko minuta</string>
-    <string name="Scaning">ispitivanje</string>
-    <string name="Toast_cant_detect_face">Žao nam je, niste mogli otkriti lice partnera, pokušajte upotrijebiti jasniju fotografiju na licu.</string>
+    <string name="Scanning">ispitivanje</string>
+    <string name="toast_cant_detect_face">Žao nam je, niste mogli otkriti lice partnera, pokušajte upotrijebiti jasniju fotografiju na licu.</string>
   <string name="about">O aplikaciji</string>
   <string name="alarm_deleted">Alarm je izbrisan</string>
   <string name="app_theme_summary">Promijenite boje programa</string>

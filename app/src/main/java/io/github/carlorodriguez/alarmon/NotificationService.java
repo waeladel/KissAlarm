@@ -39,6 +39,8 @@ import androidx.core.content.ContextCompat;
 import android.util.Log;
 import android.view.Surface;
 
+import static io.github.carlorodriguez.alarmon.App.ALARM_CHANNEL_ID;
+
 
 /**
  * This service is responsible for notifying the user when an alarm is
@@ -52,6 +54,9 @@ import android.view.Surface;
  * alarms).
  */
 public class NotificationService extends Service {
+  private Notification mNotification;
+  private static final int ALARM_NOTIFICATION_ID = 1;
+  private final static int PENDING_INTENT_REQUEST_CODE = 45; // For the notification
 
   // Binder given to clients
   private final IBinder mBinder = new LocalBinder();
@@ -239,7 +244,7 @@ public class NotificationService extends Service {
           return;
         }
 
-          NotificationCompat.Builder builder = new NotificationCompat.Builder(
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(
                   getApplicationContext());
 
           Notification notification = builder

@@ -29,9 +29,25 @@ android {
 
     buildTypes {
         release {
+            // Enables code shrinking, obfuscation, and optimization for only
+            // your project's release build type.
             minifyEnabled true
+
+            // Enables resource shrinking, which is performed by the
+            // Android Gradle plugin.
+            shrinkResources true
+
+            // Includes the default ProGuard rules files that are packaged with
+            // the Android Gradle plugin. To learn more, go to the section about
+            // R8 configuration files.
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
             signingConfig signingConfigs.release
+        }
+        debug {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            debuggable true
         }
     }
 
@@ -45,23 +61,25 @@ android {
 dependencies {
     implementation project(':library')
 
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.2.1'
     implementation 'org.apache.commons:commons-lang3:3.4'
-    implementation 'androidx.preference:preference:1.1.0'
+    implementation 'androidx.preference:preference:1.1.1'
     implementation 'fr.baloomba:viewpagerindicator:2.4.2'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.github.iammert:MaterialIntroView:1.5.2'
-    // for image and gallery
-    implementation 'com.yanzhenjie:album:2.0.2'
+    // No need for image and gallery dependencies, whe are using intents now to call the default camera and gallery
+    //implementation 'com.yanzhenjie:album:2.0.2'
+    //implementation 'com.zhihu.android:matisse:0.5.3-beta3' // matisse for gallery and camera.
+    //implementation 'com.github.bumptech.glide:glide:4.11.0' // Glide for loading images thumbnails in matisse
     // for dialog
     implementation 'com.afollestad.material-dialogs:commons:0.9.6.0'
     implementation 'com.github.adrielcafe:AndroidAudioRecorder:0.2.0'
     // Image Cropper
-    implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
+    api 'com.theartofdev.edmodo:android-image-cropper:2.8.0'  // to crop images
     // face detector
-    implementation 'com.google.android.gms:play-services-vision:19.0.0'
-    implementation 'com.google.firebase:firebase-core:17.2.3'
+    implementation 'com.google.android.gms:play-services-vision:20.1.2'
+    implementation 'com.google.firebase:firebase-core:18.0.0'
     implementation 'com.google.firebase:firebase-invites:17.0.0'
     // Required only if Facebook login and ads support is required. Find the latest Facebook SDK releases here: https://goo.gl/Ce5L94
     implementation 'com.facebook.android:facebook-android-sdk:5.5.1'

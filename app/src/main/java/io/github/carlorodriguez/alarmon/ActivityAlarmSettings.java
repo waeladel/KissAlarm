@@ -25,12 +25,15 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -38,12 +41,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.fragment.app.FragmentManager;
+
+import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Display;
@@ -66,14 +74,18 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
-import com.yanzhenjie.album.Action;
-import com.yanzhenjie.album.Album;
-import com.yanzhenjie.album.AlbumFile;
 
 import cafe.adriel.androidaudiorecorder.AndroidAudioRecorder;
 import cafe.adriel.androidaudiorecorder.model.AudioChannel;
 import cafe.adriel.androidaudiorecorder.model.AudioSampleRate;
 import cafe.adriel.androidaudiorecorder.model.AudioSource;
+import io.github.carlorodriguez.alarmon.Utils.CameraHelper;
+import io.github.carlorodriguez.alarmon.interfaces.ItemClickListener;
+
+import static io.github.carlorodriguez.alarmon.Utils.FilesHelper.createImageUri;
+import static io.github.carlorodriguez.alarmon.Utils.FilesHelper.createVideoUri;
+import static io.github.carlorodriguez.alarmon.Utils.FilesHelper.getFileName;
+import static io.github.carlorodriguez.alarmon.Utils.FilesHelper.getMimeTyp;
 
 
 /**
@@ -92,13 +104,20 @@ import cafe.adriel.androidaudiorecorder.model.AudioSource;
  */
 public final class ActivityAlarmSettings extends AppCompatActivity implements
         TimePickerDialog.OnTimeChangedListener,
-        TimePickerDialog.OnTimeSetListener {
+        TimePickerDialog.OnTimeSetListener,
+        ItemClickListener {
 
     private static String TAG = ActivityAlarmSettings.class.getSimpleName();
     private static final int SELECT_MULTIMEDIA = 2;
     private static final int MIC_PERMISSION_REQUEST_CODE = 7000;
+    private static final int REQUEST_CAMERA_PHOTO_PERMISSIONS_CODE = 124;
+    private static final int REQUEST_CAMERA_VIDEO_PERMISSIONS_CODE = 125;
 
-    private ArrayList<AlbumFile> mMediaFiles;
+    private static final int SELECT_MEDIA_REQUEST_CODE = 102;
+    private static final int CROP_IMAGE_REQUEST_CODE = 104;
+
+    private static final String APP_AUTHORITY = BuildConfig.APPLICATION_ID +".fileprovider";
+    private  static final String PERMISSION_RATIONALE_FRAGMENT = "storagePermissionFragment";
     private File mOutputFile;
     private File mCroppdImage;
 
@@ -106,7 +125,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
     public static final String EXTRAS_ALARM_ID = "alarm_id";
     private static final int MISSING_EXTRAS = -69;
     private static final int READ_EXTERNAL_STORAGE_PERMISSION_REQUEST = 11;
-    private static final int SELECT_Media_REQUEST = 22;
+    //private static final int SELECT_Media_REQUEST = 22;
 
     private static final int EXPLAIN_MIC_PERMISSION = 43;
     private static final String SETTINGS_VIBRATE_KEY = "SETTINGS_VIBRATE_KEY";
@@ -134,8 +153,10 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
     private int mMediaType ;
     private String  mMediaName ;
     private Uri mMediaUri  ;
+    private FragmentManager mFragmentManager;
 
-  private enum SettingType {
+
+    private enum SettingType {
     TIME,
     NAME,
     DAYS_OF_WEEK,
@@ -154,6 +175,11 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
     public static final int PERMISSION_NOT_GRANTED = 8;
     public static final int MEDIA_PICKER = 9;
 
+    //Media selection popup Menu
+    public static final int MENU_SELECT_PICTURE = 0;
+    public static final int MENU_CAPTURE_PICTURE = 1;
+    public static final int MENU_SELECT_VIDEO = 2;
+    public static final int MENU_RECORD_VIDEO = 3;
 
     private TimePickerDialog picker;
 
@@ -165,13 +191,15 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
   private static AlarmSettings originalSettings;
   private static AlarmSettings settings;
   static SettingsAdapter settingsAdapter;
-    private static ProgressDialog progressDialog;
+  private static ProgressDialog progressDialog;
 
-  @Override
+    @Override
   protected void onCreate(Bundle savedInstanceState) {
       AppSettings.setTheme(getBaseContext(), ActivityAlarmSettings.this);
 
     super.onCreate(savedInstanceState);
+
+    mFragmentManager = getSupportFragmentManager(); // Needed to open the rational dialog
 
     setContentView(R.layout.settings);
 
@@ -557,33 +585,95 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 4) {
-            if (resultCode == RESULT_OK) {
-                Log.d(TAG, "Great! User has recorded and saved the audio file");
-                Log.d(TAG, "data= "+data);
-                // Great! User has recorded and saved the audio file
-                settings.setTone(Uri.parse(mOutputFile.getPath()), mOutputFile.getName());// Set video url on tone
-                settingsAdapter.notifyDataSetChanged();
-            } else if (resultCode == RESULT_CANCELED) {
-                // Oops! User has canceled the recording
-                Log.d(TAG, "Oops! User has canceled the recording");
-            }
-        }else if(requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
-            Log.d(TAG, "CROP_PICTURE requestCode="+ requestCode);
-            CropImage.ActivityResult result =  CropImage.getActivityResult(data);
-            if (resultCode == RESULT_OK) {
-                Uri MediaUri = result.getUri();
-                Log.d(TAG, "CROP_PICTURE getUri="+ MediaUri);
-                settings.setMedia(MediaUri,mMediaName  ,"Photo");// Set photo url on media getResources().getString(R.string.media_photo)
-                settingsAdapter.notifyDataSetChanged();
+        switch (requestCode) {
+            case 4:
+                if (resultCode == RESULT_OK) {
+                    Log.d(TAG, "Great! User has recorded and saved the audio file");
+                    Log.d(TAG, "data= "+data);
+                    // Great! User has recorded and saved the audio file
+                    settings.setTone(Uri.parse(mOutputFile.getPath()), mOutputFile.getName());// Set video url on tone
+                    settingsAdapter.notifyDataSetChanged();
+                } else if (resultCode == RESULT_CANCELED) {
+                    // Oops! User has canceled the recording
+                    Log.w(TAG, "Oops! User has canceled the recording");
+                }
+                break;
+            case SELECT_MEDIA_REQUEST_CODE:
+                if (resultCode == RESULT_OK) {
+                    // User selected a media file or captured a new one
+                    /*List<Uri> selectedMedias = Matisse.obtainResult(data);
+                    Uri selectedMediaUri = selectedMedias.get(0);
+                    Log.d(TAG, "mSelected: " + selectedMediaUri);*/
+                    if(null != data && null != data.getData()){
+                        // We have intent data because we only select a photo or video not capturing a new one
+                        Log.d(TAG, "intent= " + data);
+                        mMediaUri = data.getData();
+                    }
+                    // if intent or getData() is null it's because we provide the camera with file for saving
+                    Log.d(TAG, "mSelected mMediaUri= " + mMediaUri);
+                    if(mMediaUri == null){
+                        if (progressDialog != null) {
+                            progressDialog.dismiss();
+                            progressDialog = null;
+                        }
+                        return; // Return because we don't have the location of the saved media file
+                    }
 
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                Exception error = result.getError();
-                Toast.makeText(ActivityAlarmSettings.this, error.toString(),
-                        Toast.LENGTH_LONG).show();
-                Log.d(TAG, "CROP_PICTURE error ="+ result.getError());
+                    String mediaType = getMimeTyp(mMediaUri, this);
+                    Log.d(TAG, "mediaType: " + mediaType);
 
-            }
+                    mMediaName = getFileName(mMediaUri, this);
+                    if (TextUtils.isEmpty(mMediaName)) {
+                        mMediaName = getString(R.string.unknown_name);
+                    }
+                    Log.d(TAG, "mMediaName: " + mMediaName);
+
+                    if (mediaType.contains("image/")){
+                        // It's a photo
+                        cropImage(mMediaUri);
+                    }else {
+                        // It's a video
+                        settings.setMedia(mMediaUri,mMediaName ,"Video");// Set photo url on media getResources().getString(R.string.media_video)
+                        settings.setTone(mMediaUri, mMediaName);// Set video url on tone
+                        settingsAdapter.notifyDataSetChanged();
+                    }
+
+                    if (progressDialog != null) {
+                        progressDialog.dismiss();
+                        progressDialog = null;
+                    }
+                }else{
+                    // The user canceled the selection, hide the progress dialog
+                    if (progressDialog != null) {
+                        progressDialog.dismiss();
+                        progressDialog = null;
+                    }
+                    // Delete the photo uri from database so that we don't add a blank photo
+                    if(mMediaUri != null){
+                        ContentResolver resolver = this.getContentResolver();
+                        resolver.delete(mMediaUri, null, null);
+                    }
+                    Log.w(TAG, "Select Media error. maybe the user canceled");
+                }
+
+                break;
+            case CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE:
+                Log.d(TAG, "CROP_PICTURE requestCode="+ requestCode);
+                CropImage.ActivityResult result =  CropImage.getActivityResult(data);
+                if (resultCode == RESULT_OK) {
+                    Uri MediaUri = result.getUri();
+                    Log.d(TAG, "CROP_PICTURE getUri="+ MediaUri);
+                    settings.setMedia(MediaUri,mMediaName  ,"Photo");// Set photo url on media getResources().getString(R.string.media_photo)
+                    settingsAdapter.notifyDataSetChanged();
+
+                } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                    Exception error = result.getError();
+                    Toast.makeText(ActivityAlarmSettings.this, error.toString(),
+                            Toast.LENGTH_LONG).show();
+                    Log.w(TAG, "CROP_PICTURE error ="+ result.getError());
+
+                }
+                break;
         }
     }
 
@@ -615,6 +705,34 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                     showDialogFragment(PERMISSION_NOT_GRANTED);
+                }
+                break;
+            case REQUEST_CAMERA_PHOTO_PERMISSIONS_CODE: // To write a file to image directory for api < 29
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the task you need to do.
+                    Log.i(TAG, "onRequestPermissionsResult permission was granted");
+                    selectMedia(MENU_CAPTURE_PICTURE);
+                    //showMediaMenu(settingsAdapter.getView(0, null, null));
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Log.i(TAG, "onRequestPermissionsResult permission denied");
+                }
+                break;
+            case REQUEST_CAMERA_VIDEO_PERMISSIONS_CODE: // To write a file to video directory for api < 29
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the task you need to do.
+                    Log.i(TAG, "onRequestPermissionsResult permission was granted");
+                    selectMedia(MENU_RECORD_VIDEO);
+                    //showMediaMenu(settingsAdapter.getView(0, null, null));
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Log.i(TAG, "onRequestPermissionsResult permission denied");
                 }
                 break;
         }
@@ -797,11 +915,11 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
             break;
 
           case MEDIA:
-              showProgressDialog();
               Log.d(TAG, "MEDIA clicked");
               Log.d(TAG, "type" + type);
               Log.d(TAG, "getAllData buffer= "+db.getAllData().toString());
-              selectMedia();
+              showMediaMenu(view);
+              //showMediaMenu(settingsAdapter.getView(0, null, null));
               break;
 
         case SNOOZE:
@@ -815,10 +933,177 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
     }
   }
 
-    public void selectMedia() {
+    public void showMediaMenu(View view) {
+
+        // Create a popup Menu if null. To enable user to select to select or capture media
+        PopupMenu popupBlockMenu = new PopupMenu(this, view);
+        popupBlockMenu.getMenu().add(Menu.NONE, MENU_SELECT_PICTURE, 0, R.string.menu_item_select_picture);
+        popupBlockMenu.getMenu().add(Menu.NONE, MENU_CAPTURE_PICTURE, 1, R.string.menu_item_capture_picture);
+        popupBlockMenu.getMenu().add(Menu.NONE, MENU_SELECT_VIDEO, 2, R.string.menu_item_select_video);
+        popupBlockMenu.getMenu().add(Menu.NONE, MENU_RECORD_VIDEO, 3, R.string.menu_item_record_video);
+
+        popupBlockMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case MENU_SELECT_PICTURE:
+                        Log.i(TAG, "onMenuItemClick. item select_picture clicked ");
+                        showProgressDialog();
+                        selectMedia(MENU_SELECT_PICTURE);
+                        return true;
+                    case MENU_CAPTURE_PICTURE:
+                        Log.i(TAG, "onMenuItemClick. item capture_picture clicked ");
+                        // We need write permission in Api < 29 to save file at shared storage
+                        if (!isWritePermissionsGranted()) {
+                            requestWritePermission(MENU_CAPTURE_PICTURE);
+                        }else{
+                            showProgressDialog();
+                            selectMedia(MENU_CAPTURE_PICTURE);
+                        }
+                        return true;
+                    case MENU_SELECT_VIDEO:
+                        Log.i(TAG, "onMenuItemClick. item select_video clicked ");
+                        showProgressDialog();
+                        selectMedia(MENU_SELECT_VIDEO);
+                        return true;
+                    case MENU_RECORD_VIDEO:
+                        Log.i(TAG, "onMenuItemClick. item record_video clicked ");
+                        // We need write permission in Api < 29 to save file at shared storage
+                        if (!isWritePermissionsGranted()) {
+                            requestWritePermission(MENU_RECORD_VIDEO);
+                        }else{
+                            showProgressDialog();
+                            selectMedia(MENU_RECORD_VIDEO);
+                        }
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+
+        popupBlockMenu.show();
+
+    }
+    public void selectMedia(int menuItem) {
         //final int mediaType = AlbumFile.getMediaType();
 
-        Album.album(this) // Image and video mix options.
+        switch (menuItem) {
+            case MENU_SELECT_PICTURE:
+                Log.i(TAG, "selectMedia. select picture");
+                Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                try {
+                    startActivityForResult(pickPhoto, SELECT_MEDIA_REQUEST_CODE);
+                } catch (ActivityNotFoundException e) {
+                    // display error state to the user
+                }
+                break;
+            case MENU_CAPTURE_PICTURE:
+                Log.i(TAG, "selectMedia. capture picture");
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+                // Ensure that there's a camera activity to handle the intent
+                List<ResolveInfo> listPhotosCam = getPackageManager().queryIntentActivities(takePictureIntent, PackageManager.MATCH_DEFAULT_ONLY);
+                if (listPhotosCam.size() <= 0) {
+                    Log.i(TAG, "No camera app to handel the intent");
+                    if (progressDialog != null) {
+                        progressDialog.dismiss();
+                        progressDialog = null;
+                    }
+                    Toast.makeText(ActivityAlarmSettings.this, R.string.no_camera_app_error, Toast.LENGTH_LONG).show();
+                    return;
+                }
+                // Create a file location to tell the camera to save the new photo at it
+                mMediaUri = createImageUri(this);
+                if(mMediaUri != null){
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mMediaUri); // Pass the new file uri in the intent extras
+                }
+                Log.d(TAG, "mMediaUri= "+mMediaUri);
+                /*takePictureIntent.setClipData(ClipData.newRawUri("", mediaUri));
+                takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);*/
+                try {
+                    startActivityForResult(takePictureIntent, SELECT_MEDIA_REQUEST_CODE);
+                } catch (ActivityNotFoundException e) {
+                    // display error state to the user
+                }
+                break;
+            case MENU_SELECT_VIDEO:
+                Log.i(TAG, "selectMedia. select video");
+                Intent pickVideo = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+                try {
+                    startActivityForResult(pickVideo, SELECT_MEDIA_REQUEST_CODE);
+                } catch (ActivityNotFoundException e) {
+                    // display error state to the user
+                }
+                break;
+            case MENU_RECORD_VIDEO:
+                Log.i(TAG, "selectMedia. record video");
+                Intent recordVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                // Ensure that there's a camera activity to handle the intent
+                List<ResolveInfo> listVideosCams = getPackageManager().queryIntentActivities(recordVideoIntent, PackageManager.MATCH_DEFAULT_ONLY);
+                if (listVideosCams.size() <= 0) {
+                    Log.i(TAG, "No camera app to handel the intent");
+                    if (progressDialog != null) {
+                        progressDialog.dismiss();
+                        progressDialog = null;
+                    }
+                    Toast.makeText(ActivityAlarmSettings.this, R.string.no_camera_app_error, Toast.LENGTH_LONG).show();
+                    return;
+                }
+                // Create a file location to tell the camera to save the new photo at it
+                mMediaUri = createVideoUri(this);
+                if(mMediaUri != null){
+                    recordVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, mMediaUri); // Pass the new file uri in the intent extras
+                }
+                Log.d(TAG, "mMediaUri= "+mMediaUri);
+                try {
+                    startActivityForResult(recordVideoIntent, SELECT_MEDIA_REQUEST_CODE);
+                } catch (ActivityNotFoundException e) {
+                    // display error state to the user
+                }
+                break;
+        }
+
+        //Don't enable capturing photos by camera without the permission
+        /*if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED){
+            // Enable camera
+            Matisse.from(this)
+                    .choose(MimeType.ofAll(), false)
+                    .theme(R.style.Matisse_Dracula)
+                    .countable(false)
+                    .maxSelectable(1)
+                    .capture(true)
+                    //.captureStrategy(new CaptureStrategy(true, BuildConfig.APPLICATION_ID +".fileprovider", "Basbes"))
+                    .captureStrategy(new CaptureStrategy(false, APP_AUTHORITY))
+                    .showSingleMediaType(false)
+                    //.addFilter(new GifSizeFilter(320, 320, 5 * Filter.K * Filter.K))
+                    //.gridExpectedSize(getResources().getDimensionPixelSize(R.dimen.album_item_height))
+                    .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+                    .thumbnailScale(0.85f)
+                    .imageEngine(new MyGlideEngine())
+                    .showPreview(true) // Default is `true`
+                    .autoHideToolbarOnSingleTap(true)
+                    .forResult(SELECT_MEDIA_REQUEST_CODE);
+        }else{
+            // Disable camera
+            Matisse.from(this)
+                    .choose(MimeType.ofAll(), false)
+                    .theme(R.style.Matisse_Dracula)
+                    .countable(false)
+                    .maxSelectable(1)
+                    .showSingleMediaType(false)
+                    //.addFilter(new GifSizeFilter(320, 320, 5 * Filter.K * Filter.K))
+                    //.gridExpectedSize(getResources().getDimensionPixelSize(R.dimen.album_item_height))
+                    .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+                    .thumbnailScale(0.85f)
+                    .imageEngine(new MyGlideEngine())
+                    .showPreview(true) // Default is `true`
+                    .autoHideToolbarOnSingleTap(true)
+                    .forResult(SELECT_MEDIA_REQUEST_CODE);
+        }*/
+
+
+        /*Album.album(this) // Image and video mix options.
                 .singleChoice() // Multi-Mode, Single-Mode: singleChoice().
                 .requestCode(SELECT_Media_REQUEST) // The request code will be returned in the listener.
                 .columnCount(SELECT_MULTIMEDIA) // The number of columns in the page list.
@@ -827,7 +1112,6 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                 .onResult(new Action<ArrayList<AlbumFile>>() {
                     @Override
                     public void onAction(int requestCode, @NonNull ArrayList<AlbumFile> result) {
-                        // TODO accept the result.
                         mMediaFiles = result;
                         AlbumFile albumFile =mMediaFiles.get(0);
                         mMediaType = albumFile.getMediaType();
@@ -870,7 +1154,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
 
                     }
                 })
-                .start();
+                .start();*/
     }
 
     private void cropImage(Uri mediaUri) {
@@ -882,7 +1166,8 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
         int height = size.y;
         Log.d(TAG, "width= " +width + "height= "+height);
 
-        CropImage.activity(Uri.fromFile(new File(mediaUri.toString())))
+        //CropImage.activity(Uri.fromFile(new File(mediaUri.toString())))
+        CropImage.activity(mediaUri)
                 //.setGuidelines(CropImageView.Guidelines.ON)
                 //.setOutputUri(Uri.parse(mCroppdImage.getPath()))
                 .setAspectRatio(width,height)
@@ -1243,9 +1528,71 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
         }
     }
 
+    // If Write to storage permissions are granted return true so that we stop asking for permissions
+    private boolean isWritePermissionsGranted() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            Log.d(TAG, "is permission Granted= "+ true); // API 29 dosen't need write permission
+            return true;
+        }else{
+            Log.d(TAG, "is permission Granted= "+(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED));
+            return (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+        }
+
+    }
+
+    private void requestWritePermission(int type) {
+        // Permission is not granted
+        // Should we show an explanation?
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                Log.i(TAG, "requestPermission: permission should show Rationale");
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                showPermissionRationaleDialog(type);
+            } else {
+                // No explanation needed; request the permission
+                Log.i(TAG, "requestPermission: No explanation needed; request the permission");
+                // using requestPermissions(new String[] instead of ActivityCompat.requestPermissions(this, new String[] to get onRequestPermissionsResult in the fragment
+                // Use different request code for photo and video so when permission is granted we know whether we should take photo or record video
+                if(type == MENU_CAPTURE_PICTURE){
+                    ActivityCompat.requestPermissions(ActivityAlarmSettings.this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_PHOTO_PERMISSIONS_CODE);
+                }else{
+                    ActivityCompat.requestPermissions(ActivityAlarmSettings.this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_VIDEO_PERMISSIONS_CODE);
+                }
+            }
+        }
+    }
+
+    private void showPermissionRationaleDialog(int type) {
+        // Use different request code for photo and video so when permission is granted we know whether we should take photo or record video
+        CameraPermissionAlertFragment permissionRationaleDialog = CameraPermissionAlertFragment.newInstance(this, this,  type);
+        permissionRationaleDialog.show(mFragmentManager, PERMISSION_RATIONALE_FRAGMENT);
+        Log.i(TAG, "showPermissionRationaleDialog: permission AlertFragment show clicked ");
+    }
+
+    // When Permission Rationale Dialog dialog is clicked
+    @Override
+    public void onClick(View view, int position, boolean isLongClick) {
+        Log.d(TAG, "item clicked position= " + position + " View= "+view);
+        if(view == null && position == MENU_CAPTURE_PICTURE){
+            // User grant the permission after selecting capture a photo
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                // OK button of the permission dialog is clicked, lets ask for permissions
+                ActivityCompat.requestPermissions(ActivityAlarmSettings.this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_PHOTO_PERMISSIONS_CODE);
+            }
+        }else if(view == null && position == MENU_RECORD_VIDEO){
+            // User grant the permission after selecting record a video
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                // OK button of the permission dialog is clicked, lets ask for permissions
+                ActivityCompat.requestPermissions(ActivityAlarmSettings.this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_VIDEO_PERMISSIONS_CODE);
+            }
+        }
+    }
+
     private void recordAudio() {
         //String filePath = Environment.getExternalStorageDirectory() + "/recorded_audio.wav";
-        int color = getResources().getColor(R.color.teal);
+        int color = getResources().getColor(R.color.colorPrimary);
         int requestCode = 4;
         AndroidAudioRecorder.with(this)
                 // Required

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <files-path
+        name="my_internal_files"
+        path="."/>
+    <!--files in the files/ subdirectory of your app's internal storage area. getFilesDir()-->
+    <external-path
+        name="shared_images"
+        path="Pictures"/>
+    <!--files in the root of the external storage area. getExternalStorageDirectory()-->
+    <external-path
+        name="shared_videos"
+        path="Movies"/>
+    <!--files in the root of the external storage area. getExternalStorageDirectory()-->
+    <cache-path
+        name="my_internal_cache"
+        path="." />
+    <!--files in the cache subdirectory of your app's internal storage area. getCacheDir()-->
+    <external-cache-path
+        name="my_external_cache"
+        path="." />
+    <!--files in the root of your app's external cache area. getExternalCacheDir()-->
+    <external-files-path
+        name="my_external_images"
+        path="Pictures" />
+    <!--files in the root of your app's external storage area. getExternalFilesDir()-->
+    <external-files-path
+        name="my_external_video"
+        path="Movies" />
+    <!--files in the root of your app's external storage area. getExternalFilesDir()-->
+    <external-files-path
+        name="my_external_notifications"
+        path="Notifications"/>
+    <!--files in the root of your app's external storage area. getExternalFilesDir()-->
+    <external-path
+        name="my_images"
+        path="Android/data/com.kiss.alarm/files/Pictures"/>
+
+
+
+</paths>
+<!--<paths>
+// This the public path
+<external-path
+    name="my_images"
+    path="Pictures"/>
+    // This the package path
+    <external-path
+    name="my_images"
+    path="Android/data/com.basbes.dating/files/Pictures"/>
+</paths>-->

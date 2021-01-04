@@ -86,8 +86,8 @@
   <string name="time_out_title">Alarm tijd uit</string>
   <string name="time_out_error">WAARSCHUWING: Dit alarm is vergaan tijdens het wachten op erkenning.</string>
   <string name="time_out_summary">Een afgaand alarm wordt automatisch verworpen na dit aantal minuten.</string>
-    <string name="Scaning">onderzoeken</string>
-    <string name="Toast_cant_detect_face">Sorry, kon het gezicht van je partner niet detecteren, probeer een duidelijkere gezichtsfoto te gebruiken.</string>
+    <string name="Scanning">onderzoeken</string>
+    <string name="toast_cant_detect_face">Sorry, kon het gezicht van je partner niet detecteren, probeer een duidelijkere gezichtsfoto te gebruiken.</string>
   <string name="about">Over de applicatie</string>
   <string name="alarm_deleted">Alarm verwijderd</string>
   <string name="app_theme_summary">Wijzig de toepassingskleuren</string>

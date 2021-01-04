@@ -13,9 +13,13 @@
   <string name="record">Record via microphone</string>
   <string name="btn_choose">Choose</string>
 
-  <string name="Scaning">Scaning</string>
+  <string name="Scanning">Scanning</string>
   <string name="detecting_you_partner_face">Detecting your partner\'s face</string>
-  <string name="Toast_cant_detect_face">Sorry, couldn\'t detect your partner\'s face, try to use a clearer photo for his/her face.</string>
+  <string name="toast_cant_detect_face">Sorry, couldn\'t detect your partner\'s face, try to use a clearer photo for his/her face.</string>
+  <string name="alarm_notification_channel_name">Firing alarms.</string>
+  <string name="alarm_notification_channel_description">To notify you when firing alarms.</string>
+  <string name="notification_alarm_title">Alarm</string>
+  <string name="notification_alarm_body">Wakeup, kiss your partner to dismiss or snooze the alarm.</string>
 
 
   <string name="app_name" translatable="false">Kiss Alarm</string>
@@ -131,6 +135,7 @@
   <string name="read_external_storage_message">We need your permission to read your media files so you can set your own alarm wake-up call.</string>
   <string name="proceed">Proceed</string>
   <string name="permission_not_granted">We are sorry, we cannot access this feature until you grant us permission.</string>
+  <string name="no_camera_app_error">Sorry, there is no camera app.</string>
   <string name="permission_not_granted_title">Permission not granted</string>
   <string name="notification_text_title">Notification text</string>
   <string name="notification_text_summary">Configure alarm information displayed on the notification</string>
@@ -167,6 +172,8 @@
   <string name="swipe_right_to_delete">Hi There! Swipe right  to delete an alarm.</string>
   <string name="material_intro_id_alarm_deletion">material_intro_id_119.104</string>
 
+  <string name="storage_permission_dialog_title">Storage permissions</string>
+  <string name="storage_permission_dialog_message">The app needs access to your storage to save the captured  photo/video.</string>
   <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
   <string name="access_mic">Microphone Access</string>
   <string name="mic_permission_required">Access to the Microphone is required to record a wake-up call and save it.</string>
@@ -175,7 +182,7 @@
     <string name="invitation_title">Suggest to friends</string>
     <string name="invitation_message">Hi! this app is funny. Wake up to your lover\'s video or voice, kiss to dismiss</string>
   <string name="invitation_deep_link" translatable="false">https://uf24v.app.goo.gl/kiss</string>
-  <string name="invitation_custom_image" >https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png</string>
+  <string name="invitation_custom_image" translatable="false">https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png</string>
     <string name="invitation_cta">Install</string>
     <string name="invitation_failed">Sorry, we couldn\'t sent the invitation to your friends.</string>
     <string name="google_play_services_error">Connection failed.</string>
@@ -192,6 +199,12 @@
   <string name="deep_link_default">Deep link not set</string>
   <string name="invitation_id_default">Invitation ID not set</string>
 
+  <!-- Media selection popup Menu -->
+  <string name="menu_item_select_picture">Select photo from gallery</string>
+  <string name="menu_item_capture_picture">Capture photo</string>
+  <string name="menu_item_select_video">Select video from gallery</string>
+  <string name="menu_item_record_video">Record video</string>
+  <!-- Media selection popup Menu -->
 
   <string name="about_text">Every day starts by opening your eyes, so nothing will make your day like waking up by your beloved one.\n\nWhy choosing a ringtone while you can wake up every day by the most thing you adore, your lover\'s voice.\n\n\"kiss alarm\" enables you to choose a recorded video or a voice note accompanied by your partner\'s photo to wake you up, it\'s more like a visual wake-up call but not from a hotel employee. Speaking of visuals, you have to kiss your partner\'s lips to dismiss the alarm, or forehead to snooze.\n\n
   Features:\n\n

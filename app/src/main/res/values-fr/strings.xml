@@ -86,8 +86,8 @@
   <string name="time_out_title">Alarm time out</string>
   <string name="time_out_error">WARNING: AVERTISSEMENT:. Cette alarme a expiré en attente d\'un accusé de réception</string>
   <string name="time_out_summary">Un alarme activé automatiquement sera automatiquement desactivé apres après plusieurs minutes.</string>
-    <string name="Scaning">examinant</string>
-    <string name="Toast_cant_detect_face">Désolé, impossible de détecter le visage de votre partenaire, essayez d\'utiliser une photo plus nette.</string>
+    <string name="Scanning">examinant</string>
+    <string name="toast_cant_detect_face">Désolé, impossible de détecter le visage de votre partenaire, essayez d\'utiliser une photo plus nette.</string>
   <string name="about">A propos de l\'application</string>
   <string name="alarm_deleted">Alarme supprimé</string>
   <string name="app_theme_summary">Changer les couleurs de l\'application</string>

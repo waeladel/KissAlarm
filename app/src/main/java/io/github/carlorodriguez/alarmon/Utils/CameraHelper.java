@@ -1,4 +1,4 @@
-package io.github.carlorodriguez.alarmon;
+package io.github.carlorodriguez.alarmon.Utils;
 
 /**
  * Created by hp on 06/01/2018.
