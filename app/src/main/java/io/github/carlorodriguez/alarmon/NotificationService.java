@@ -35,6 +35,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Vibrator;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import android.util.Log;
 import android.view.Surface;
@@ -55,6 +56,7 @@ import static io.github.carlorodriguez.alarmon.App.ALARM_CHANNEL_ID;
  */
 public class NotificationService extends Service {
   private Notification mNotification;
+  private NotificationManagerCompat notificationManager;
   private static final int ALARM_NOTIFICATION_ID = 1;
   private final static int PENDING_INTENT_REQUEST_CODE = 45; // For the notification
 
@@ -210,7 +212,8 @@ public class NotificationService extends Service {
     MediaSingleton.INSTANCE.useContext(getApplicationContext());
 
     // Setup notification bar.
-    manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    //manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    notificationManager = NotificationManagerCompat.from(this);
     // Use the notification activity explicitly in this intent just in case the
     // activity can't be viewed via the root activity.
     Intent intent = new Intent(getApplicationContext(), ActivityAlarmNotification.class);
@@ -244,7 +247,20 @@ public class NotificationService extends Service {
           return;
         }
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(
+        mNotification = new NotificationCompat.Builder(NotificationService.this, ALARM_CHANNEL_ID)
+                .setContentTitle(notifyText)
+                .setContentText(getString(R.string.notification_alarm_body))
+                .setSmallIcon(R.mipmap.ic_notification)
+                .setColor(ContextCompat.getColor(getApplicationContext(),
+                        R.color.notification_color))
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setContentIntent(notificationActivity)
+                .build();
+
+        mNotification.flags |= Notification.FLAG_ONGOING_EVENT;
+
+        /*NotificationCompat.Builder builder = new NotificationCompat.Builder(
                   getApplicationContext());
 
           Notification notification = builder
@@ -255,9 +271,10 @@ public class NotificationService extends Service {
                   .setColor(ContextCompat.getColor(getApplicationContext(),
                           R.color.notification_color))
                   .build();
-          notification.flags |= Notification.FLAG_ONGOING_EVENT;
+          notification.flags |= Notification.FLAG_ONGOING_EVENT;*/
 
-        manager.notify(AlarmClockService.NOTIFICATION_BAR_ID, notification);
+        notificationManager.notify(AlarmClockService.NOTIFICATION_BAR_ID, mNotification);
+        //startForeground(AlarmClockService.NOTIFICATION_BAR_ID, mNotification);
 
         long next = AlarmUtil.millisTillNextInterval(AlarmUtil.Interval.SECOND);
         handler.postDelayed(notificationBlinker, next);
