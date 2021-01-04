@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <color name="colorPrimary">#c1004f</color>
+  <color name="colorPrimaryVariant">#f94e7b</color>
+  <color name="colorPrimaryDark">#8a0028</color> <!--B02394-->
+  <color name="colorSecondary">#00acc1</color> <!--9af976-->
+  <color name="colorSecondaryVariant">#5ddef4</color>
+  <color name="colorSecondaryDark">#007c91</color>
+
+  <!--<color name="colorPrimary">#00acc1</color>
+  <color name="colorPrimaryVariant">#5ddef4</color>
+  <color name="colorPrimaryDark">#007c91</color> &lt;!&ndash;B02394&ndash;&gt;
+  <color name="colorSecondary">#c1004f</color> &lt;!&ndash;9af976&ndash;&gt;
+  <color name="colorSecondaryVariant">#f94e7b</color>
+  <color name="colorSecondaryDark">#8a0028</color>-->
+
   <color name="colorSurface">#FFFFFF</color>
   <item name="white" type="color">#ffffff</item>
   <item name="teal" type="color">#26a69a</item>

@@ -104,7 +104,6 @@
   <string name="deep_purple">тамно љубичаста</string>
   <string name="default_tone">Подразумевани позив за буђење</string>
   <string name="detecting_you_partner_face">Откривање лица вашег партнера</string>
-  <string name="grant">Грант</string>
   <string name="green">Зелен</string>
     <string name="grey">Греи</string>
   <string name="indigo">Индиго</string>
@@ -146,7 +145,7 @@
   <string name="visibility_button">Јасноћа дугмади</string>
   <string name="volume_duration_label">Трајање: %1$d секунде</string>
   <string name="volume_end_label">Завршни обим: %1$d%%</string>
-  <string name="volume_start_label">Почетни ниво јачине звука</string>
+  <string name="volume_start_label">Почетни ниво јачине звука: %1$d%%</string>
     <string name="deep_link_congratulation">Честитам</string>
   <string name="deep_link_welcome_text">Сада можете да користите апликацију.</string>
   <string name="google_play_services_error">Веза није успостављена.</string>
