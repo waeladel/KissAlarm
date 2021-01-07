@@ -1,3 +1,4 @@
+
 /****************************************************************************
  * Copyright 2010 kraigs.android@gmail.com
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -970,9 +971,11 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
     private void calculateVideoSize( Uri toneUri) {
         try {
             //AssetFileDescriptor afd = getAssets().openFd(FILE_NAME);
+            Log.d(TAG, "calculateVideoSize: video uri= "+toneUri);
             MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
             //metaRetriever.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-            metaRetriever.setDataSource(toneUri.toString());
+            metaRetriever.setDataSource(this, toneUri);
+            //metaRetriever.setDataSource(getFileUri(toneUri, this));
 
             final String height = metaRetriever
                     .extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);

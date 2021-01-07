@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 import io.github.carlorodriguez.alarmon.ActivityAlarmSettings;
+import io.github.carlorodriguez.alarmon.DbHelper;
 
 /**
  * Camera related utilities.
@@ -221,9 +222,16 @@ public class FilesHelper {
     public static String getFileName(Uri uri , Context context) {
         String result = null;
         if (uri.getScheme().equals("content")) {
+            // The query, because it only applies to a single document, returns only
+            // one row. There's no need to filter, sort, or select fields,
+            // because we want all fields for one document.
             Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
             try {
+                // moveToFirst() returns false if the cursor has 0 rows. Very handy for
+                // "if there's anything to look at, look at it" conditionals.
                 if (cursor != null && cursor.moveToFirst()) {
+                    // Note it's called "Display Name". This is
+                    // provider-specific, and might not necessarily be the file name.
                     result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                 }
             } finally {
@@ -236,6 +244,55 @@ public class FilesHelper {
             if (cut != -1) {
                 result = result.substring(cut + 1);
             }
+        }
+        return result;
+    }
+
+    public static String getFileRealPath(Uri uri , Context context) {
+        String  result = null;
+        //String[] proj = { MediaStore.Video.Media.DATA };
+        if (uri.getScheme().equals("content")) {
+            Log.d(TAG, "getFileRealPath: it's a content scheme");
+            // The query, because it only applies to a single document, returns only
+            // one row. There's no need to filter, sort, or select fields,
+            // because we want all fields for one document.
+            Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+            try {
+                // moveToFirst() returns false if the cursor has 0 rows. Very handy for
+                // "if there's anything to look at, look at it" conditionals.
+                if (cursor != null && cursor.moveToFirst()) {
+                    //result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                    //result = Uri.parse(cursor.getString(cursor.getColumnIndex(DbHelper.SETTINGS_COL_MEDIA_URL)));
+                    result = cursor.getString(0);
+                    // Note it's called "Display Name". This is
+                    // provider-specific, and might not necessarily be the file name.
+                    String displayName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                    Log.i(TAG, "Display Name: " + displayName);
+
+                    int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+                    // If the size is unknown, the value stored is null. But because an
+                    // int can't be null, the behavior is implementation-specific,
+                    // and unpredictable. So as
+                    // a rule, check if it's null before assigning to an int. This will
+                    // happen often: The storage API allows for remote files, whose
+                    // size might not be locally known.
+                    String size = null;
+                    if (!cursor.isNull(sizeIndex)) {
+                        // Technically the column stores an int, but cursor.getString()
+                        // will do the conversion automatically.
+                        size = cursor.getString(sizeIndex);
+                    } else {
+                        size = "Unknown";
+                    }
+                    Log.i(TAG, "Size: " + size);
+
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+        if (result == null) {
+            result = uri.getPath();
         }
         return result;
     }

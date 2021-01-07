@@ -36,6 +36,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -50,6 +51,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.FragmentManager;
 
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
@@ -85,6 +87,7 @@ import io.github.carlorodriguez.alarmon.interfaces.ItemClickListener;
 import static io.github.carlorodriguez.alarmon.Utils.FilesHelper.createImageUri;
 import static io.github.carlorodriguez.alarmon.Utils.FilesHelper.createVideoUri;
 import static io.github.carlorodriguez.alarmon.Utils.FilesHelper.getFileName;
+import static io.github.carlorodriguez.alarmon.Utils.FilesHelper.getFileRealPath;
 import static io.github.carlorodriguez.alarmon.Utils.FilesHelper.getMimeTyp;
 
 
@@ -633,6 +636,16 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                         cropImage(mMediaUri);
                     }else {
                         // It's a video
+                        Log.d(TAG, "Video content:// mMediaUri= " + mMediaUri);
+                        //Log.d(TAG, "Video file:// mMediaUri= " + getFileRealPath(mMediaUri, this));
+                        if(null != data){
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT){
+                                int takeFlags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                                ContentResolver resolver = this.getContentResolver();
+                                //this.grantUriPermission(getPackageName(), mMediaUri, Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+                                resolver.takePersistableUriPermission(mMediaUri, takeFlags);
+                            }
+                        }
                         settings.setMedia(mMediaUri,mMediaName ,"Video");// Set photo url on media getResources().getString(R.string.media_video)
                         settings.setTone(mMediaUri, mMediaName);// Set video url on tone
                         settingsAdapter.notifyDataSetChanged();
@@ -991,7 +1004,10 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
         switch (menuItem) {
             case MENU_SELECT_PICTURE:
                 Log.i(TAG, "selectMedia. select picture");
-                Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                pickPhoto.setType("image/*"); //"video/*"
+                //pickPhoto.addCategory(Intent.CATEGORY_OPENABLE); addCategory is only a part of storage api. works with ACTION_GET_CONTENT only
+
                 try {
                     startActivityForResult(pickPhoto, SELECT_MEDIA_REQUEST_CODE);
                 } catch (ActivityNotFoundException e) {
@@ -1029,7 +1045,23 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                 break;
             case MENU_SELECT_VIDEO:
                 Log.i(TAG, "selectMedia. select video");
-                Intent pickVideo = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+                Intent pickVideo = null;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+                    pickVideo = new Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+                    pickVideo.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+                }else{
+                    pickVideo = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+                    pickVideo.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+                pickVideo.setType("video/*"); //"image/*"
+                pickVideo.addCategory(Intent.CATEGORY_OPENABLE);
+
+                // Optionally, specify a URI for the file that should appear in the
+                // system file picker when it loads.
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    pickVideo.putExtra(DocumentsContract.EXTRA_INITIAL_URI, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+                }
+
                 try {
                     startActivityForResult(pickVideo, SELECT_MEDIA_REQUEST_CODE);
                 } catch (ActivityNotFoundException e) {
