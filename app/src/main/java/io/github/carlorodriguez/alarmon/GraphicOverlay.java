@@ -165,8 +165,8 @@ public class GraphicOverlay extends View {
 
         synchronized (mLock) {
             if ((mPreviewWidth != 0) && (mPreviewHeight != 0)) {
-                mWidthScaleFactor = (float) canvas.getWidth() / (float) mPreviewWidth;
-                mHeightScaleFactor = (float) canvas.getHeight() / (float) mPreviewHeight;
+                mWidthScaleFactor = (float) getWidth() / (float) mPreviewWidth;
+                mHeightScaleFactor = (float) getHeight() / (float) mPreviewHeight;
             }
 
             for (Graphic graphic : mGraphics) {
@@ -188,7 +188,8 @@ public class GraphicOverlay extends View {
 
             case MotionEvent.ACTION_DOWN:
                 //Check if the x and y position of the touch is inside the bitmap
-                if(FaceGraphic.foreheadRect.contains(x, y)){
+                // Don't do anything if the graphic is not drown yet, App will crash if we use contains on a null rectangle
+                if(null != FaceGraphic.foreheadRect && FaceGraphic.foreheadRect.contains(x, y)){
                     //BITMAP TOUCHED
                     if(!ActivityAlarmNotification.isToggled){
                         ActivityAlarmNotification.foreheadButton.callOnClick();
@@ -198,8 +199,7 @@ public class GraphicOverlay extends View {
                         Log.d(TAG, "forehead TOUCHED but we will dismiss");
                     }
 
-                }else if(FaceGraphic.lipRect.contains(x, y)){
-
+                }else if(null != FaceGraphic.lipRect && FaceGraphic.lipRect.contains(x, y)){
                     if(!ActivityAlarmNotification.isToggled){
                         ActivityAlarmNotification.lipButton.callOnClick();
                         Log.d(TAG,"lip TOUCHED so we will dismiss");
