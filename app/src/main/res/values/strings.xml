@@ -136,6 +136,7 @@
   <string name="proceed">Proceed</string>
   <string name="permission_not_granted">We are sorry, we cannot access this feature until you grant us permission.</string>
   <string name="no_camera_app_error">Sorry, there is no camera app.</string>
+  <string name="no_audio_file_error">Sorry, couldn\'t create a file for recording.</string>
   <string name="permission_not_granted_title">Permission not granted</string>
   <string name="notification_text_title">Notification text</string>
   <string name="notification_text_summary">Configure alarm information displayed on the notification</string>

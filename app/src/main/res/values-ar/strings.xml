@@ -109,7 +109,8 @@
     <string name="pending_alarms">التنبيهات المعلقة</string>
     <string name="permission_camera_rationale">السماح بالوصول للكاميرا ضروري لفحص الوجه</string>
     <string name="permission_not_granted">عذرا، لا يمكننا الوصول إلى هذه الخاصية حتى تمنحنا الإذن.</string>
-    <string name="no_camera_app_error">نأسف، ليس لديك تطبيق للكاميرا</string>
+    <string name="no_camera_app_error">نأسف، ليس لديك تطبيق للكاميرا.</string>
+    <string name="no_audio_file_error">نأسف، تعذر انشاء ملف لتسجيل الصوت.</string>
     <string name="permission_not_granted_title">لم يتم منح الإذن</string>
     <string name="pink">زهري</string>
     <string name="please_wait">انتظر من فضلك</string>

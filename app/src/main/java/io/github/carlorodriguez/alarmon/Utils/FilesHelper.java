@@ -10,18 +10,28 @@ import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.FileUtils;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
+import androidx.loader.content.CursorLoader;
+
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import io.github.carlorodriguez.alarmon.ActivityAlarmSettings;
-import io.github.carlorodriguez.alarmon.DbHelper;
+import io.github.carlorodriguez.alarmon.R;
 
 /**
  * Camera related utilities.
@@ -33,7 +43,6 @@ public class FilesHelper {
     public static final int MEDIA_TYPE_Audio = 3;
 
     private static String TAG = FilesHelper.class.getSimpleName();
-
 
     /**
      * Iterate over supported camera video sizes to see which one best fits the
@@ -151,22 +160,34 @@ public class FilesHelper {
      * @param type Media type. Can be video or image.
      * @return A file object pointing to the newly created file.
      */
-    public static File getOutputMediaFile(int type){
+    public static File getOutputMediaFile(Context context, int type){
+        Log.d(TAG, "getOutputMediaFile started");
+
+        File mediaStorageDir = null;
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
         if (!Environment.getExternalStorageState().equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-            return  null;
+            Log.d(TAG, "getExternalStorageState not exist");
+            // If files not meant to be shared with other apps, store them in your package-specific directories
+            // Files will be deleted after your app has been uninstalled.
+            mediaStorageDir =  new File(context.getFilesDir(), Environment.DIRECTORY_ALARMS);
+        }else{
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                //mediaStorageDir = new File(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI.toString() + File.separator + Environment.DIRECTORY_ALARMS);
+                // If files not meant to be shared with other apps, store them in your package-specific directories
+                // Files will be deleted after your app has been uninstalled.
+                mediaStorageDir =  new File(context.getExternalFilesDir(Environment.DIRECTORY_ALARMS).getAbsolutePath());
+            }else{
+                // This location works best if you want the created media to be shared
+                // between applications and persist after your app has been uninstalled.
+                mediaStorageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_ALARMS);
+            }
         }
 
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_NOTIFICATIONS).getAbsolutePath());
-        // This location works best if you want the created images to be shared
-        // between applications and persist after your app has been uninstalled.
-
         // Create the storage directory if it does not exist
-        if (! mediaStorageDir.exists()){
-            if (! mediaStorageDir.mkdirs()) {
-                Log.d("mediaStorageDir", "failed to create directory");
+        if (!mediaStorageDir.exists()){
+            if (!mediaStorageDir.mkdirs()) {
+                Log.d(TAG, "failed to create directory");
                 return null;
             }
         }
@@ -183,11 +204,12 @@ public class FilesHelper {
 
         }else if(type == MEDIA_TYPE_Audio) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "basbes.ogg");
+                    "KissAlarm_"+ timeStamp + ".wav");
         }else{
             return null;
         }
 
+        Log.d(TAG, "mediaFile = "+ mediaFile.getAbsolutePath());
         return mediaFile;
     }
 
@@ -248,28 +270,44 @@ public class FilesHelper {
         return result;
     }
 
-    public static String getFileRealPath(Uri uri , Context context) {
+    public static String getRealPathFromURI(Uri uri , Context context) {
         String  result = null;
-        //String[] proj = { MediaStore.Video.Media.DATA };
+        String[] proj;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            proj = null;
+        }else{
+            proj = new String[]{MediaStore.Audio.Media.DATA};
+        }
+
+        Log.d(TAG, "getFileRealPath: scheme= "+uri.getScheme());
         if (uri.getScheme().equals("content")) {
             Log.d(TAG, "getFileRealPath: it's a content scheme");
             // The query, because it only applies to a single document, returns only
             // one row. There's no need to filter, sort, or select fields,
             // because we want all fields for one document.
-            Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+            //Cursor cursor = context.getContentResolver().query(uri, proj, null, null, null);
+            CursorLoader loader = new CursorLoader(context, uri, proj, null, null, null);
+            Cursor cursor = loader.loadInBackground();
             try {
                 // moveToFirst() returns false if the cursor has 0 rows. Very handy for
                 // "if there's anything to look at, look at it" conditionals.
                 if (cursor != null && cursor.moveToFirst()) {
                     //result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                     //result = Uri.parse(cursor.getString(cursor.getColumnIndex(DbHelper.SETTINGS_COL_MEDIA_URL)));
-                    result = cursor.getString(0);
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        result= cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.RELATIVE_PATH));
+                    }else{
+                        result = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
+                    }
+
                     // Note it's called "Display Name". This is
                     // provider-specific, and might not necessarily be the file name.
-                    String displayName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                    /*String displayName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                     Log.i(TAG, "Display Name: " + displayName);
+                    long id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID));
+                    int duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION));*/
 
-                    int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+                    /*int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
                     // If the size is unknown, the value stored is null. But because an
                     // int can't be null, the behavior is implementation-specific,
                     // and unpredictable. So as
@@ -284,13 +322,14 @@ public class FilesHelper {
                     } else {
                         size = "Unknown";
                     }
-                    Log.i(TAG, "Size: " + size);
+                    Log.i(TAG, "Size: " + size);*/
 
                 }
             } finally {
                 cursor.close();
             }
         }
+        Log.d(TAG, "getFileRealPath: result= "+result);
         if (result == null) {
             result = uri.getPath();
         }
@@ -368,7 +407,7 @@ public class FilesHelper {
             //values.put(MediaStore.MediaColumns.DATA, mOutputFile.getAbsolutePath()); // It crashes without the data column
         }else{
             //collection = MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
-            collection = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+            collection = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
             //collection = MediaStore.Video.Media.getContentUri(String.valueOf(mActivityContext.getExternalFilesDir(Environment.DIRECTORY_NOTIFICATIONS)));
             //collection = MediaStore.Video.Media.getContentUri(imageFile.getAbsolutePath());
 
@@ -387,4 +426,67 @@ public class FilesHelper {
 
     }
 
+    // To pass the Uri to the audio recorder so it can save the new alarm sound at this directory
+    public static Uri addAudioToMediaStore(Context context, File outputFile) {
+        // Create the File where the photo should go
+        Uri collection = null;
+        OutputStream outStream = null;
+        ContentResolver resolver = context.getContentResolver();
+
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Audio.Media.DISPLAY_NAME, outputFile.getName());
+        values.put(MediaStore.Audio.Media.TITLE, outputFile.getName()); // Important to have a title in notifications list @api<=29
+        values.put(MediaStore.Audio.Media.MIME_TYPE, "audio/wav");
+        values.put(MediaStore.Audio.Media.IS_RINGTONE, false);
+        values.put(MediaStore.Audio.Media.IS_NOTIFICATION, false); // To only appear in notifications list
+        values.put(MediaStore.Audio.Media.IS_ALARM, true);
+        values.put(MediaStore.Audio.Media.IS_MUSIC, false);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            collection =  MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY); // added in @api<=29 to get the primary external storage
+            //collection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+            //collection = Uri.parse(MediaStore.Images.Media.EXTERNAL_CONTENT_URI+ File.separator+ Environment.DIRECTORY_NOTIFICATIONS);
+
+            // To specify a location instead of the default picture directory in external
+            values.put(MediaStore.Audio.Media.RELATIVE_PATH, Environment.DIRECTORY_ALARMS);
+            //collection = MediaStore.Images.Media.getContentUriForPath(mOutputFile.getAbsolutePath());
+            //values.put(MediaStore.MediaColumns.DATA, mOutputFile.getAbsolutePath()); // It crashes without the data column
+        }else{
+            //collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
+            //collection = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+            //collection = MediaStore.Images.Media.getContentUri(String.valueOf(mActivityContext.getExternalFilesDir(Environment.DIRECTORY_NOTIFICATIONS)));
+            //collection = MediaStore.Images.Media.getContentUri(imageFile.getAbsolutePath());
+
+            // To get the location of the created shared pictures storage
+            collection = MediaStore.Audio.Media.getContentUriForPath(outputFile.getAbsolutePath());
+            values.put(MediaStore.MediaColumns.DATA, outputFile.getAbsolutePath()); // It crashes without the data column
+        }
+
+        if (collection == null) {
+            Log.i(TAG, "writeToExternal collection is null. return");
+            return null;
+        }
+
+        Uri uriSavedAudio = resolver.insert(collection, values);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // Copy the file to a shared location because it's in the app external specific location and can't be found again by my app or others
+            ParcelFileDescriptor parcelFileDescriptor;
+
+            try {
+                parcelFileDescriptor = resolver.openFileDescriptor(uriSavedAudio, "w");
+                FileOutputStream outputStream = new FileOutputStream(parcelFileDescriptor.getFileDescriptor());
+                FileInputStream inputStream = new FileInputStream(outputFile.getAbsoluteFile());
+                FileUtils.copy(inputStream, outputStream); //Simply reads input to output stream
+                outputStream.flush();
+                outputStream.close();
+                inputStream.close();
+                parcelFileDescriptor.close();
+            } catch (Exception e) {
+
+                e.printStackTrace();
+            }
+        }
+
+        return uriSavedAudio;
+    }
 }
