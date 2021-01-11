@@ -36,6 +36,8 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -115,8 +117,14 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
     private static final int REQUEST_CAMERA_PHOTO_PERMISSIONS_CODE = 124;
     private static final int REQUEST_CAMERA_VIDEO_PERMISSIONS_CODE = 125;
     private static final int REQUEST_RECORD_AUDIO_CODE = 4;
+    private static final int SELECT_ALARM_REQUEST_CODE = 46;
+    private static final int SELECT_AUDIO_REQUEST_CODE = 48;
 
     private static final int SELECT_MEDIA_REQUEST_CODE = 102;
+    // A specific request code for recording videos because recorded videos don't have persistable Uri permission in their intent
+    // The app will crash if we tried to access the non existing persistable Uri permission
+    private static final int RECORD_VIDEO_REQUEST_CODE = 152;
+
     private static final int CROP_IMAGE_REQUEST_CODE = 104;
 
     private static final String APP_AUTHORITY = BuildConfig.APPLICATION_ID +".fileprovider";
@@ -603,6 +611,36 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                     Log.w(TAG, "Oops! User has canceled the recording");
                 }
                 break;
+            case SELECT_ALARM_REQUEST_CODE:
+                if (resultCode == RESULT_OK && data != null) {
+                    // Make sure the request was successful
+                    Log.d(TAG, "Great! User has choosed to select alarm sound");
+                    Uri alarmUri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+                    // Get the alarm's title
+                    Ringtone ringtone = RingtoneManager.getRingtone(this, alarmUri);
+                    String alarmTitle = ringtone.getTitle(this);
+                    Log.d(TAG, "Selected alarm uri: "+alarmUri + " title: "+alarmTitle);
+                    settings.setTone(alarmUri, alarmTitle);// Set video url on tone
+                    settingsAdapter.notifyDataSetChanged();
+                } else if (resultCode == RESULT_CANCELED) {
+                    // Oops! User has canceled the recording
+                    Log.w(TAG, "Oops! User has canceled the recording");
+                }
+                break;
+            case SELECT_AUDIO_REQUEST_CODE:
+                if (resultCode == RESULT_OK && data != null) {
+                    // Make sure the request was successful
+                    Log.d(TAG, "Great! User has choosed to select alarm sound");
+                    Uri audioUri = data.getData();
+                    String audioName = getFileName(audioUri, this);
+                    Log.d(TAG, "Selected audio uri: "+audioUri + " title: "+audioName);
+                    settings.setTone(audioUri, audioName);// Set video url on tone
+                    settingsAdapter.notifyDataSetChanged();
+                } else if (resultCode == RESULT_CANCELED) {
+                    // Oops! User has canceled the recording
+                    Log.w(TAG, "Oops! User has canceled the recording");
+                }
+                break;
             case SELECT_MEDIA_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
                     // User selected a media file or captured a new one
@@ -652,6 +690,58 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                         settings.setTone(mMediaUri, mMediaName);// Set video url on tone
                         settingsAdapter.notifyDataSetChanged();
                     }
+
+                    if (progressDialog != null) {
+                        progressDialog.dismiss();
+                        progressDialog = null;
+                    }
+                }else{
+                    // The user canceled the selection, hide the progress dialog
+                    if (progressDialog != null) {
+                        progressDialog.dismiss();
+                        progressDialog = null;
+                    }
+                    // Delete the photo uri from database so that we don't add a blank photo
+                    if(mMediaUri != null){
+                        ContentResolver resolver = this.getContentResolver();
+                        resolver.delete(mMediaUri, null, null);
+                    }
+                    Log.w(TAG, "Select Media error. maybe the user canceled");
+                }
+
+                break;
+            case RECORD_VIDEO_REQUEST_CODE:
+                // A specific request code for recording videos because recorded videos don't have persistable Uri permission in their intent
+                // The app will crash if we tried to access the non existing persistable Uri permission
+                if (resultCode == RESULT_OK) {
+                    // User selected a media file or captured a new one
+                    /*List<Uri> selectedMedias = Matisse.obtainResult(data);
+                    Uri selectedMediaUri = selectedMedias.get(0);
+                    Log.d(TAG, "mSelected: " + selectedMediaUri);*/
+                    if(null != data && null != data.getData()){
+                        // We have intent data because we only select a photo or video not capturing a new one
+                        Log.d(TAG, "intent= " + data);
+                        mMediaUri = data.getData();
+                    }
+                    // if intent or getData() is null it's because we provide the camera with file for saving
+                    Log.d(TAG, "mSelected mMediaUri= " + mMediaUri);
+                    if(mMediaUri == null){
+                        if (progressDialog != null) {
+                            progressDialog.dismiss();
+                            progressDialog = null;
+                        }
+                        return; // Return because we don't have the location of the saved media file
+                    }
+
+                    mMediaName = getFileName(mMediaUri, this);
+                    if (TextUtils.isEmpty(mMediaName)) {
+                        mMediaName = getString(R.string.unknown_name);
+                    }
+                    Log.d(TAG, "mMediaName: " + mMediaName);
+
+                    settings.setMedia(mMediaUri,mMediaName ,"Video");// Set photo url on media getResources().getString(R.string.media_video)
+                    settings.setTone(mMediaUri, mMediaName);// Set video url on tone
+                    settingsAdapter.notifyDataSetChanged();
 
                     if (progressDialog != null) {
                         progressDialog.dismiss();
@@ -1091,7 +1181,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                 }
                 Log.d(TAG, "mMediaUri= "+mMediaUri);
                 try {
-                    startActivityForResult(recordVideoIntent, SELECT_MEDIA_REQUEST_CODE);
+                    startActivityForResult(recordVideoIntent, RECORD_VIDEO_REQUEST_CODE);
                 } catch (ActivityNotFoundException e) {
                     // display error state to the user
                 }
@@ -1491,19 +1581,53 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                         Log.d(TAG, "which= " + which);
                         Log.d(TAG, "CharSequence= " + text);
                         switch (which) {
-                            case 0://Select a file
+                            case 0://Select alarm sound
+                                Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+                                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM);
+                                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, R.string.select_alarm_sound);
+                                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true);
+                                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false);
+                                //intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, getCurrentRingtoneUri());
+                                //intent.putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, Uri.parse("android.resource://" + mActivityContext.getPackageName() + "/" + R.raw.basbes)); //my custom sound
+                                //intent.putExtra(ringtoneManager.EXTRA_RINGTONE_DEFAULT_URI, Uri.parse(mOutputFile.getPath()));
+                                //intent.putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + File.pathSeparator + File.separator + mActivityContext.getPackageName() + "/raw/" + "basbes"));
 
-                                if (ContextCompat.checkSelfPermission(ActivityAlarmSettings.this,
+                                startActivityForResult(intent, SELECT_ALARM_REQUEST_CODE );
+                                break;
+                            case 1://Select music file
+                                /*if (ContextCompat.checkSelfPermission(ActivityAlarmSettings.this,
                                         Manifest.permission.READ_EXTERNAL_STORAGE)
                                         == PackageManager.PERMISSION_GRANTED) {
                                     showProgressDialog();
                                     showDialogFragment(TONE_PICKER);
                                 } else {
                                     requestReadExternalStoragePermission();
+                                }*/
+                                Log.i(TAG, "select music file");
+                                Intent pickAudio = null;
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+                                    pickAudio = new Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+                                    pickAudio.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+                                }else{
+                                    pickAudio = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+                                    pickAudio.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                }
+                                pickAudio.setType("audio/*"); //"image/*"
+                                pickAudio.addCategory(Intent.CATEGORY_OPENABLE);
+
+                                // Optionally, specify a URI for the file that should appear in the
+                                // system file picker when it loads.
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    pickAudio.putExtra(DocumentsContract.EXTRA_INITIAL_URI, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
                                 }
 
+                                try {
+                                    startActivityForResult(pickAudio, SELECT_AUDIO_REQUEST_CODE);
+                                } catch (ActivityNotFoundException e) {
+                                    // display error state to the user
+                                }
                                 break;
-                            case 1: //Record via microphone
+                            case 2: //Record via microphone
                                 if(checkMicPermissions()) {
                                     recordAudio();
                                 }
@@ -1636,6 +1760,21 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
         Log.i(TAG, "showPermissionRationaleDialog: permission AlertFragment show clicked ");
     }
 
+    // To get the ringtone name from it's uri
+    /*private String getAudioNameFromUri(Uri uri) {
+        int ringtonePosition = mRingtoneManager.getRingtonePosition(uri);
+        String result ;
+        if(ringtonePosition == -1){
+            result = this.getResources().getString(R.string.default_tone);
+        }else{
+            Cursor cursor = mRingtoneManager.getCursor();
+            cursor.moveToPosition(ringtonePosition);
+            result = cursor.getString(RingtoneManager.TITLE_COLUMN_INDEX);
+        }
+
+        return result;
+    }*/
+
     // When Permission Rationale Dialog dialog is clicked
     @Override
     public void onClick(View view, int position, boolean isLongClick) {
@@ -1767,7 +1906,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
                 // Optional
                 .setSource(AudioSource.MIC)
                 .setChannel(AudioChannel.STEREO)
-                .setSampleRate(AudioSampleRate.HZ_48000)
+                .setSampleRate(AudioSampleRate.HZ_32000)
                 //.setAutoStart(true)
                 .setKeepDisplayOn(true)
 

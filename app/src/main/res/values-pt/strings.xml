@@ -127,9 +127,10 @@
   <string name="purple">Roxa</string>
   <string name="read_external_storage_message">Precisamos de sua permissão para ler seus arquivos de mídia para que você possa configurar sua chamada de despertar.</string>
   <string name="read_external_storage_title">Leia os arquivos</string>
-  <string name="record">Gravar através de microfone</string>
   <string name="red">Vermelho</string>
-  <string name="selected_file">Escolha o arquivo</string>
+  <string name="select_alarm_sound">Selecione o som do alarme</string>
+  <string name="select_music_file">Selecione o arquivo de música</string>
+  <string name="record">Gravar através de microfone</string>
   <string name="show_button">Mostrar botões</string>
   <string name="show_button_hint">Exibir os limites clicáveis em torno de lábios e testa.</string>
     <string name="swipe_right_to_delete">Olá, deslize para a direita para excluir o alarme.</string>

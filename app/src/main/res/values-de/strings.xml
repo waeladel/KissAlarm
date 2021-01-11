@@ -127,9 +127,10 @@
   <string name="purple">Lila</string>
   <string name="read_external_storage_message">Wir benötigen Ihre Erlaubnis, Ihre Mediendateien zu lesen, damit Sie Ihren Weckruf einstellen können.</string>
   <string name="read_external_storage_title">Lesen Sie die Dateien</string>
-  <string name="record">Aufnahme über Mikrofon</string>
   <string name="red">Rot</string>
-  <string name="selected_file">Wählen Sie Datei</string>
+  <string name="select_alarm_sound">Alarmton auswählen</string>
+  <string name="select_music_file">Musikdatei auswählen</string>
+  <string name="record">Aufnahme über Mikrofon</string>
   <string name="show_button">Schaltflächen anzeigen</string>
   <string name="show_button_hint">Zeigen Sie die anklickbaren Grenzen um Lippen und Stirn an.</string>
   <string name="swipe_right_to_delete">Hallo, wischen Sie nach rechts, um den Alarm zu löschen.</string>

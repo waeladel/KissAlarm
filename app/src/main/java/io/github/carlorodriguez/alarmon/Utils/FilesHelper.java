@@ -247,7 +247,9 @@ public class FilesHelper {
             // The query, because it only applies to a single document, returns only
             // one row. There's no need to filter, sort, or select fields,
             // because we want all fields for one document.
-            Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+            //Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+            CursorLoader loader = new CursorLoader(context, uri, null, null, null, null);
+            Cursor cursor = loader.loadInBackground();
             try {
                 // moveToFirst() returns false if the cursor has 0 rows. Very handy for
                 // "if there's anything to look at, look at it" conditionals.

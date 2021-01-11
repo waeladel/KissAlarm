@@ -127,9 +127,10 @@
   <string name="purple">Purper</string>
   <string name="read_external_storage_message">We hebben uw toestemming nodig om uw mediabestanden te lezen, zodat u uw wekoproep kunt instellen.</string>
   <string name="read_external_storage_title">Lees de bestanden</string>
-  <string name="record">Neem op via microfoon</string>
   <string name="red">Rood</string>
-  <string name="selected_file">Kies Bestand</string>
+  <string name="select_alarm_sound">Selecteer alarmgeluid</string>
+  <string name="select_music_file">Selecteer een muziekbestand</string>
+  <string name="record">Neem op via microfoon</string>
   <string name="show_button">Toon knoppen</string>
   <string name="show_button_hint">Geef de aanklikbare grenzen weer rond lippen en voorhoofd.</string>
   <string name="swipe_right_to_delete">Hallo, veeg naar rechts om het alarm te verwijderen.</string>

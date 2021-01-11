@@ -127,9 +127,10 @@
   <string name="purple">Purpurna boja</string>
   <string name="read_external_storage_message">Trebamo vašu dozvolu za čitanje multimedijskih datoteka kako biste mogli postaviti svoj bučni poziv.</string>
   <string name="read_external_storage_title">Pročitajte datoteke</string>
-  <string name="record">Snimanje putem mikrofona</string>
   <string name="red">Crvena</string>
-  <string name="selected_file">Odaberite datoteku</string>
+  <string name="select_alarm_sound">Odaberite zvuk alarma</string>
+  <string name="select_music_file">Odaberite glazbenu datoteku</string>
+  <string name="record">Snimanje putem mikrofona</string>
   <string name="show_button">Prikaži gumbe</string>
   <string name="show_button_hint">Prikažite granice koje se mogu kliknuti oko usana i čela.</string>
   <string name="swipe_right_to_delete">Pozdrav, prijeđite prstom udesno da biste izbrisali alarm.</string>

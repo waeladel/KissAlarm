@@ -127,9 +127,10 @@
   <string name="purple">Љубичаста</string>
   <string name="read_external_storage_message">Потребна вам је дозвола да прочитате ваше медијске датотеке како бисте могли поставити свој позив за буђење.</string>
   <string name="read_external_storage_title">Прочитајте датотеке</string>
-  <string name="record">Снимајте преко микрофона</string>
   <string name="red">Црвена</string>
-  <string name="selected_file">Изаберите Филе</string>
+  <string name="select_alarm_sound">Изаберите звук аларма</string>
+  <string name="select_music_file">Изаберите музичку датотеку</string>
+  <string name="record">Снимајте преко микрофона</string>
   <string name="show_button">Покажи дугмад</string>
   <string name="show_button_hint">Приказати границе које се могу кликнути око усана и чела.</string>
     <string name="swipe_right_to_delete">Здраво, превуците десно да обришете аларм.</string>

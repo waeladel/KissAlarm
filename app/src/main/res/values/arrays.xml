@@ -103,7 +103,8 @@
   </string-array>
 
   <string-array name="audio_source">
-    <item>@string/selected_file</item>
+    <item>@string/select_alarm_sound</item>
+    <item>@string/select_music_file</item>
     <item>@string/record</item>
   </string-array>
 

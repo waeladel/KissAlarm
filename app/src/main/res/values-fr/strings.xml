@@ -127,9 +127,10 @@
   <string name="purple">Violet</string>
   <string name="read_external_storage_message">Nous avons besoin de votre autorisation pour lire vos fichiers multimédias afin de pouvoir définir votre appel de réveil.</string>
   <string name="read_external_storage_title">Lire les fichiers</string>
+  <string name="select_alarm_sound">Sélectionnez le son de l\'alarme</string>
+  <string name="select_music_file">Sélectionnez un fichier de musique</string>
   <string name="record">Enregistrement par microphone</string>
   <string name="red">Rouge</string>
-  <string name="selected_file">Choisir un fichier</string>
   <string name="show_button">Afficher les boutons</string>
   <string name="show_button_hint">Afficher les limites cliquables autour des lèvres et du front.</string>
   <string name="swipe_right_to_delete">Bonjour, balayez vers la droite pour supprimer l\'alarme.</string>

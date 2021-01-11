@@ -127,9 +127,10 @@
   <string name="purple">Viola</string>
   <string name="read_external_storage_message">Abbiamo bisogno della tua autorizzazione per leggere i file multimediali in modo da poter impostare la sveglia.</string>
   <string name="read_external_storage_title">Leggi i file</string>
-  <string name="record">Registra tramite microfono</string>
   <string name="red">Rosso</string>
-  <string name="selected_file">Scegli File</string>
+  <string name="select_alarm_sound">Selezionare il suono dell\'allarme</string>
+  <string name="select_music_file">Selezionare il file musicale</string>
+  <string name="record">Registra tramite microfono</string>
   <string name="show_button">Mostra pulsanti</string>
   <string name="show_button_hint">Mostra i contorni cliccabili attorno alle labbra e alla fronte.</string>
   <string name="swipe_right_to_delete">Ciao, scorri verso destra per eliminare l\'allarme.</string>

@@ -139,12 +139,13 @@
   <string name="partner_video_or_photo">Video / foto del socio</string>
   <string name="pending_alarms">Alertas pendientes</string>
   <string name="permission_camera_rationale">El acceso a la cámara es necesario para detectar la cara de tu pareja</string>
-    <string name="record">Grabar a través del micrófono</string>
-  <string name="selected_file">Elija archivo</string>
+  <string name="select_alarm_sound">seleccionar sonido de alarma</string>
+  <string name="select_music_file">seleccionar archivo de música</string>
+  <string name="record">Grabar a través del micrófono</string>
   <string name="show_button">Mostrar botones</string>
   <string name="show_button_hint">Muestra los límites clicables alrededor de los labios y la frente.</string>
-    <string name="test_alarm">Alarma de prueba</string>
-    <string name="toggle_button">Alternar repetición / apagar</string>
+  <string name="test_alarm">Alarma de prueba</string>
+  <string name="toggle_button">Alternar repetición / apagar</string>
   <string name="toggle_button_hint">Si está habilitado, los labios comienzan a dormitar y la frente detiene la alarma.</string>
   <string name="tone">Voz del socio</string>
   <string name="visibility_button">Claridad de botones</string>

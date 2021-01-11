@@ -119,12 +119,13 @@
     <string name="purple">أرجواني</string>
     <string name="read_external_storage_message">نحتاج إذنك لقراءة ملفات الوسائط الخاصة بك حتى تتمكن من ضبط نداء التنبيه.</string>
     <string name="read_external_storage_title">اقرأ الملفات</string>
-    <string name="record">سجل بواسطة الميكروفون</string>
     <string name="red">أحمر</string>
     <string name="repeat">كرر</string>
     <string name="scheduled_days">الأيام المجدولة</string>
     <string name="selected">المختار:</string>
-    <string name="selected_file">اختر ملف</string>
+    <string name="select_alarm_sound">اختر صوت تنبيه</string>
+    <string name="select_music_file">اختر ملف موسيقي</string>
+    <string name="record">سجل بواسطة الميكروفون</string>
     <string name="show_button">اظهر الأزرار</string>
     <string name="show_button_hint">عرض الحدود القابلة للنقر حول الشفاه والجبين.</string>
     <string name="snooze">غفوة</string>

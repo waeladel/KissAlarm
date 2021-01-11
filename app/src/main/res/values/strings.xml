@@ -9,7 +9,8 @@
 
 
   <string name="audio_source">Audio source</string>
-  <string name="selected_file">Select a file</string>
+  <string name="select_alarm_sound">Select alarm sound</string>
+  <string name="select_music_file">Select music file</string>
   <string name="record">Record via microphone</string>
   <string name="btn_choose">Choose</string>
 
@@ -214,8 +215,7 @@
 - Kissing your partner\'s lips dismisses the alarm, while forehead snoozes it.\n\n
 - Toggle between dismiss and snooze, if you want to dismiss the alarm by kissing forehead and vice versa.\n\n
 - Highlights lips and forehead\'s boundaries for easier clicking.\n\n
-- Choosing the highlight\'s transparency, in case you don\'t want to miss your partner\'s details.
-</string>
+- Choosing the highlight\'s transparency, in case you don\'t want to miss your partner\'s details.</string>
 
 
 </resources>
