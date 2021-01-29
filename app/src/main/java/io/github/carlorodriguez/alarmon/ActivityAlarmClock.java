@@ -26,6 +26,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
 import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -43,14 +46,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.gms.appinvite.AppInvite;
-import com.google.android.gms.appinvite.AppInviteInvitation;
-import com.google.android.gms.appinvite.AppInviteInvitationResult;
-import com.google.android.gms.appinvite.AppInviteReferral;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
+import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 import com.wdullaer.materialdatetimepicker.time.*;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 import java.util.ArrayList;
@@ -68,7 +70,7 @@ import java.util.Calendar;
  */
 public final class ActivityAlarmClock extends AppCompatActivity implements
         TimePickerDialog.OnTimeSetListener,
-        TimePickerDialog.OnTimeChangedListener , GoogleApiClient.OnConnectionFailedListener{
+        TimePickerDialog.OnTimeChangedListener {
 
     private static String TAG = ActivityAlarmClock.class.getSimpleName();
 
@@ -95,9 +97,8 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
     private Runnable tickCallback;
     private static RecyclerView alarmList;
     private int mLastFirstVisiblePosition;
-
     // [START define_variables]
-    private GoogleApiClient mGoogleApiClient;
+    //private GoogleApiClient mGoogleApiClient;
     // [END define_variables]
 
     @Override
@@ -106,6 +107,8 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
                 ActivityAlarmClock.this);
 
         super.onCreate(savedInstanceState);
+
+        FirebaseAnalytics.getInstance(this); // to start analytics before DynamicLinks
 
         setContentView(R.layout.alarm_list);
 
@@ -246,17 +249,17 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
         }
 
         // Create an auto-managed GoogleApiClient with access to App Invites.
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
+        /*mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(AppInvite.API)
                 .enableAutoManage(this, this)
-                .build();
+                .build();*/
 
         // Check for App Invite invitations and launch deep-link activity if possible.
         // Requires that an Activity is registered in AndroidManifest.xml to handle
         // deep-link URLs.
         //boolean autoLaunchDeepLink = true;
-        boolean autoLaunchDeepLink = false;
-        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, this, autoLaunchDeepLink)
+        //boolean autoLaunchDeepLink = false;
+        /*AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, this, autoLaunchDeepLink)
                 .setResultCallback(
                         new ResultCallback<AppInviteInvitationResult>() {
                             @Override
@@ -266,9 +269,8 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
                                     // Extract information from the intent
                                     Intent intent = result.getInvitationIntent();
                                     String deepLink = AppInviteReferral.getDeepLink(intent);
-                                    String invitationId = AppInviteReferral.getInvitationId(intent);
+                                    //String invitationId = AppInviteReferral.getInvitationId(intent);
                                     Log.d(TAG, "getInvitation:deepLink:" + deepLink);
-                                    Log.d(TAG, "getInvitation:invitationId:" + invitationId);
 
                                     // Because autoLaunchDeepLink = true we don't have to do anything
                                     // here, but we could set that to false and manually choose
@@ -279,19 +281,48 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
                                     startActivity(congratulationIntent);
                                 }
                             }
-                        });
+                        });*/
+
+
+        FirebaseDynamicLinks.getInstance()
+                .getDynamicLink(getIntent())
+                .addOnSuccessListener(this, new OnSuccessListener<PendingDynamicLinkData>() {
+                    @Override
+                    public void onSuccess(PendingDynamicLinkData pendingDynamicLinkData) {
+                        // Get deep link from result (may be null if no link is found)
+                        Uri deepLink = null;
+                        if (pendingDynamicLinkData != null) {
+                            deepLink = pendingDynamicLinkData.getLink();
+
+                            Log.d(TAG, "FirebaseDynamicLinks. deepLink:" + deepLink);
+                            // Handle the deep link. For example, open the linked
+                            // content, or apply promotional credit to the user's account.
+                            Intent congratulationIntent = new Intent(ActivityAlarmClock.this, DeepLinkActivity.class);
+                            //startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(congratulationIntent);
+
+                        }
+
+                    }
+                })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "getDynamicLink:onFailure", e);
+                    }
+                });
 
     }
     // [END on_create]
 
-    @Override
+    /*@Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
         //showMessage(getString(R.string.google_play_services_error));
         Toast.makeText(ActivityAlarmClock.this, getString(R.string.google_play_services_error),
                 Toast.LENGTH_LONG).show();
         // Sending failed or it was canceled
-    }
+    }*/
 
     private void undoAlarmDeletion(AlarmTime alarmTime,
             AlarmSettings alarmSettings, String alarmName, boolean enabled) {
@@ -407,7 +438,7 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
         return true;
     }
 
-    @Override
+   /* @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "onActivityResult: requestCode=" + requestCode + ", resultCode=" + resultCode);
@@ -426,7 +457,7 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
                 // ...
             }
         }
-    }
+    }*/
     // [END on_activity_result]
 
     @Override
@@ -509,13 +540,20 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
     }
 
     private void onInviteClicked() {
-        Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))
+        /*Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))
                 .setMessage(getString(R.string.invitation_message))
                 .setDeepLink(Uri.parse(getString(R.string.invitation_deep_link)))
                 //.setCustomImage(Uri.parse(getString(R.string.invitation_custom_image)))
                 .setCallToActionText(getString(R.string.invitation_cta))
                 .build();
-        startActivityForResult(intent, REQUEST_INVITE);
+        startActivityForResult(intent, REQUEST_INVITE);*/
+
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.invitation_message)+"\n\n" + Uri.parse(getString(R.string.invitation_deep_link)));
+        sendIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.invitation_subject));
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.invitation_cta)));
     }
 
     private void showDialogFragment(int id) {

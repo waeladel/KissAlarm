@@ -170,12 +170,13 @@
     <string name="deep_link_congratulation">مبروك:</string>
     <string name="deep_link_welcome_text">يمكنك الآن استخدام التطبيق.</string>
     <string name="google_play_services_error">فشل الاتصال.</string>
-    <string name="invitation_cta">تنصيب</string>
+    <string name="invitation_cta">ارسل إلى</string>
     <string name="invitation_failed">عذرا، لم نتمكن من إرسال الدعوة إلى أصدقائك.</string>
-    <string name="invitation_message">مرحبا! لن تصدق هذا التطبيق. يمكنك الاستيقاظ بفيديو أو صوت حبيبك، قبله لتوقف التنبيه</string>
-    <string name="invitation_title">قل للأصدقاء</string>
+    <string name="invitation_message">لن تصدق هذا التطبيق. يمكنك الاستيقاظ بفيديو أو صوت حبيبك، وعليك أن تقبل شفتيه لتوقف التنبيه</string>
+    <string name="invitation_title">اخبر للأصدقاء</string>
+    <string name="invitation_subject">مرحبا! هذا التطبيق مرح جدا</string>
     <string name="invite_dialog_title">لقد تلقيت دعوة!</string>
-    <string name="menu_invite">قل للأصدقاء</string>
+    <string name="menu_invite">اخبر الأصدقاء</string>
     <string name="send_failed">فشل إرسال الدعوات</string>
     <string name="sent_invitations_fmt">تم إرسال %d دعوات</string>
     <string name="storage_permission_dialog_title">إذن التخزين</string>

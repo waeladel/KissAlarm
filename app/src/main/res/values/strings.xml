@@ -182,10 +182,11 @@
 
   <string name="menu_invite">Invite Friends</string>
     <string name="invitation_title">Suggest to friends</string>
-    <string name="invitation_message">Hi! this app is funny. Wake up to your lover\'s video or voice, kiss to dismiss</string>
+  <string name="invitation_subject">Hi! this app is funny</string>
+    <string name="invitation_message">Wake up by your lover\'s voice, kiss your partner\'s lips to dismiss the alarm</string>
   <string name="invitation_deep_link" translatable="false">https://uf24v.app.goo.gl/kiss</string>
   <string name="invitation_custom_image" translatable="false">https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png</string>
-    <string name="invitation_cta">Install</string>
+    <string name="invitation_cta">Send to</string>
     <string name="invitation_failed">Sorry, we couldn\'t sent the invitation to your friends.</string>
     <string name="google_play_services_error">Connection failed.</string>
 

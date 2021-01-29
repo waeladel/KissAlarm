@@ -23,8 +23,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.android.gms.appinvite.AppInviteReferral;
-
 /**
  * Activity for displaying information about a receive App Invite invitation.  This activity
  * displays as a Dialog over the MainActivity and does not cover the full screen.
@@ -50,21 +48,22 @@ public class DeepLinkActivity extends AppCompatActivity implements
 
         // Check if the intent contains an AppInvite and then process the referral information.
         Intent intent = getIntent();
-        if (AppInviteReferral.hasReferral(intent)) {
+        /*if (AppInviteReferral.hasReferral(intent)) {
             processReferralIntent(intent);
-        }
+        }*/
+        processReferralIntent(intent);
     }
     // [END deep_link_on_start]
 
-    // [START process_referral_intent]
+    // [START process_referral_intent]InvitationId
     private void processReferralIntent(Intent intent) {
         // Extract referral information from the intent
-        String invitationId = AppInviteReferral.getInvitationId(intent);
-        String deepLink = AppInviteReferral.getDeepLink(intent);
+        //String invitationId = AppInviteReferral.get(intent);
+        //String deepLink = AppInviteReferral.getDeepLink(intent);
 
         // Display referral information
         // [START_EXCLUDE]
-        Log.d(TAG, "Found Referral: " + invitationId + ":" + deepLink);
+        //Log.d(TAG, "Found Referral: deepLink =" + ":" + deepLink);
         /*((TextView) findViewById(R.id.deep_link_text))
                 .setText(getString(R.string.deep_link_fmt, deepLink));
         ((TextView) findViewById(R.id.invitation_id_text))
