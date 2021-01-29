@@ -14,8 +14,8 @@ android {
         applicationId "com.kiss.alarm"
         minSdkVersion 16
         targetSdkVersion 30
-        versionName '1.0.8'
-        versionCode 108
+        versionName '1.1.0'
+        versionCode 110
     }
 
     signingConfigs {
@@ -79,10 +79,10 @@ dependencies {
     api 'com.theartofdev.edmodo:android-image-cropper:2.8.0'  // to crop images
     // face detector
     implementation 'com.google.android.gms:play-services-vision:20.1.3'
-    implementation 'com.google.firebase:firebase-core:18.0.0'
+    implementation 'com.google.firebase:firebase-core:18.0.2'
     implementation 'com.google.firebase:firebase-invites:17.0.0'
     // Required only if Facebook login and ads support is required. Find the latest Facebook SDK releases here: https://goo.gl/Ce5L94
-    implementation 'com.facebook.android:facebook-android-sdk:5.5.1'
+    //implementation 'com.facebook.android:facebook-android-sdk:5.5.1'
 }
 
 play {

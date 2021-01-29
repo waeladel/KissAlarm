@@ -56,8 +56,8 @@ import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import com.facebook.FacebookSdk; // for facebook ads app installs
-import com.facebook.appevents.AppEventsLogger; // for facebook analytics
+//import com.facebook.FacebookSdk; // for facebook ads app installs
+//import com.facebook.appevents.AppEventsLogger; // for facebook analytics
 
 /**
  * This is the main Activity for the application.  It contains a ListView
@@ -224,7 +224,6 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
                 }
 
                 long next = AlarmUtil.millisTillNextInterval(interval);
-                Log.d(TAG, "next = "+next);
 
                 handler.postDelayed(tickCallback, next);
             }

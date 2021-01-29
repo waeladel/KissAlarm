@@ -46,7 +46,7 @@ public class App extends Application {
             // Create audioAttributes for notification's sound
             audioAttributes = new AudioAttributes.Builder()
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                     .build();
 
             NotificationChannel alarmChannel = new NotificationChannel(

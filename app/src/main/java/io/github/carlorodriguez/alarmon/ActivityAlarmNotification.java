@@ -160,7 +160,6 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         }
 
         super.onCreate(savedInstanceState);
-
         // remove title
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,

@@ -55,6 +55,7 @@ import static io.github.carlorodriguez.alarmon.App.ALARM_CHANNEL_ID;
  * alarms).
  */
 public class NotificationService extends Service {
+  private final static String TAG = NotificationService.class.getSimpleName();
   private Notification mNotification;
   private NotificationManagerCompat notificationManager;
   private static final int ALARM_NOTIFICATION_ID = 1;
@@ -250,9 +251,10 @@ public class NotificationService extends Service {
         mNotification = new NotificationCompat.Builder(NotificationService.this, ALARM_CHANNEL_ID)
                 .setContentTitle(notifyText)
                 .setContentText(getString(R.string.notification_alarm_body))
+                //.setSmallIcon(R.drawable.ic_stat_notify_alarm)
                 .setSmallIcon(R.mipmap.ic_notification)
                 .setColor(ContextCompat.getColor(getApplicationContext(),
-                        R.color.notification_color))
+                        R.color.colorSecondary))
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                 .setContentIntent(notificationActivity)
@@ -273,8 +275,9 @@ public class NotificationService extends Service {
                   .build();
           notification.flags |= Notification.FLAG_ONGOING_EVENT;*/
 
-        notificationManager.notify(AlarmClockService.NOTIFICATION_BAR_ID, mNotification);
-        //startForeground(AlarmClockService.NOTIFICATION_BAR_ID, mNotification);
+        // use startForeground because startForegroundService is called from the ReceiverAlarm
+        startForeground(AlarmClockService.NOTIFICATION_BAR_ID, mNotification);
+        //notificationManager.notify(AlarmClockService.NOTIFICATION_BAR_ID, mNotification);
 
         long next = AlarmUtil.millisTillNextInterval(AlarmUtil.Interval.SECOND);
         handler.postDelayed(notificationBlinker, next);
@@ -300,6 +303,10 @@ public class NotificationService extends Service {
   public void onDestroy() {
     super.onDestroy();
     db.closeConnections();
+    // Use stopForeground instead of cancelling the notification, because this service is a foreground service
+    //notificationManager.cancel(AlarmClockService.NOTIFICATION_BAR_ID); // To remove notification when the alarm is dismissed
+    stopForeground(true);
+
     service.unbind();
 
     boolean debug = AppSettings.isDebugMode(getApplicationContext());
