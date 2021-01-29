@@ -195,6 +195,44 @@ public final class AlarmTime implements Parcelable, Comparable<AlarmTime> {
     return value;
   }
 
+  // Use the function to strip minutes from notification text because we only update the notification every hour
+  public String timeUntilStringNoMinutes(Context c) {
+    Calendar now = Calendar.getInstance();
+    if (calendar.before(now)) {
+      return c.getString(R.string.alarm_has_occurred);
+    }
+    long now_min = now.getTimeInMillis() / 1000 / 60;
+    long then_min = calendar.getTimeInMillis() / 1000 / 60;
+    long difference_minutes = then_min - now_min;
+    long days = difference_minutes / (60 * 24);
+    long hours = difference_minutes % (60 * 24);
+    long minutes = hours % 60;
+    hours = hours / 60;
+
+    String value = "";
+    if (days == 1) {
+      value += c.getString(R.string.day, days) + " ";
+    } else if (days > 1) {
+      value += c.getString(R.string.days, days) + " ";
+    }
+    if (hours == 1) {
+      value += c.getString(R.string.hour, hours) + " ";
+    } else if (hours > 1) {
+      value += c.getString(R.string.hours, hours) + " ";
+    }
+    if (hours <= 0) {
+      // When time is less than hour make minutes vague
+      value += c.getString(R.string.less_than_hour) + " ";
+    }else{
+      if (minutes == 1) {
+        value += c.getString(R.string.minute, minutes) + " ";
+      } else if (minutes > 1) {
+        value += c.getString(R.string.minutes, minutes) + " ";
+      }
+    }
+    return value;
+  }
+
   /**
    * A static method which generates an AlarmTime object @minutes in the future.
    * It first truncates seconds (rounds down to the nearest minute) before

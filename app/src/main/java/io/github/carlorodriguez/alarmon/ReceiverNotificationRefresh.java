@@ -31,6 +31,7 @@ public class ReceiverNotificationRefresh extends BroadcastReceiver {
   @Override
   public void onReceive(Context context, Intent intent) {
     final Intent causeRefresh = new Intent(context, AlarmClockService.class);
+    Log.d(TAG, "onReceive: ");
     causeRefresh.putExtra(AlarmClockService.COMMAND_EXTRA, AlarmClockService.COMMAND_NOTIFICATION_REFRESH);
     // We must use startForegroundService because we need to start the service
     // even if we received this receiver when the app is in the background
@@ -39,7 +40,9 @@ public class ReceiverNotificationRefresh extends BroadcastReceiver {
     }else{
       context.startService(causeRefresh);
     }
-    long next = AlarmUtil.nextIntervalInUTC(AlarmUtil.Interval.MINUTE);
+    // Don't refresh every minute it's bad for battery life, lets refresh the notification every hour
+    //long next = AlarmUtil.nextIntervalInUTC(AlarmUtil.Interval.MINUTE);
+    long next = AlarmUtil.nextIntervalInUTC(AlarmUtil.Interval.HOUR);
     final AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     manager.set(AlarmManager.RTC, next, pendingIntent(context));
   }

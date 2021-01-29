@@ -182,7 +182,7 @@ public final class AlarmClockService extends Service {
 
           values.put("t", nextTime.localizedString(getApplicationContext()));
 
-          values.put("c", nextTime.timeUntilString(getApplicationContext()));
+          values.put("c", nextTime.timeUntilStringNoMinutes(getApplicationContext()));
 
           String templateString = AppSettings.getNotificationTemplate(
                   getApplicationContext());
@@ -197,7 +197,7 @@ public final class AlarmClockService extends Service {
 
       //NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext());
 
-      String notificationTitle = getString(R.string.app_name);
+      String notificationTitle = getString(R.string.upcoming_alarm);
 
       if (pendingAlarms.nextAlarmId() != AlarmClockServiceBinder.NO_ALARM_ID) {
           DbAccessor db = new DbAccessor(getApplicationContext());
@@ -207,7 +207,7 @@ public final class AlarmClockService extends Service {
           if (alarmInfo != null) {
               notificationTitle = alarmInfo.getName() != null && !alarmInfo.getName().isEmpty()
                       ? alarmInfo.getName()
-                      : getString(R.string.app_name);
+                      : getString(R.string.upcoming_alarm);
           }
 
           db.closeConnections();

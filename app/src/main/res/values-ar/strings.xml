@@ -74,6 +74,7 @@
     <string name="grey">رمادي</string>
     <string name="hour">%d ساعة</string>
     <string name="hours">%d ساعات</string>
+    <string name="less_than_hour">أقل من ساعة</string>
     <string name="indigo">نيلي</string>
     <string name="internal">نغمات التنبيه</string>
     <string name="label">عنوان</string>
@@ -96,6 +97,7 @@
     <string name="minutes">%d دقائق</string>
     <string name="next_alarm">التنبيه المقبل:</string>
     <string name="no_pending_alarms">لا توجد تنبيهات معلقة</string>
+    <string name="upcoming_alarm">التنبيه القادم</string>
     <string name="no_repeats">لا يكرر</string>
     <string name="none">لا شيء</string>
     <string name="notification_icon_off">لا تعرض أيقونة عند وجود تنبيهات معلقة</string>

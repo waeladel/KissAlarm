@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 /**
  * Created by hp on 26/12/2017.
  */
@@ -29,6 +31,8 @@ public class App extends Application {
     public void onCreate() {
 
         super.onCreate();
+
+        FirebaseAnalytics.getInstance(this); // to start analytics before DynamicLinks
 
         sApplicationContext = getApplicationContext();
         //sMediaPlayer = new MediaPlayer();

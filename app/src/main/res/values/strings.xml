@@ -71,11 +71,13 @@
   <string name="minus_five">-5</string>
   <string name="next_alarm">Next alarm:</string>
   <string name="no_pending_alarms">No pending alarms</string>
+  <string name="upcoming_alarm">Upcoming alarm</string>
   <string name="alarm_has_occurred">Alarm has occurred</string>
   <string name="day">%d day</string>
   <string name="days">%d days</string>
   <string name="hour">%d hour</string>
   <string name="hours">%d hours</string>
+  <string name="less_than_hour">less than an hour</string>
   <string name="minute">%d minute</string>
   <string name="minutes">%d minutes</string>
   <string name="am">AM</string>

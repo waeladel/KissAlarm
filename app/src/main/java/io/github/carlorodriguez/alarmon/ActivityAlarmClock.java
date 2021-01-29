@@ -108,8 +108,6 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
 
         super.onCreate(savedInstanceState);
 
-        FirebaseAnalytics.getInstance(this); // to start analytics before DynamicLinks
-
         setContentView(R.layout.alarm_list);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
