@@ -64,6 +64,16 @@ public class ReceiverAlarm extends BroadcastReceiver {
     //PendingIntent notificationActivity = PendingIntent.getActivity(context, 0, intent, 0);
     PendingIntent notificationActivity = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+    // Intent to for the action button to dismiss the alarm
+    Intent dismissIntent = new Intent(context, NotificationService.class);
+    dismissIntent.putExtra(AlarmClockService.COMMAND_EXTRA, NotificationService.COMMAND_DISMISS_ALARM);
+    PendingIntent dismissPendingIntent = PendingIntent.getService(context, 1, dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+    // Intent to for the action button to snooze the alarm
+    Intent snoozeIntent = new Intent(context, NotificationService.class);
+    snoozeIntent.putExtra(AlarmClockService.COMMAND_EXTRA, NotificationService.COMMAND_SNOOZE_ALARM);
+    PendingIntent snoozePendingIntent = PendingIntent.getService(context, 2, snoozeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
     NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 
     Notification mNotification = new NotificationCompat.Builder(context, FIRING_ALARM_CHANNEL_ID)
@@ -85,6 +95,9 @@ public class ReceiverAlarm extends BroadcastReceiver {
             // or higher, you need to request the USE_FULL_SCREEN_INTENT permission in
             // order for the platform to invoke this notification.
             .setFullScreenIntent(notificationActivity, true)
+            .addAction(R.drawable.ic_baseline_snooze_24, context.getString(R.string.snooze), snoozePendingIntent) // Snooze button
+            .addAction(R.drawable.ic_baseline_alarm_off_24, context.getString(R.string.dismiss), dismissPendingIntent) // Dismiss button
+            .setOnlyAlertOnce(true)
             .build();
 
     //mNotification.flags |= Notification.FLAG_ONGOING_EVENT;

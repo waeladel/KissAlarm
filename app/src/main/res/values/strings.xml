@@ -24,7 +24,7 @@
   <string name="ongoing_alarm_notification_channel_description">To notify you when there is an ongoing alarm.</string>
   <string name="upcoming_alarm_notification_channel_description">To notify you when there is an upcoming alarm.</string>
   <string name="notification_alarm_title">Alarm</string>
-  <string name="notification_alarm_body">Wake up, kiss your partner to dismiss or snooze</string>
+  <string name="notification_alarm_body">Wake up, select to kiss your partner</string>
 
 
   <string name="app_name" translatable="false">Kiss Alarm</string>

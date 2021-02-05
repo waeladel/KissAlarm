@@ -15,7 +15,7 @@
     <string name="ongoing_alarm_notification_channel_description">لإعلامك عندما يوجد منبه جاري.</string>
     <string name="upcoming_alarm_notification_channel_description">لإعلامك عندما يوجد منبه قادم.</string>
     <string name="notification_alarm_title">المنبه انطلق</string>
-    <string name="notification_alarm_body">استيقظ، قبل شريكك لغلق المنبه أو  لتفعيل الغفوة</string>
+    <string name="notification_alarm_body">استيقظ، اختر لتقبيل شريكك</string>
     <string name="about">عن التطبيق</string>
     <string name="alarm_deleted">تم حذف التنبيه</string>
     <string name="alarm_fade">تلاشي صوت التنبيه</string>

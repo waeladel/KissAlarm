@@ -74,7 +74,8 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
 
     private static String TAG = ActivityAlarmClock.class.getSimpleName();
 
-
+    // boolean to know if the activity is already opened or not, so we refresh it when user click on the notification action button
+    static boolean isActive = false;
     public static final int DELETE_CONFIRM = 1;
     public static final int DELETE_ALARM_CONFIRM = 2;
 
@@ -220,9 +221,9 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
                 // Schedule the next update on the next interval boundary.
                 AlarmUtil.Interval interval = AlarmUtil.Interval.MINUTE;
 
-                if (AppSettings.isDebugMode(getApplicationContext())) {
+                /*if (AppSettings.isDebugMode(getApplicationContext())) {
                     interval = AlarmUtil.Interval.SECOND;
-                }
+                }*/
 
                 long next = AlarmUtil.millisTillNextInterval(interval);
 
@@ -386,6 +387,7 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
         }
 
         Log.d(TAG, "onResume");
+        isActive = true; // the activity is already opened, if user click on notification action button we must refresh this activity
 
     }
 
@@ -406,6 +408,7 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
                 findFirstCompletelyVisibleItemPosition();
 
         Log.d(TAG, "onPause");
+        isActive = false; // the activity is not opened, no need to refresh this activity if the user click on notification action button
     }
 
     @Override

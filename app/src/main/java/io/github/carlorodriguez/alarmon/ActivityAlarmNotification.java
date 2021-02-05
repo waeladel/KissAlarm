@@ -20,6 +20,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -41,6 +42,7 @@ import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.Surface;
@@ -143,6 +145,19 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
     // Dialog state
     int snoozeMinutes;
+
+    // To receiver finish Broadcast from the service, this way when the user click on the notification action button we stop the service
+    // then the service send this broadcast to stop the activity if it was already created
+    LocalBroadcastManager mLocalBroadcastManager;
+    BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.getAction().equals("com.kiss.alarm.action.close")){
+                finish(); // finish this activity when receiving the broadcast from the notificationService
+            }
+        }
+    };
 
 
     @Override
@@ -428,6 +443,12 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                 }
             }
         });
+
+        // Register the local receiver to know when the service wants to finish this activity. it happens when user click on the notification's action button
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
+        IntentFilter mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction("com.kiss.alarm.action.close");
+        mLocalBroadcastManager.registerReceiver(mBroadcastReceiver, mIntentFilter);
     }
 
 
@@ -462,6 +483,9 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
         // Cancel the heads up notification here instead of service onDestroy because the service is not destroyed until all activities unbound
         notificationManager.cancel(FIRING_NOTIFICATION_BAR_ID);
+
+        // unregister the local receiver that tells us when the service wants to finish this activity. it happens when user click on the notification's action button
+        mLocalBroadcastManager.unregisterReceiver(mBroadcastReceiver);
     }
 
     @Override

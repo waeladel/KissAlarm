@@ -31,18 +31,20 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Vibrator;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import android.util.Log;
 import android.view.Surface;
 
 import static io.github.carlorodriguez.alarmon.App.FIRING_ALARM_CHANNEL_ID;
 import static io.github.carlorodriguez.alarmon.App.ONGOING_ALARM_CHANNEL_ID;
-
 
 /**
  * This service is responsible for notifying the user when an alarm is
@@ -66,6 +68,12 @@ public class NotificationService extends Service {
   // Binder given to clients
   //private final IBinder mBinder = new LocalBinder();
   public Uri currentTone;
+
+  // Commands to help us know which intent was received when the user click the notification's action button, dismiss or snooze intent
+  public final static String COMMAND_EXTRA = "command";
+  public final static int COMMAND_UNKNOWN = 1;
+  public final static int COMMAND_DISMISS_ALARM = 5;
+  public final static int COMMAND_SNOOZE_ALARM = 6;
 
   public class NoAlarmsException extends Exception {
     private static final long serialVersionUID = 1L;
@@ -345,13 +353,51 @@ public class NotificationService extends Service {
 
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
-    Log.d(TAG, "onStartCommand: ");
+    Log.d(TAG, "onStartCommand: start id= "+startId);
     handleStart(intent);
     return START_NOT_STICKY;
   }
 
   private void handleStart(Intent intent) {
-    // startService called from alarm receiver with an alarm id url.
+
+    // Check if we must start the alarm sound or the user just clicked on action button in the notification and we must stop the service?
+    if (intent != null && intent.hasExtra(COMMAND_EXTRA)) {
+      Bundle extras = intent.getExtras();
+      int command = extras.getInt(COMMAND_EXTRA, COMMAND_UNKNOWN);
+      try {
+        long alarmId = currentAlarmId(); // get the current alarm
+        switch (command) {
+          case COMMAND_DISMISS_ALARM:
+            Log.d(TAG, "action button: dismiss is clicked");
+            acknowledgeCurrentNotification(0);
+            break;
+          case COMMAND_SNOOZE_ALARM:
+            Log.d(TAG, "action button: snooze is clicked");
+            int snoozeMinutes = db.readAlarmSettings(alarmId).getSnoozeMinutes(); // get snooze minutes time from the database
+            acknowledgeCurrentNotification(snoozeMinutes);
+            break;
+        }
+
+        // finish the notification activity because it may be already exists. Send a local broadcast that will be received by the activity
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(NotificationService.this);
+        localBroadcastManager.sendBroadcast(new Intent("com.kiss.alarm.action.close"));
+
+        // To refresh the alarm's "next time" if the main activity was already opened
+        if(ActivityAlarmClock.isActive){
+          Intent i =new Intent(getApplicationContext(), ActivityAlarmClock.class);
+          i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+          startActivity(i);
+        }
+
+      } catch (NoAlarmsException e) {
+        e.printStackTrace();
+      }
+
+
+      return; // Don't start the alarm sound, return because this intent is started by a user clicked on dismiss or snooze action button
+    }
+
+    // startService called from alarm receiver with an alarm id url. onStartCommand is not starting by an action button
     if (intent != null && intent.getData() != null) {
       long alarmId = AlarmUtil.alarmUriToId(intent.getData());
       try {
