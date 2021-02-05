@@ -18,10 +18,8 @@
   <string name="detecting_you_partner_face">Detecting your partner\'s face</string>
   <string name="toast_cant_detect_face">Sorry, couldn\'t detect your partner\'s face, try to use a clearer photo for his/her face.</string>
   <string name="firing_alarms_notification_channel_name">Firing alarms</string>
-  <string name="ongoing_alarms_notification_channel_name">Ongoing alarms</string>
   <string name="upcoming_alarms_notification_channel_name">Upcoming alarms</string>
   <string name="firing_alarm_notification_channel_description">To notify you when firing an alarm.</string>
-  <string name="ongoing_alarm_notification_channel_description">To notify you when there is an ongoing alarm.</string>
   <string name="upcoming_alarm_notification_channel_description">To notify you when there is an upcoming alarm.</string>
   <string name="notification_alarm_title">Alarm</string>
   <string name="notification_alarm_body">Wake up, select to kiss your partner</string>

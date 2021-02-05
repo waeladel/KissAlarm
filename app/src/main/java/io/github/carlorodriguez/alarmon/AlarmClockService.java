@@ -246,6 +246,7 @@ public final class AlarmClockService extends Service {
           @Override
           public void run() {
             // To remove the notification
+            startForeground(NOTIFICATION_BAR_ID, mNotificationBuilder.build()); // to be sure startForeground is called in all cases
             stopForeground(true);
             //stopSelf();
             Log.d(TAG, "stopForeground and stopSelf");

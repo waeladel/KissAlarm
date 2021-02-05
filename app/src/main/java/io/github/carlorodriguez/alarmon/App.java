@@ -23,7 +23,6 @@ public class App extends Application {
     private AudioAttributes audioAttributes;
 
     public static final String FIRING_ALARM_CHANNEL_ID = "Firing_alarm_channel_id";
-    public static final String ONGOING_ALARM_CHANNEL_ID = "Ongoing_alarm_channel_id";
     public static final String UPCOMING_ALARM_CHANNEL_ID = "Upcoming_alarm_channel_id";
     private final static String TAG = App.class.getSimpleName();
 
@@ -66,15 +65,6 @@ public class App extends Application {
             //alarmChannel.setSound(null, audioAttributes);
             firingAlarmChannel.setSound(null, null);
 
-            // Create a notification channel for ongoing alarms. IT's the notification for foreground service when the alarm is ringing
-            NotificationChannel onGoingAlarmChannel = new NotificationChannel(
-                    ONGOING_ALARM_CHANNEL_ID,
-                    getString(R.string.ongoing_alarms_notification_channel_name),
-                    NotificationManager.IMPORTANCE_LOW // to display a heads up notification. We use null sound because we already play sound in the service
-            );
-            onGoingAlarmChannel.setDescription(getString(R.string.ongoing_alarm_notification_channel_description));
-            onGoingAlarmChannel.enableLights(true);
-
             // Create a notification channel for upcoming alarms
             NotificationChannel upcomingAlarmChannel = new NotificationChannel(
                     UPCOMING_ALARM_CHANNEL_ID,
@@ -87,7 +77,6 @@ public class App extends Application {
             NotificationManagerCompat manager = NotificationManagerCompat.from(this);
             if (manager != null) {
                 manager.createNotificationChannel(firingAlarmChannel);
-                manager.createNotificationChannel(onGoingAlarmChannel);
                 manager.createNotificationChannel(upcomingAlarmChannel);
             }
         }

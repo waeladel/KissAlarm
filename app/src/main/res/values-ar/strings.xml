@@ -9,10 +9,8 @@
     <string name="Scanning">جار الفحص</string>
     <string name="toast_cant_detect_face">نأسف، تعذر التعرف على وجه شريكِك أو شريكتك، حاول استخدام صورة أوضح للوجه.</string>
     <string name="firing_alarms_notification_channel_name">انطلاق المنبهات</string>
-    <string name="ongoing_alarms_notification_channel_name">المنبهات الجارية</string>
     <string name="upcoming_alarms_notification_channel_name">المنبهات القادمة</string>
     <string name="firing_alarm_notification_channel_description">لإعلامك عندما ينطلق المنبه.</string>
-    <string name="ongoing_alarm_notification_channel_description">لإعلامك عندما يوجد منبه جاري.</string>
     <string name="upcoming_alarm_notification_channel_description">لإعلامك عندما يوجد منبه قادم.</string>
     <string name="notification_alarm_title">المنبه انطلق</string>
     <string name="notification_alarm_body">استيقظ، اختر لتقبيل شريكك</string>
