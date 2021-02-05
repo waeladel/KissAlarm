@@ -40,6 +40,7 @@ import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationManagerCompat;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.Surface;
@@ -65,6 +66,7 @@ import com.google.android.gms.vision.face.FaceDetector;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
+import static io.github.carlorodriguez.alarmon.NotificationService.FIRING_NOTIFICATION_BAR_ID;
 
 /**
  * This is the activity responsible for alerting the user when an alarm goes
@@ -134,7 +136,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
     public static boolean isShown;
     public static int visibility;
 
-
+    private NotificationManagerCompat notificationManager;
 
 
     //private FrameLayout fl_surfaceview_container;
@@ -172,6 +174,15 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
         db = new DbAccessor(getApplicationContext());
 
+        // We must start the notification in the receiver not her, because if the system Ui chooses to display a heads up notification
+        // user will here no sound because the service isn't started
+        /*Intent intent = getIntent();
+        if (intent != null && intent.getData() != null) {
+            Intent notifyService = new Intent(ActivityAlarmNotification.this, NotificationService.class);
+            notifyService.setData(intent.getData());
+            startService(notifyService);
+        }*/
+
         // Start the notification service and bind to it.
         notifyService = new NotificationServiceBinder(getApplicationContext());
 
@@ -205,6 +216,8 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
             }
         };
         Log.d(TAG, "mamaMediaPlayer= onCreate");
+
+        notificationManager = NotificationManagerCompat.from(this); // it's needed to cancel the heads up notification when user stop the sound
 
         // Setup individual UI elements.
 
@@ -446,6 +459,9 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
             mDetector.release();
             Log.d(TAG, "mDetector released onDestroy");
         }*/
+
+        // Cancel the heads up notification here instead of service onDestroy because the service is not destroyed until all activities unbound
+        notificationManager.cancel(FIRING_NOTIFICATION_BAR_ID);
     }
 
     @Override

@@ -3,17 +3,18 @@
           xmlns:android="http://schemas.android.com/apk/res/android"
           android:versionName="1.2.0" android:versionCode="4">
 
-<!--  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> required for firebase analytics, will be added later-->
+
   <uses-permission android:name="android.permission.WAKE_LOCK"/>
   <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
   <uses-permission android:name="android.permission.VIBRATE"/>
   <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
   <uses-permission android:name="android.permission.RECORD_AUDIO" />
 <!-- No need for this, we use intent to call the default camera app <uses-permission android:name="android.permission.CAMERA" />-->
-  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+<!--  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />-->
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28"/>
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+  <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 
   <uses-feature android:name="android.hardware.telephony" android:required="false" />
   <uses-feature android:name="android.hardware.camera" android:required="false" />
@@ -79,11 +80,13 @@
       </intent-filter>
       <!-- [END deep_link_filter] -->
     </activity>
+    <!-- We added taskAffinity so that the notification activity becomes a singleInstance in a new task, so when it's closed it doesn't close the app if it was opened-->
     <activity
         android:name="io.github.carlorodriguez.alarmon.ActivityAlarmNotification"
         android:theme="@style/Theme.AppCompat.NoActionBar"
         android:launchMode="singleInstance"
         android:screenOrientation="portrait"
+        android:taskAffinity=""
         android:excludeFromRecents="true"/>
     <activity
         android:name="io.github.carlorodriguez.alarmon.ActivityAlarmSettings"

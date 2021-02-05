@@ -40,7 +40,8 @@ import androidx.core.content.ContextCompat;
 import android.util.Log;
 import android.view.Surface;
 
-import static io.github.carlorodriguez.alarmon.App.ALARM_CHANNEL_ID;
+import static io.github.carlorodriguez.alarmon.App.FIRING_ALARM_CHANNEL_ID;
+import static io.github.carlorodriguez.alarmon.App.ONGOING_ALARM_CHANNEL_ID;
 
 
 /**
@@ -58,11 +59,12 @@ public class NotificationService extends Service {
   private final static String TAG = NotificationService.class.getSimpleName();
   private Notification mNotification;
   private NotificationManagerCompat notificationManager;
-  private static final int ALARM_NOTIFICATION_ID = 1;
-  private final static int PENDING_INTENT_REQUEST_CODE = 45; // For the notification
+
+  public final static int FIRING_NOTIFICATION_BAR_ID = 44;
+  public final static int ONGOING_NOTIFICATION_BAR_ID = 57;
 
   // Binder given to clients
-  private final IBinder mBinder = new LocalBinder();
+  //private final IBinder mBinder = new LocalBinder();
   public Uri currentTone;
 
   public class NoAlarmsException extends Exception {
@@ -196,12 +198,14 @@ public class NotificationService extends Service {
 
   @Override
   public IBinder onBind(Intent intent) {
+    Log.d(TAG, "onBind: ");
     return new NotificationServiceInterfaceStub(this);
     //return mBinder;
   }
 
   @Override
   public void onCreate() {
+    Log.d(TAG, "onCreate: ");
     super.onCreate();
     firingAlarms = new LinkedList<>();
     // Access to in-memory and persistent data structures.
@@ -218,8 +222,8 @@ public class NotificationService extends Service {
     // Use the notification activity explicitly in this intent just in case the
     // activity can't be viewed via the root activity.
     Intent intent = new Intent(getApplicationContext(), ActivityAlarmNotification.class);
-    //intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-    notificationActivity = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
+    intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+    notificationActivity = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
     // Setup a self-scheduling event loops.
     handler = new Handler();
@@ -234,6 +238,7 @@ public class NotificationService extends Service {
         handler.postDelayed(soundCheck, next);
       }
     };
+
     notificationBlinker = new Runnable() {
       @Override
       public void run() {
@@ -248,19 +253,26 @@ public class NotificationService extends Service {
           return;
         }
 
-        mNotification = new NotificationCompat.Builder(NotificationService.this, ALARM_CHANNEL_ID)
+        mNotification = new NotificationCompat.Builder(NotificationService.this, ONGOING_ALARM_CHANNEL_ID)
                 .setContentTitle(notifyText)
                 .setContentText(getString(R.string.notification_alarm_body))
                 //.setSmallIcon(R.drawable.ic_stat_notify_alarm)
                 .setSmallIcon(R.mipmap.ic_notification)
-                .setColor(ContextCompat.getColor(getApplicationContext(),
-                        R.color.colorSecondary))
-                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setColor(ContextCompat.getColor(getApplicationContext(), R.color.colorSecondary))
+                .setPriority(NotificationCompat.PRIORITY_LOW) // just to be above lower priority notifications
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
-                .setContentIntent(notificationActivity)
+                //.setNotificationSilent() // it's already a low channel
+                //.setAutoCancel(true)
+                .setContentIntent(notificationActivity) // not need for Content Intent as we use FullScreen Intent instead
+                // Use a full-screen intent only for the highest-priority alerts where you
+                // have an associated activity that you would like to launch after the user
+                // interacts with the notification. Also, if your app targets Android 10
+                // or higher, you need to request the USE_FULL_SCREEN_INTENT permission in
+                // order for the platform to invoke this notification.
+                //.setFullScreenIntent(notificationActivity, true)
                 .build();
 
-        mNotification.flags |= Notification.FLAG_ONGOING_EVENT;
+        //mNotification.flags |= Notification.FLAG_FOREGROUND_SERVICE;
 
         /*NotificationCompat.Builder builder = new NotificationCompat.Builder(
                   getApplicationContext());
@@ -275,14 +287,18 @@ public class NotificationService extends Service {
                   .build();
           notification.flags |= Notification.FLAG_ONGOING_EVENT;*/
 
-        // use startForeground because startForegroundService is called from the ReceiverAlarm
-        startForeground(AlarmClockService.NOTIFICATION_BAR_ID, mNotification);
-        //notificationManager.notify(AlarmClockService.NOTIFICATION_BAR_ID, mNotification);
-
-        long next = AlarmUtil.millisTillNextInterval(AlarmUtil.Interval.SECOND);
-        handler.postDelayed(notificationBlinker, next);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+          // use startForeground because startForegroundService is called from the ReceiverAlarm
+          startForeground(ONGOING_NOTIFICATION_BAR_ID, mNotification);
+        }else{
+          notificationManager.notify(ONGOING_NOTIFICATION_BAR_ID, mNotification);
+          // blinking notification only works in old androids. handler.post will be called later in soundAlarm function
+          long next = AlarmUtil.millisTillNextInterval(AlarmUtil.Interval.SECOND);
+          handler.postDelayed(notificationBlinker, next);
+        }
       }
     };
+
     autoCancel = new Runnable() {
       @Override
       public void run() {
@@ -302,10 +318,17 @@ public class NotificationService extends Service {
   @Override
   public void onDestroy() {
     super.onDestroy();
+    Log.d(TAG, "onDestroy");
     db.closeConnections();
-    // Use stopForeground instead of cancelling the notification, because this service is a foreground service
-    //notificationManager.cancel(AlarmClockService.NOTIFICATION_BAR_ID); // To remove notification when the alarm is dismissed
-    stopForeground(true);
+
+    // This service wouldn't be destroy until the last clint unbound, that why we remove the notification when stopping the player
+    // We already canceling the foreground notification when user stops the sound, but lets do it here just in case
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      stopForeground(true);
+    }else{
+      notificationManager.cancel(ONGOING_NOTIFICATION_BAR_ID);
+    }
+    notificationManager.cancel(FIRING_NOTIFICATION_BAR_ID); // To remove the heads up notification that starts the activity
 
     service.unbind();
 
@@ -322,6 +345,7 @@ public class NotificationService extends Service {
 
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
+    Log.d(TAG, "onStartCommand: ");
     handleStart(intent);
     return START_NOT_STICKY;
   }
@@ -337,9 +361,11 @@ public class NotificationService extends Service {
           throw new IllegalStateException(e.getMessage());
         }
       }
-      Intent notifyActivity = new Intent(getApplicationContext(), ActivityAlarmNotification.class);
+      // We starts the notification activity by the notification now, so that the system Ui can choose to show
+      // heads up notification instead of the activity if the user is busy using the device right now
+      /*Intent notifyActivity = new Intent(getApplicationContext(), ActivityAlarmNotification.class);
       notifyActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-      startActivity(notifyActivity);
+      startActivity(notifyActivity);*/
 
       boolean firstAlarm = firingAlarms.size() == 0;
       if (!firingAlarms.contains(alarmId)) {
@@ -411,6 +437,15 @@ public class NotificationService extends Service {
     // If this was the only alarm firing, stop the service.  Otherwise,
     // start the next alarm in the stack.
     if (firingAlarms.size() == 0) {
+      // We must clear the foreground notification here because in OnDestroy is not called until all activities unbound
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        // This service wouldn't be destroy until the last clint unbound, that why we remove the notification when stopping the player
+        stopForeground(true);
+      }else{
+        notificationManager.cancel(ONGOING_NOTIFICATION_BAR_ID);
+      }
+      notificationManager.cancel(FIRING_NOTIFICATION_BAR_ID); //  Remove the heads up notification that starts the activity
+
       stopSelf();
     } else {
       soundAlarm(alarmId);
@@ -495,12 +530,12 @@ public class NotificationService extends Service {
    * Class used for the client Binder.  Because we know this service always
    * runs in the same process as its clients, we don't need to deal with IPC.
    */
-  public class LocalBinder extends Binder {
+  /*public class LocalBinder extends Binder {
     NotificationService getService() {
       // Return this instance of LocalService so clients can call public methods
       return NotificationService.this;
     }
-  }
+  }*/
 }
 
 

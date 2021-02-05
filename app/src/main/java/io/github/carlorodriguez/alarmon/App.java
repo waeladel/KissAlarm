@@ -6,9 +6,9 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
+
+import androidx.core.app.NotificationManagerCompat;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -22,7 +22,9 @@ public class App extends Application {
     private static MediaPlayer sMediaPlayer;
     private AudioAttributes audioAttributes;
 
-    public static final String ALARM_CHANNEL_ID = "Alarm_channel_id";
+    public static final String FIRING_ALARM_CHANNEL_ID = "Firing_alarm_channel_id";
+    public static final String ONGOING_ALARM_CHANNEL_ID = "Ongoing_alarm_channel_id";
+    public static final String UPCOMING_ALARM_CHANNEL_ID = "Upcoming_alarm_channel_id";
     private final static String TAG = App.class.getSimpleName();
 
 
@@ -47,22 +49,46 @@ public class App extends Application {
             // Create the NotificationChannel, but only on API 26+ because
             // the NotificationChannel class is new and not in the support library
 
-            // Create audioAttributes for notification's sound
-            audioAttributes = new AudioAttributes.Builder()
+            // No need to Create audioAttributes for notification's sound because all notification's music is played in the service
+            /*audioAttributes = new AudioAttributes.Builder()
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-                    .build();
+                    .build();*/
 
-            NotificationChannel alarmChannel = new NotificationChannel(
-                    ALARM_CHANNEL_ID,
-                    getString(R.string.alarm_notification_channel_name),
-                    NotificationManager.IMPORTANCE_LOW
+            // Create a notification channel for firing alarms. It's heads up notification with full screen intent when the alarm first start
+            NotificationChannel firingAlarmChannel = new NotificationChannel(
+                    FIRING_ALARM_CHANNEL_ID,
+                    getString(R.string.firing_alarms_notification_channel_name),
+                    NotificationManager.IMPORTANCE_HIGH // to display a heads up notification. We use null sound because we already play sound in the service
             );
-            alarmChannel.setDescription(getString(R.string.alarm_notification_channel_description));
+            firingAlarmChannel.setDescription(getString(R.string.firing_alarm_notification_channel_description));
+            firingAlarmChannel.enableLights(true);
+            //alarmChannel.setSound(null, audioAttributes);
+            firingAlarmChannel.setSound(null, null);
 
-            NotificationManager manager = getSystemService(NotificationManager.class);
+            // Create a notification channel for ongoing alarms. IT's the notification for foreground service when the alarm is ringing
+            NotificationChannel onGoingAlarmChannel = new NotificationChannel(
+                    ONGOING_ALARM_CHANNEL_ID,
+                    getString(R.string.ongoing_alarms_notification_channel_name),
+                    NotificationManager.IMPORTANCE_LOW // to display a heads up notification. We use null sound because we already play sound in the service
+            );
+            onGoingAlarmChannel.setDescription(getString(R.string.ongoing_alarm_notification_channel_description));
+            onGoingAlarmChannel.enableLights(true);
+
+            // Create a notification channel for upcoming alarms
+            NotificationChannel upcomingAlarmChannel = new NotificationChannel(
+                    UPCOMING_ALARM_CHANNEL_ID,
+                    getString(R.string.upcoming_alarms_notification_channel_name),
+                    NotificationManager.IMPORTANCE_LOW // to display a heads up notification. We use null sound because we already play sound in the service
+            );
+            upcomingAlarmChannel.setDescription(getString(R.string.upcoming_alarm_notification_channel_description));
+
+            //NotificationManager manager = getSystemService(NotificationManager.class);
+            NotificationManagerCompat manager = NotificationManagerCompat.from(this);
             if (manager != null) {
-                manager.createNotificationChannel(alarmChannel);
+                manager.createNotificationChannel(firingAlarmChannel);
+                manager.createNotificationChannel(onGoingAlarmChannel);
+                manager.createNotificationChannel(upcomingAlarmChannel);
             }
         }
     }

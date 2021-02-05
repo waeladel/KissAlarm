@@ -18,7 +18,9 @@ public class WakeLock {
 
   public static void acquire(Context context, long alarmId) throws WakeLockException {
     if (wakeLocks.containsKey(alarmId)) {
-      throw new WakeLockException("Multiple acquisitions of wake lock for id: " + alarmId);
+      if (AppSettings.isDebugMode(context)) {
+        throw new WakeLockException("Multiple acquisitions of wake lock for id: " + alarmId);
+      }
     }
 
     PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
@@ -34,14 +36,18 @@ public class WakeLock {
   public static void assertHeld(long alarmId) throws WakeLockException {
     PowerManager.WakeLock wakeLock = wakeLocks.get(alarmId);
     if (wakeLock == null || !wakeLock.isHeld()) {
-      throw new WakeLockException("Wake lock not held for alarm id: " + alarmId);
+      if (AppSettings.isDebugMode(App.getContext())) {
+        throw new WakeLockException("Wake lock not held for alarm id: " + alarmId);
+      }
     }
   }
 
   public static void assertNoneHeld() throws WakeLockException {
     for (PowerManager.WakeLock wakeLock : wakeLocks.values()) {
       if (wakeLock.isHeld()) {
-        throw new WakeLockException("No wake locks are held.");
+        if (AppSettings.isDebugMode(App.getContext())) {
+          throw new WakeLockException("No wake locks are held.");
+        }
       }
     }
   }

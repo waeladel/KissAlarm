@@ -42,7 +42,7 @@ import android.widget.Toast;
 
 import org.apache.commons.lang3.text.StrSubstitutor;
 
-import static io.github.carlorodriguez.alarmon.App.ALARM_CHANNEL_ID;
+import static io.github.carlorodriguez.alarmon.App.UPCOMING_ALARM_CHANNEL_ID;
 
 public final class AlarmClockService extends Service {
   private final static String TAG = AlarmClockService.class.getSimpleName();
@@ -58,6 +58,7 @@ public final class AlarmClockService extends Service {
   private PendingAlarmList pendingAlarms;
   private NotificationCompat.Builder mNotificationBuilder;
   private NotificationManagerCompat notificationManager;
+  private PendingIntent notificationActivity;
 
   @Override
   public void onCreate() {
@@ -97,29 +98,30 @@ public final class AlarmClockService extends Service {
       pendingAlarms.put(alarmId, alarmTime);
     }
 
+    // Make the notification launch the UI Activity when clicked.
+    final Intent notificationIntent = new Intent(this, ActivityAlarmClock.class);
+    notificationActivity = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
     //final NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
     notificationManager = NotificationManagerCompat.from(this);
 
-    // Make the notification launch the UI Activity when clicked.
-    final Intent notificationIntent = new Intent(this, ActivityAlarmClock.class);
-    final PendingIntent launch = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-
     //Notification notification = builder
-    mNotificationBuilder = new NotificationCompat.Builder(AlarmClockService.this, ALARM_CHANNEL_ID)
-            .setContentIntent(launch)
+    mNotificationBuilder = new NotificationCompat.Builder(AlarmClockService.this, UPCOMING_ALARM_CHANNEL_ID)
+            .setContentIntent(notificationActivity)
             //.setSmallIcon(R.drawable.ic_stat_notify_alarm)
-            //.setContentTitle(notificationTitle)
-            //.setContentText(resolvedString)
+            .setContentTitle(getString(R.string.upcoming_alarm))
+            .setContentText(getString(R.string.no_pending_alarms))
             .setSmallIcon(R.mipmap.ic_notification)
             .setColor(ContextCompat.getColor(getApplicationContext(),
                     R.color.colorSecondary))
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setCategory(NotificationCompat.CATEGORY_ALARM);
-    mNotificationBuilder.build().flags |= Notification.FLAG_ONGOING_EVENT;
+    //mNotificationBuilder.build().flags |= Notification.FLAG_FOREGROUND_SERVICE;
 
-    // use startForeground instead of notificationManager because startForegroundService is called from the Receiver
-    startForeground(NOTIFICATION_BAR_ID, mNotificationBuilder.build());
-    //notificationManager.notify(NOTIFICATION_BAR_ID, mNotificationBuilder.build());
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      // use startForeground instead of notificationManager because startForegroundService is called from the Receiver
+      startForeground(NOTIFICATION_BAR_ID, mNotificationBuilder.build());
+    }
 
     ReceiverNotificationRefresh.startRefreshing(getApplicationContext());
   }
@@ -182,7 +184,9 @@ public final class AlarmClockService extends Service {
 
           values.put("t", nextTime.localizedString(getApplicationContext()));
 
-          values.put("c", nextTime.timeUntilStringNoMinutes(getApplicationContext()));
+          // append "or less" at the end because we update the countdown only every hour instead of every minute
+          values.put("c", nextTime.timeUntilString(getApplicationContext())+ getString(R.string.or_less_time));
+          //values.put("c", nextTime.timeUntilString(getApplicationContext()));
 
           String templateString = AppSettings.getNotificationTemplate(
                   getApplicationContext());
@@ -191,7 +195,6 @@ public final class AlarmClockService extends Service {
 
           resolvedString = sub.replace(templateString);
       }
-
 
     Context c = getApplicationContext();
 
@@ -213,37 +216,48 @@ public final class AlarmClockService extends Service {
           db.closeConnections();
       }
 
-    // To change the text of pending alarm's notification every time we refresh the notification
-    mNotificationBuilder.setContentTitle(notificationTitle);
-    mNotificationBuilder.setContentText(resolvedString);
-
-    // use startForeground because startForegroundService is called from the Receiver
-    // IF we don't use startForeground again with every refresh the app keeps ui keeps on freezing for weird reason
-    startForeground(NOTIFICATION_BAR_ID, mNotificationBuilder.build());
-    //notificationManager.notify(NOTIFICATION_BAR_ID, mNotificationBuilder.build());
+    // build another notification to update the countdown on every refresh to the notification (every hour instead of minutes)
+    mNotificationBuilder = new NotificationCompat.Builder(AlarmClockService.this, UPCOMING_ALARM_CHANNEL_ID)
+            .setContentIntent(notificationActivity)
+            //.setSmallIcon(R.drawable.ic_stat_notify_alarm)
+            .setContentTitle(notificationTitle)
+            .setContentText(resolvedString)
+            .setSmallIcon(R.mipmap.ic_notification)
+            .setColor(ContextCompat.getColor(getApplicationContext(),
+                    R.color.colorSecondary))
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setCategory(NotificationCompat.CATEGORY_ALARM);
+    //mNotificationBuilder.build().flags |= Notification.FLAG_FOREGROUND_SERVICE;
 
     if (pendingAlarms.size() > 0 && AppSettings.displayNotificationIcon(c)) {
-      // To change the text of pending alarm's notification every time we refresh the notification
-      notificationManager.notify(NOTIFICATION_BAR_ID, mNotificationBuilder.build());
       Log.d(TAG, "pendingAlarms.size = : "+ pendingAlarms.size() +" We must update service");
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        // use startForeground instead of notificationManager because startForegroundService is called from the Receiver
+        startForeground(NOTIFICATION_BAR_ID, mNotificationBuilder.build());
+      }else{
+        notificationManager.notify(NOTIFICATION_BAR_ID, mNotificationBuilder.build());
+      }
     } else {
       Log.d(TAG, "pendingAlarms.size = : "+ pendingAlarms.size() +" We must stop service");
-     // Muse use a runnable or the app will crash when changing the "Display notification icon" settings or when selecting a media for the alarm
-      Handler stopForegroundHandler = new Handler();
-      Runnable stopForegroundRunnable = new Runnable() {
-        @Override
-        public void run() {
-          // To remove the notification
-          stopForeground(true);
-          stopSelf();
-          Log.d(TAG, "stopForeground and stopSelf");
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        // Muse use a runnable or the app will crash when changing the "Display notification icon" settings or when selecting a media for the alarm
+        Handler stopForegroundHandler = new Handler();
+        Runnable stopForegroundRunnable = new Runnable() {
+          @Override
+          public void run() {
+            // To remove the notification
+            stopForeground(true);
+            //stopSelf();
+            Log.d(TAG, "stopForeground and stopSelf");
 
-        }
-      };
-      //stopForegroundHandler.postDelayed(stopForegroundRunnable, 500);
-      stopForegroundHandler.post(stopForegroundRunnable);
-      // Don't cancel the notification by notificationManager because this is a foreground service
-      //notificationManager.cancel(NOTIFICATION_BAR_ID);
+          }
+        };
+        //stopForegroundHandler.postDelayed(stopForegroundRunnable, 500);
+        stopForegroundHandler.post(stopForegroundRunnable);
+      }else{
+        // cancel the notification by notificationManager because it is not a foreground service
+        notificationManager.cancel(NOTIFICATION_BAR_ID);
+      }
     }
 
     setSystemAlarmStringOnLockScreen(getApplicationContext(), nextTime);
@@ -298,10 +312,12 @@ public final class AlarmClockService extends Service {
     super.onDestroy();
     db.closeConnections();
 
-    // Use stopForeground instead of cancelling the notification, because this service is a foreground service
-    stopForeground(true);
-    //final NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-    //notificationManager.cancel(AlarmClockService.NOTIFICATION_BAR_ID); // To remove notification when the alarm is dismissed
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      // Use stopForeground instead of cancelling the notification, because this service is a foreground service
+      stopForeground(true);
+    }else{
+      notificationManager.cancel(NOTIFICATION_BAR_ID); // To remove the upcoming alarms notification
+    }
 
     ReceiverNotificationRefresh.stopRefreshing(getApplicationContext());
 

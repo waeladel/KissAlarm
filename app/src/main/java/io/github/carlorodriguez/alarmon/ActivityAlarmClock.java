@@ -347,6 +347,7 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
 
         alarmList.getLayoutManager().scrollToPosition(mLastFirstVisiblePosition);
 
+        // Start the notification service and bind to it.
         notifyService = new NotificationServiceBinder(getApplicationContext());
 
         notifyService.bind();

@@ -17,10 +17,14 @@
   <string name="Scanning">Scanning</string>
   <string name="detecting_you_partner_face">Detecting your partner\'s face</string>
   <string name="toast_cant_detect_face">Sorry, couldn\'t detect your partner\'s face, try to use a clearer photo for his/her face.</string>
-  <string name="alarm_notification_channel_name">Firing alarms.</string>
-  <string name="alarm_notification_channel_description">To notify you when firing alarms.</string>
+  <string name="firing_alarms_notification_channel_name">Firing alarms</string>
+  <string name="ongoing_alarms_notification_channel_name">Ongoing alarms</string>
+  <string name="upcoming_alarms_notification_channel_name">Upcoming alarms</string>
+  <string name="firing_alarm_notification_channel_description">To notify you when firing an alarm.</string>
+  <string name="ongoing_alarm_notification_channel_description">To notify you when there is an ongoing alarm.</string>
+  <string name="upcoming_alarm_notification_channel_description">To notify you when there is an upcoming alarm.</string>
   <string name="notification_alarm_title">Alarm</string>
-  <string name="notification_alarm_body">Wakeup, kiss your partner to dismiss or snooze the alarm.</string>
+  <string name="notification_alarm_body">Wake up, kiss your partner to dismiss or snooze</string>
 
 
   <string name="app_name" translatable="false">Kiss Alarm</string>
@@ -77,7 +81,7 @@
   <string name="days">%d days</string>
   <string name="hour">%d hour</string>
   <string name="hours">%d hours</string>
-  <string name="less_than_hour">less than an hour</string>
+  <string name="or_less_time">or less</string>
   <string name="minute">%d minute</string>
   <string name="minutes">%d minutes</string>
   <string name="am">AM</string>
