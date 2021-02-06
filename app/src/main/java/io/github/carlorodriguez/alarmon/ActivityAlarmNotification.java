@@ -88,8 +88,8 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
     private NotificationServiceBinder notifyService;
     private DbAccessor db;
-    private Handler handler;
-    private Runnable timeTick;
+    //private Handler handler;
+    //private Runnable timeTick;
     //private VideoView mVideoView;
     private SurfaceView mSurfaceView;
     private volatile TextureView mTextureView;
@@ -189,21 +189,27 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
         db = new DbAccessor(getApplicationContext());
 
-        // We must start the notification in the receiver not her, because if the system Ui chooses to display a heads up notification
+        // We must start the heads up notification in the notificationService not her, because if the system Ui chooses to display a heads up notification
         // user will here no sound because the service isn't started
-        /*Intent intent = getIntent();
-        if (intent != null && intent.getData() != null) {
-            Intent notifyService = new Intent(ActivityAlarmNotification.this, NotificationService.class);
-            notifyService.setData(intent.getData());
-            startService(notifyService);
-        }*/
+
+        // Checking for timeout extra is not needed as we decided to show a missed notification instead of restart this activity to display alert dialog
+        // but we are doing it just in case for weired reason this activity receives a timeout intent extra
+        // The app was originally checking onNewIntent if it this activity received a timeout extra and shows an alert dialog that destroy the activity when clicked
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra(TIMEOUT_COMMAND)) {
+            Log.d(TAG, "onNewIntent: first it's time out");
+            // The notification service has signaled this activity for a second time.
+            // This represents a acknowledgment timeout.  Display the appropriate error.
+            // (which also finish()es this activity.
+            showDialogFragment(TIMEOUT);
+        }
 
         // Start the notification service and bind to it.
         notifyService = new NotificationServiceBinder(getApplicationContext());
 
         notifyService.bind();
         // Setup a self-scheduling event loops.
-        handler = new Handler();
+        /*handler = new Handler();
         timeTick = new Runnable() {
             @Override
             public void run() {
@@ -211,7 +217,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                         ServiceCallback() {
                     @Override
                     public void run(NotificationServiceInterface service) {
-                        /*try {
+                        *//*try {
                             TextView volume = (TextView)
                                     findViewById(R.id.volume);
 
@@ -220,7 +226,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                             volume.setText(volumeText);
                         } catch (RemoteException e) {
                             e.printStackTrace();
-                        }*/
+                        }*//*
 
                         long next = AlarmUtil.millisTillNextInterval(
                                 AlarmUtil.Interval.SECOND);
@@ -229,7 +235,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
                     }
                 });
             }
-        };
+        };*/
         Log.d(TAG, "mamaMediaPlayer= onCreate");
 
         notificationManager = NotificationManagerCompat.from(this); // it's needed to cancel the heads up notification when user stop the sound
@@ -455,7 +461,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
     @Override
     protected void onResume() {
         super.onResume();
-        handler.post(timeTick);
+        //handler.post(timeTick);
         redraw();
         Log.d(TAG, "mamaMediaPlayer= onResume");
     }
@@ -463,7 +469,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
     @Override
     protected void onPause() {
         super.onPause();
-        handler.removeCallbacks(timeTick);
+        //handler.removeCallbacks(timeTick);
         //fl_surfaceview_container.removeAllViews();
         Log.d(TAG, "mamaMediaPlayer= onPause");
     }
@@ -740,17 +746,25 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
                     AlertDialog dialog = timeoutBuilder.create();
 
-                    dialog.setOnDismissListener(new DialogInterface.
+                    /*dialog.setOnDismissListener(new DialogInterface.
                             OnDismissListener() {
                         @Override
                         public void onDismiss(DialogInterface dialog) {
                             getActivity().finish();
-                        }});
+                        }});*/
+
 
                     return dialog;
                 default:
                     return super.onCreateDialog(savedInstanceState);
             }
+        }
+
+        //  must override the onDismiss or OnCancel instead of 'setOnDismissListener'
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            // finish the alarm activity
+            getActivity().finish();
         }
 
     }

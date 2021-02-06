@@ -24,6 +24,7 @@ public class App extends Application {
 
     public static final String FIRING_ALARM_CHANNEL_ID = "Firing_alarm_channel_id";
     public static final String UPCOMING_ALARM_CHANNEL_ID = "Upcoming_alarm_channel_id";
+    public static final String MISSED_ALARM_CHANNEL_ID = "Missed_alarm_channel_id";
     private final static String TAG = App.class.getSimpleName();
 
 
@@ -73,11 +74,20 @@ public class App extends Application {
             );
             upcomingAlarmChannel.setDescription(getString(R.string.upcoming_alarm_notification_channel_description));
 
+            // Create a notification channel for missed alarms
+            NotificationChannel missedAlarmChannel = new NotificationChannel(
+                    MISSED_ALARM_CHANNEL_ID,
+                    getString(R.string.missed_alarms_notification_channel_name),
+                    NotificationManager.IMPORTANCE_LOW // to display a heads up notification. We use null sound because we already play sound in the service
+            );
+            upcomingAlarmChannel.setDescription(getString(R.string.missed_alarm_notification_channel_description));
+
             //NotificationManager manager = getSystemService(NotificationManager.class);
             NotificationManagerCompat manager = NotificationManagerCompat.from(this);
             if (manager != null) {
                 manager.createNotificationChannel(firingAlarmChannel);
                 manager.createNotificationChannel(upcomingAlarmChannel);
+                manager.createNotificationChannel(missedAlarmChannel);
             }
         }
     }

@@ -44,6 +44,7 @@ import android.util.Log;
 import android.view.Surface;
 
 import static io.github.carlorodriguez.alarmon.App.FIRING_ALARM_CHANNEL_ID;
+import static io.github.carlorodriguez.alarmon.App.MISSED_ALARM_CHANNEL_ID;
 
 /**
  * This service is responsible for notifying the user when an alarm is
@@ -60,6 +61,7 @@ public class NotificationService extends Service {
   private final static String TAG = NotificationService.class.getSimpleName();
   private Notification mNotification;
   private NotificationManagerCompat notificationManager;
+  private String notifyText;
 
   public final static int FIRING_NOTIFICATION_BAR_ID = 44;
 
@@ -243,7 +245,7 @@ public class NotificationService extends Service {
     notificationBlinker = new Runnable() {
       @Override
       public void run() {
-        String notifyText;
+        //String notifyText;
         try {
           AlarmInfo info = db.readAlarmInfo(currentAlarmId());
           notifyText = (info == null || info.getName() == null) ? "" : info.getName();
@@ -256,7 +258,7 @@ public class NotificationService extends Service {
 
         // Use the notification activity explicitly in this intent just in case the
         // activity can't be viewed via the root activity.
-        // Starts the heads up notification which is the foreground notification as weel
+        // Starts the heads up notification which is the foreground notification as well
         Intent intent = new Intent(getApplicationContext(), ActivityAlarmNotification.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         notificationActivity = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -314,14 +316,47 @@ public class NotificationService extends Service {
       @Override
       public void run() {
         try {
-          acknowledgeCurrentNotification(0);
+          acknowledgeCurrentNotification(0); // to stop the notification and the player sound
         } catch (NoAlarmsException e) {
           return;
         }
-        Intent notifyActivity = new Intent(getApplicationContext(), ActivityAlarmNotification.class);
+        // When alarm timed out we will close the alarm activity if it's already opened and display a notification instead of restarting the alarm activity to display a dialog
+        /*Intent notifyActivity = new Intent(getApplicationContext(), ActivityAlarmNotification.class);
         notifyActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         notifyActivity.putExtra(ActivityAlarmNotification.TIMEOUT_COMMAND, true);
-        startActivity(notifyActivity);
+        startActivity(notifyActivity);*/
+
+        // finish the notification activity because it may be already exists. Send a local broadcast that will be received by the activity
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(NotificationService.this);
+        localBroadcastManager.sendBroadcast(new Intent("com.kiss.alarm.action.close"));
+
+        // To refresh the alarm's "next time" if the main activity was already opened
+        if(ActivityAlarmClock.isActive){
+          Intent i =new Intent(getApplicationContext(), ActivityAlarmClock.class);
+          i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+          startActivity(i);
+        }
+
+        // Display a missed alarm notification
+        // Intent to open the main activity when missed notification is clicked
+        Intent intent = new Intent(getApplicationContext(), ActivityAlarmClock.class);
+        PendingIntent AlarmClockPending = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Notification missedNotification = new NotificationCompat.Builder(getApplicationContext(), MISSED_ALARM_CHANNEL_ID)
+                .setContentTitle(getString(R.string.missed_alarms_notification_title))
+                .setContentText(notifyText)
+                //.setSmallIcon(R.drawable.ic_stat_notify_alarm)
+                .setSmallIcon(R.mipmap.ic_notification)
+                .setColor(ContextCompat.getColor(getApplicationContext(), R.color.colorSecondary))
+                .setPriority(NotificationCompat.PRIORITY_LOW) // just to be above lower priority notifications
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                //.setNotificationSilent() //it prevents the heads up notification and fires the full screen intent
+                .setAutoCancel(true)
+                .setContentIntent(AlarmClockPending)
+                .build();
+
+        int now = (int) System.currentTimeMillis(); // to have additional notification for each missed alarm
+        notificationManager.notify(now, missedNotification);
       }
     };
   }

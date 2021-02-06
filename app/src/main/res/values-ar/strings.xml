@@ -10,8 +10,11 @@
     <string name="toast_cant_detect_face">نأسف، تعذر التعرف على وجه شريكِك أو شريكتك، حاول استخدام صورة أوضح للوجه.</string>
     <string name="firing_alarms_notification_channel_name">انطلاق المنبهات</string>
     <string name="upcoming_alarms_notification_channel_name">المنبهات القادمة</string>
+    <string name="missed_alarms_notification_channel_name">المنبهات الفائتة</string>
     <string name="firing_alarm_notification_channel_description">لإعلامك عندما ينطلق المنبه.</string>
     <string name="upcoming_alarm_notification_channel_description">لإعلامك عندما يوجد منبه قادم.</string>
+    <string name="missed_alarm_notification_channel_description">لإعلامك عندما يوجد منبه فاتك.</string>
+    <string name="missed_alarms_notification_title">منبه فائت</string>
     <string name="notification_alarm_title">المنبه انطلق</string>
     <string name="notification_alarm_body">استيقظ، اختر لتقبيل شريكك</string>
     <string name="about">عن التطبيق</string>
