@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Translation by Daniele Ottorogo <daniele.ottorogo@gmail.com> -->
 <resources>
-    <string name="add_alarm">Aggiungi Sveglia</string>
+  <string name="firing_alarms_notification_channel_name">Sveglie attivi</string>
+  <string name="upcoming_alarms_notification_channel_name">Prossime sveglie</string>
+  <string name="missed_alarms_notification_channel_name">Sveglie ignorate</string>
+  <string name="firing_alarm_notification_channel_description">Per notificare l\'attivazione di un sveglia.</string>
+  <string name="upcoming_alarm_notification_channel_description">Per notificare l\'arrivo di un sveglia.</string>
+  <string name="missed_alarm_notification_channel_description">Per notificare all\'utente il mancato sveglia</string>
+  <string name="missed_alarms_notification_title">Sveglia ignorate</string>
+  <string name="notification_alarm_title">Sveglia</string>
+  <string name="notification_alarm_body">Svegliati, seleziona per baciare il tuo partner</string>
+  <string name="add_alarm">Aggiungi Sveglia</string>
   <string name="default_settings">Impostazioni Base Sveglia</string>
   <string name="app_settings">Preferenze</string>
   <string name="delete_all">Elimina Tutto</string>
@@ -17,6 +26,7 @@
   <string name="vibrate">Vibrazione</string>
   <string name="enabled">Attivata</string>
   <string name="disabled">Disattivata</string>
+  <string name="aspect_ratio">Proporzioni</string>
   <string name="alarm_fade">Dissolvenza Volume Sveglia</string>
   <string name="fade_description">Dal %1$d%% al %2$d%% in %3$d secondi.</string>
   <string name="unknown_name">Senza nome</string>
@@ -33,11 +43,13 @@
   <string name="minus_five">-5</string>
   <string name="next_alarm">Prossima Sveglia:</string>
   <string name="no_pending_alarms">Nessuna sveglia attiva</string>
+  <string name="upcoming_alarm">Sveglia in arrivo</string>
   <string name="alarm_has_occurred">La sveglia ha suonato</string>
   <string name="day">%d giorno</string>
   <string name="days">%d giorni</string>
   <string name="hour">%d ora</string>
   <string name="hours">%d ore</string>
+  <string name="or_less_time">or less</string>
   <string name="minute">%d minuto</string>
   <string name="minutes">%d minuti</string>
   <string name="am">AM</string>
@@ -102,7 +114,8 @@
   <string name="dark">Buio</string>
     <string name="deep_orange">arancione scuro</string>
   <string name="deep_purple">viola scuro</string>
-  <string name="default_tone">La sveglia predefinita</string>
+    <string name="default_media">Supporto predefinito</string>
+    <string name="default_tone">La sveglia predefinita</string>
   <string name="detecting_you_partner_face">Rilevare la faccia del tuo partner</string>
   <string name="green">Verde</string>
   <string name="grey">Grigio</string>
@@ -119,13 +132,18 @@
   <string name="orange">Arancione</string>
   <string name="partner_video_or_photo">Video / foto del partner</string>
   <string name="pending_alarms">Avvisi in sospeso</string>
+  <string name="storage_permission_dialog_title">Permesso di archiviazione</string>
+  <string name="storage_permission_dialog_message">The app needs access to your storage to save the captured photo/video.</string>
   <string name="permission_camera_rationale">L\'accesso alla videocamera è necessario per rilevare il viso del tuo partner</string>
   <string name="permission_not_granted">Siamo spiacenti, non possiamo accedere a questa funzione fino a quando non ci autorizzi.</string>
+  <string name="no_camera_app_error">Spiacenti, non esiste un\'app per la fotocamera.</string>
+  <string name="no_audio_file_error">Spiacenti, impossibile creare un file per la registrazione.</string>
   <string name="permission_not_granted_title">Autorizzazione non concessa</string>
     <string name="pink">Rosa</string>
   <string name="please_wait">Attendere prego</string>
   <string name="purple">Viola</string>
   <string name="read_external_storage_message">Abbiamo bisogno della tua autorizzazione per leggere i file multimediali in modo da poter impostare la sveglia.</string>
+  <string name="dark_light">Luce oscura</string>
   <string name="read_external_storage_title">Leggi i file</string>
   <string name="red">Rosso</string>
   <string name="select_alarm_sound">Selezionare il suono dell\'allarme</string>
@@ -138,6 +156,7 @@
   <string name="test_alarm">Allarme di prova</string>
   <string name="themes">Temi</string>
   <string name="time_picker_color_summary">Seleziona il colore per la selezione del tempo.</string>
+  <string name="custom_notification_text_description">Questo è il testo che verrà visualizzato sulla notifica. Nel tuo testo, puoi usare la stringa ${c} per visualizzare il conto alla rovescia e/o la stringa ${t} per visualizzare l\'ora della sveglia. Esempio: Hello ${t} Apparirà come: Hello 8:00 AM</string>
   <string name="time_picker_color_title">Il colore del selettore del tempo</string>
     <string name="toggle_button">Attiva / disattiva snooze</string>
   <string name="toggle_button_hint">Se abilitato, le labbra iniziano a sonnecchiare e la fronte ferma l\'allarme.</string>
@@ -147,18 +166,35 @@
   <string name="volume_duration_label">Durata: %1$d secondi</string>
   <string name="volume_end_label">Volume finale: %1$d%%</string>
   <string name="volume_start_label">Livello del volume iniziale: %1$d%%</string>
-    <string name="deep_link_congratulation">Complimenti</string>
+  <string name="deep_link_fmt">Collegamento diretto: %s</string>
+  <string name="invitation_id_fmt">ID invito: %s</string>
+  <string name="deep_link_congratulation">Complimenti</string>
   <string name="deep_link_welcome_text">Ora puoi usare l\'app.</string>
   <string name="google_play_services_error">Connessione fallita.</string>
   <string name="invitation_cta">Installare</string>
   <string name="invitation_failed">Siamo spiacenti, non siamo riusciti a inviare l\'invito ai tuoi amici.</string>
+  <string name="invitation_subject">CIAO! questa app è divertente</string>
   <string name="invitation_message">Questa app è divertente Svegliati con il video o la voce del tuo amante</string>
   <string name="invitation_title">Suggerisci agli amici</string>
   <string name="invite_dialog_title">Hai un invito!</string>
+  <string name="allow_notification_title">Consenti notifiche di sveglia</string>
+  <string name="allow_notification_message">L\'app richiede l\'autorizzazione delle notifiche per visualizzare gli allarmi a schermo intero. È necessario consentire le notifiche per poter ignorare l\'allarme.</string>
+  <string name="notification_settings_message">L\'app richiede l\'autorizzazione delle notifiche per visualizzare gli allarmi a schermo intero. \n\n Vuoi andare alle impostazioni per abilitare le notifiche?</string>
+  <string name="allow_alarm_settings_title">Consenti sveglie</string>
+  <string name="allow_alarm_settings_message">Devi abilitare \"sveglie e promemoria\" per questa app.\n\n  Vuoi andare nelle impostazioni per abilitarlo?</string>
+  <string name="allow_alarm_settings_toast">Devi abilitare \"sveglie e promemoria\".</string>
+  <string name="allow_notification_toast">Devi consentire l\'invio di notifiche.</string>
   <string name="menu_invite">Invita gli amici</string>
   <string name="send_failed">Impossibile inviare inviti</string>
   <string name="sent_invitations_fmt">Inviati %d inviti</string>
     <string name="access_mic">Autorizzazione al microfono</string>
   <string name="mic_permission_required">L\'accesso al microfono è necessario per registrare una sveglia e salvarlo.</string>
     <string name="proceed">Procedere</string>
+  <string name="deep_link_default">Collegamento diretto non impostato</string>
+  <string name="invitation_id_default">ID invito non impostato</string>
+  <string name="menu_item_select_picture">Seleziona foto dalla galleria</string>
+  <string name="menu_item_capture_picture">Cattura foto</string>
+  <string name="menu_item_select_video">Seleziona il video dalla galleria</string>
+  <string name="menu_item_record_video">Registra video</string>
+  <string name="about_text">Ogni giorno inizia aprendo gli occhi, quindi niente renderà la tua giornata come svegliarsi dalla persona amata. Perché scegliere una suoneria mentre puoi svegliarti ogni giorno con la cosa che adori di più, la voce del tuo amante. \"bacio allarme\" ti consente di scegliere un video registrato o una nota vocale accompagnata dalla foto del tuo partner per svegliarti, è più simile a una sveglia visiva ma non da un impiegato dell\'hotel. A proposito di immagini, devi baciare le labbra del tuo partner per disattivare l\'allarme o la fronte per sonnecchiare. Caratteristiche: - Puoi scegliere un video del tuo partner o una foto accompagnata da una nota vocale. - Rilevamento di labbra e fronte su foto e video. - Baciare le labbra del tuo partner annulla l\'allarme, mentre la fronte lo posticipa. - Alterna tra chiudi e posponi, se vuoi chiudere la sveglia baciando la fronte e viceversa. - Evidenzia i bordi delle labbra e della fronte per un clic più facile. - Scegliere la trasparenza dell\'evidenziazione, nel caso non si vogliano perdere i dettagli del proprio interlocutore.</string>
 </resources>

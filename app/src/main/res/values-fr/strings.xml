@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Translation by Biljana Milicevic <engr3337@gmail.com> -->
 <resources>
-    <string name="add_alarm">Ajouter un alarme</string>
+  <string name="firing_alarms_notification_channel_name">Alarmes enclenchés</string>
+  <string name="upcoming_alarms_notification_channel_name">Alarmes à venir</string>
+    <string name="missed_alarms_notification_channel_name">Alarmes manquées</string>
+  <string name="firing_alarm_notification_channel_description">Pour vous avertir lors du déclenchement d\'une alarme.</string>
+  <string name="upcoming_alarm_notification_channel_description">Pour vous avertir lorsqu\'il y a une alarme à venir.</string>
+  <string name="missed_alarm_notification_channel_description">Pour vous avertir lorsqu\'il y a une alarme manquée.</string>
+  <string name="missed_alarms_notification_title">Alarme manquée</string>
+  <string name="notification_alarm_title">Alarme</string>
+  <string name="notification_alarm_body">Réveillez-vous, appuyez pour embrasser votre partenaire</string>
+  <string name="add_alarm">Ajouter un alarme</string>
   <string name="default_settings">Paramètres par défaut d\'alarme</string>
   <string name="app_settings">Paramètres de l\'application</string>
   <string name="delete_all">Supprimer tout</string>
@@ -33,11 +42,13 @@
   <string name="minus_five">-5</string>
   <string name="next_alarm">Alarme suivant:</string>
   <string name="no_pending_alarms">Pas d\'alrmes en attente</string>
+  <string name="upcoming_alarm">Alarme à venir</string>
   <string name="alarm_has_occurred">Alarme a été déclenché</string>
   <string name="day">%d jour</string>
   <string name="days">%d jours</string>
   <string name="hour">%d heure</string>
   <string name="hours">%d heure</string>
+  <string name="or_less_time">ou moins</string>
   <string name="minute">%d minute</string>
   <string name="minutes">%d minutes</string>
   <string name="am">AM</string>
@@ -102,7 +113,8 @@
   <string name="dark">Foncé</string>
   <string name="deep_orange">Orange sombre</string>
   <string name="deep_purple">Violet foncé</string>
-  <string name="default_tone">L\'appel de réveil par défaut</string>
+    <string name="default_media">Default Media</string>
+    <string name="default_tone">L\'appel de réveil par défaut</string>
   <string name="detecting_you_partner_face">Détecter le visage de votre partenaire</string>
   <string name="green">Vert</string>
   <string name="grey">Gris</string>
@@ -119,13 +131,18 @@
   <string name="orange">Orange</string>
   <string name="partner_video_or_photo">Vidéo / photo du partenaire</string>
   <string name="pending_alarms">Alertes en attente</string>
+  <string name="storage_permission_dialog_title">Autorisation de stockage</string>
+  <string name="storage_permission_dialog_message">L\'application a besoin d\'accéder à votre espace de stockage pour enregistrer la photo/vidéo capturée.</string>
   <string name="permission_camera_rationale">L\'accès à la caméra est nécessaire pour détecter le visage de votre partenaire</string>
   <string name="permission_not_granted">Nous sommes désolés, nous ne pouvons pas accéder à cette fonctionnalité tant que vous nous en avez donné l\'autorisation.</string>
+  <string name="no_camera_app_error">Désolé, il n\'y a pas d\'application appareil photo.</string>
+  <string name="no_audio_file_error">Désolé, impossible de créer un fichier pour l\'enregistrement.</string>
   <string name="permission_not_granted_title">Permission non accordée</string>
   <string name="pink">Rose</string>
   <string name="please_wait">S\'il vous plaît, attendez</string>
   <string name="purple">Violet</string>
   <string name="read_external_storage_message">Nous avons besoin de votre autorisation pour lire vos fichiers multimédias afin de pouvoir définir votre appel de réveil.</string>
+  <string name="dark_light">Lumière sombre</string>
   <string name="read_external_storage_title">Lire les fichiers</string>
   <string name="select_alarm_sound">Sélectionnez le son de l\'alarme</string>
   <string name="select_music_file">Sélectionnez un fichier de musique</string>
@@ -138,6 +155,7 @@
   <string name="test_alarm">Test d\'alarme</string>
   <string name="themes">Thèmes</string>
   <string name="time_picker_color_summary">Sélectionnez la couleur pour le sélecteur de temps.</string>
+  <string name="custom_notification_text_description">C\'est le texte qui s\'affichera sur la notification. Dans votre texte, vous pouvez utiliser la chaîne ${c} pour afficher le compte à rebours et/ou la chaîne ${t} pour afficher l\'heure de l\'alarme.\\nExemple : Bonjour ${t}\\nS\'afficherait comme : Bonjour 8h00</string>
   <string name="time_picker_color_title">La couleur du sélecteur de temps</string>
     <string name="toggle_button">Basculer snooze / éteindre</string>
   <string name="toggle_button_hint">Si activé, les lèvres initient le sommeil et le front arrête l\'alarme.</string>
@@ -147,14 +165,24 @@
   <string name="volume_duration_label">Durée: %1$d secondes</string>
   <string name="volume_end_label">Volume final: %1$d%%</string>
   <string name="volume_start_label">Niveau de volume initial: %1$d%%</string>
-    <string name="deep_link_congratulation">Toutes nos félicitations</string>
+  <string name="deep_link_fmt">Lien profond : %s</string>
+  <string name="invitation_id_fmt">ID d\'invitation : %s</string>
+  <string name="deep_link_congratulation">Toutes nos félicitations</string>
   <string name="deep_link_welcome_text">Vous pouvez maintenant utiliser l\'application.</string>
   <string name="google_play_services_error">La connexion a échoué.</string>
   <string name="invitation_cta">Installer</string>
   <string name="invitation_failed">Désolé, nous n\'avons pas pu envoyer l\'invitation à vos amis.</string>
+  <string name="invitation_subject">Salut! cette appli est marrante</string>
   <string name="invitation_message">Cette application est drôle. Réveillez-vous avec la vidéo ou la voix de votre amant</string>
   <string name="invitation_title">Suggérer aux amis</string>
   <string name="invite_dialog_title">Vous avez une invitation!</string>
+  <string name="allow_notification_title">Allow Alarm notifications</string>
+  <string name="allow_notification_message">The app needs notifications\' permission to display alarms in full screen. You must allow notifications to be able to dismiss the alarm.</string>
+  <string name="notification_settings_message">L\'application a besoin de l\'autorisation des notifications pour afficher les alarmes en plein écran. \n\n Voulez-vous accéder aux paramètres pour activer les notifications?</string>
+  <string name="allow_alarm_settings_title">Allow Alarms</string>
+  <string name="allow_alarm_settings_message">Vous devez activer les \"alarmes et rappels\" pour cette application. \n\n Voulez-vous accéder aux paramètres pour l\'activer ?</string>
+  <string name="allow_alarm_settings_toast">You must enable \"alarms &amp; reminders\".</string>
+  <string name="allow_notification_toast">Vous devez autoriser l\'envoi de notifications.</string>
   <string name="menu_invite">Inviter des amis</string>
   <string name="send_failed">Échec d\'envoi d\'invitations</string>
   <string name="sent_invitations_fmt">Envoyé %d invitations</string>
@@ -162,4 +190,11 @@
   <string name="mic_permission_required">L\'accès au microphone est nécessaire pour enregistrer un appel de réveil et le sauvegarder.</string>
     <string name="proceed">Procéder</string>
     <string name="aspect_ratio">Ratio d\'aspect</string>
+  <string name="deep_link_default">Lien profond non défini</string>
+  <string name="invitation_id_default">L\'ID d\'invitation n\'est pas défini</string>
+  <string name="menu_item_select_picture">Sélectionnez une photo dans la galerie</string>
+  <string name="menu_item_capture_picture">Capturer une photo</string>
+  <string name="menu_item_select_video">Sélectionnez la vidéo de la galerie</string>
+  <string name="menu_item_record_video">Enregistrer une vidéo</string>
+  <string name="about_text">Chaque jour commence par ouvrir les yeux, donc rien ne rendra votre journée plus agréable que de vous réveiller avec votre bien-aimé. Pourquoi choisir une sonnerie alors que vous pouvez vous réveiller chaque jour avec la chose que vous adorez le plus, la voix de votre amoureux. \"kiss alarm\" vous permet de choisir une vidéo enregistrée ou une note vocale accompagnée de la photo de votre partenaire pour vous réveiller, cela ressemble plus à un réveil visuel mais pas à un employé de l\'hôtel. En parlant de visuels, vous devez embrasser les lèvres de votre partenaire pour désactiver l\'alarme, ou le front pour somnoler. Caractéristiques : - Vous pouvez choisir une vidéo de votre partenaire ou une photo accompagnée d\'une note vocale. - Détection des lèvres et du front sur les photos et vidéos. - Embrasser les lèvres de votre partenaire annule l\'alarme, tandis que le front la répète. - Basculez entre ignorer et répéter, si vous souhaitez ignorer l\'alarme en embrassant le front et vice versa. - Souligne les lèvres et les limites du front pour faciliter le clic. - Choisir la transparence de la surbrillance, au cas où vous ne voudriez pas manquer les détails de votre partenaire.</string>
 </resources>

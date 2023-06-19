@@ -2,8 +2,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.github.triplet.play'
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    compileSdk 33
+    buildToolsVersion "33.0.2"
 
     // Load keystore
     def keystorePropertiesFile = rootProject.file("keystore.properties");
@@ -12,10 +12,14 @@ android {
 
     defaultConfig {
         applicationId "com.kiss.alarm"
-        minSdkVersion 16
-        targetSdkVersion 30
-        versionName '1.1.2'
-        versionCode 112
+        minSdk 16
+        targetSdk 33
+        versionName '1.1.6'
+        versionCode 116
+        multiDexEnabled true // Enabling multiDex support.
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
     }
 
     signingConfigs {
@@ -44,27 +48,32 @@ android {
             signingConfig signingConfigs.release
         }
         debug {
-            minifyEnabled true
-            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
             debuggable true
         }
     }
 
-
     lintOptions {
         checkReleaseBuilds false
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    namespace 'io.github.carlorodriguez.alarmon'
 
 }
 
 dependencies {
     implementation project(':library')
 
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.multidex:multidex:2.0.1' // multiDex support for min SdkVersion above 20
+    implementation 'com.google.android.material:material:1.9.0'
     implementation 'org.apache.commons:commons-lang3:3.4'
-    implementation 'androidx.preference:preference:1.1.1'
+    implementation 'androidx.preference:preference:1.2.0'
     implementation 'fr.baloomba:viewpagerindicator:2.4.2'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.github.iammert:MaterialIntroView:1.5.2'

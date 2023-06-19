@@ -177,7 +177,19 @@ public final class AlarmTime implements Parcelable, Comparable<AlarmTime> {
     hours = hours / 60;
 
     String value = "";
-    if (days == 1) {
+    if(days > 0){
+      value += c.getResources().getQuantityString(R.plurals.days, (int)days, days) + " ";
+    }
+
+    if(hours > 0){
+      value += c.getResources().getQuantityString(R.plurals.hours, (int)hours, hours) + " ";
+    }
+
+    if(minutes > 0){
+      value += c.getResources().getQuantityString(R.plurals.minutes, (int)minutes, minutes) + " ";
+    }
+
+    /*if (days == 1) {
       value += c.getString(R.string.day, days) + " ";
     } else if (days > 1) {
       value += c.getString(R.string.days, days) + " ";
@@ -191,7 +203,7 @@ public final class AlarmTime implements Parcelable, Comparable<AlarmTime> {
       value += c.getString(R.string.minute, minutes) + " ";
     } else if (minutes > 1) {
       value += c.getString(R.string.minutes, minutes) + " ";
-    }
+    }*/
     return value;
   }
 

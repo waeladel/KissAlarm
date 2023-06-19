@@ -1,14 +1,17 @@
 package io.github.carlorodriguez.alarmon;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.RemoteException;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.SwitchCompat;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,17 +20,22 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import io.github.carlorodriguez.alarmon.Utils.CheckPermissions;
+
 public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ContentViewHolder> {
 
     private ArrayList<AlarmInfo> alarmInfos;
     private AlarmClockServiceBinder service;
     private Context context;
+    private AlarmManager alarmManager;
 
     public AlarmAdapter(ArrayList<AlarmInfo> alarmInfos,
             AlarmClockServiceBinder service, Context context) {
         this.alarmInfos = alarmInfos;
         this.service = service;
         this.context = context;
+        alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
     }
 
     public ArrayList<AlarmInfo> getAlarmInfos() {
@@ -90,7 +98,18 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ContentViewH
                     toString(context));
         }
 
-        holder.enabledView.setChecked(info.enabled());
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !CheckPermissions.isNotificationPermissionGranted(context)){
+            // Starting from Api 33 we must grant post notification permission at run time
+            holder.enabledView.setEnabled(false);
+        }else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()){
+            // in App 32/31, user may disable Schedule Exact Alarms from app settings, we must check
+            holder.enabledView.setEnabled(false);
+        }else if(!CheckPermissions.isNotificationEnabled(context)){
+            // User disabled notifications channels
+            holder.enabledView.setEnabled(false);
+        }else{
+            holder.enabledView.setChecked(info.enabled());
+        }
 
         holder.enabledView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -98,9 +117,24 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ContentViewH
                 final AlarmInfo info = alarmInfos.get(position);
 
                 if (isChecked) {
-                    info.setEnabled(true);
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !CheckPermissions.isNotificationPermissionGranted(context)){
+                        // Starting from Api 33 we must grant post notification permission at run time
+                        buttonView.setChecked(false);
+                        CheckPermissions.requestNotificationPermission(context);
+                    }else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()){
+                        // in App 32/31, user may disable Schedule Exact Alarms from app settings, we must check
+                        buttonView.setChecked(false);
+                        CheckPermissions.showAlarmsRemindersDialog(context);
+                    }else if(!CheckPermissions.isNotificationEnabled(context)){
+                        // User disabled notifications channels
+                        buttonView.setChecked(false);
+                        CheckPermissions.showNotificationSettingsDialog(context);
+                    }else{
+                        info.setEnabled(true);
 
-                    service.scheduleAlarm(info.getAlarmId());
+                        service.scheduleAlarm(info.getAlarmId());
+                    }
+
                 } else {
                     info.setEnabled(false);
 
@@ -146,12 +180,26 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ContentViewH
         }
 
         public void openAlarmSettings(Context context) {
+
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !CheckPermissions.isNotificationPermissionGranted(context)){
+                // Starting from Api 33 we must grant post notification permission at run time
+                CheckPermissions.requestNotificationPermission(context);
+                return;
+            }else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()){
+                // in App 32/31, user may disable Schedule Exact Alarms from app settings, we must check
+                CheckPermissions.showAlarmsRemindersDialog(context);
+                return;
+            }else if(!CheckPermissions.isNotificationEnabled(context)){
+                // User disabled notifications channels
+                CheckPermissions.showNotificationSettingsDialog(context);
+                return;
+            }
+
             final AlarmInfo info = alarmInfos.get(getAdapterPosition());
 
             final Intent i = new Intent(context, ActivityAlarmSettings.class);
 
-            i.putExtra(ActivityAlarmSettings.EXTRAS_ALARM_ID,
-                    info.getAlarmId());
+            i.putExtra(ActivityAlarmSettings.EXTRAS_ALARM_ID, info.getAlarmId());
 
             context.startActivity(i);
         }

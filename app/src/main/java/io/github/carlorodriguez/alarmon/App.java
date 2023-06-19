@@ -1,6 +1,6 @@
 package io.github.carlorodriguez.alarmon;
 
-import android.app.Application;
+import androidx.multidex.MultiDexApplication;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -16,7 +16,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
  * Created by hp on 26/12/2017.
  */
 
-public class App extends Application {
+public class App extends MultiDexApplication {
 
     private static Context sApplicationContext;
     private static MediaPlayer sMediaPlayer;

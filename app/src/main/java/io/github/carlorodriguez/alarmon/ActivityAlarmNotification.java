@@ -19,6 +19,7 @@ package io.github.carlorodriguez.alarmon;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.KeyguardManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -162,8 +163,8 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SharedPreferences sharedPref = PreferenceManager.
-                getDefaultSharedPreferences(getBaseContext());
+        Log.d(TAG, "onCreate: ActivityAlarmNotification");
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
         String theme = sharedPref.getString(AppSettings.APP_THEME_KEY, "0");
 
@@ -177,15 +178,27 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         }
 
         super.onCreate(savedInstanceState);
+
+        // Make sure this window always shows over the lock screen.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            //setShowWhenLocked(true);
+            //setTurnScreenOn(true);
+        }
+
+        // Deprecated flags are required on some devices, even with API>=27
+        getWindow().addFlags(
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
+                        WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
+                        WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                        WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+                        WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         // remove title
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.notification);
 
-        // Make sure this window always shows over the lock screen.
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 
         db = new DbAccessor(getApplicationContext());
 
@@ -488,7 +501,7 @@ public final class ActivityAlarmNotification extends AppCompatActivity implement
         }*/
 
         // Cancel the heads up notification here instead of service onDestroy because the service is not destroyed until all activities unbound
-        notificationManager.cancel(FIRING_NOTIFICATION_BAR_ID);
+        //notificationManager.cancel(FIRING_NOTIFICATION_BAR_ID);
 
         // unregister the local receiver that tells us when the service wants to finish this activity. it happens when user click on the notification's action button
         mLocalBroadcastManager.unregisterReceiver(mBroadcastReceiver);

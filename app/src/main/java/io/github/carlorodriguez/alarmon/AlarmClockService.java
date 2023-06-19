@@ -15,10 +15,12 @@
 
 package io.github.carlorodriguez.alarmon;
 
+import static android.app.PendingIntent.FLAG_IMMUTABLE;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import android.app.Notification;
+import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -33,6 +35,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
@@ -43,6 +46,9 @@ import android.widget.Toast;
 import org.apache.commons.lang3.text.StrSubstitutor;
 
 import static io.github.carlorodriguez.alarmon.App.UPCOMING_ALARM_CHANNEL_ID;
+import static io.github.carlorodriguez.alarmon.Utils.PendingIntentFlags.pendingIntentNoFlag;
+
+import io.github.carlorodriguez.alarmon.Utils.CheckPermissions;
 
 public final class AlarmClockService extends Service {
   private final static String TAG = AlarmClockService.class.getSimpleName();
@@ -56,6 +62,7 @@ public final class AlarmClockService extends Service {
 
   private DbAccessor db;
   private PendingAlarmList pendingAlarms;
+  private AlarmManager alarmManager;
   private NotificationCompat.Builder mNotificationBuilder;
   private NotificationManagerCompat notificationManager;
   private PendingIntent notificationActivity;
@@ -67,18 +74,20 @@ public final class AlarmClockService extends Service {
     // to the device's SD card.  This is only possible if the proper
     // permissions are available.
     if (getPackageManager().checkPermission(
-        "android.permission.WRITE_EXTERNAL_STORAGE", getPackageName()) ==
-          PackageManager.PERMISSION_GRANTED) {
+            "android.permission.WRITE_EXTERNAL_STORAGE", getPackageName()) ==
+            PackageManager.PERMISSION_GRANTED) {
       Thread.setDefaultUncaughtExceptionHandler(
-          new LoggingUncaughtExceptionHandler(
-                  Environment.getExternalStorageDirectory().getPath()));
+              new LoggingUncaughtExceptionHandler(
+                      Environment.getExternalStorageDirectory().getPath()));
     }
 
+    Log.d(TAG, "onCreate: ");
     // Access to in-memory and persistent data structures.
     db = new DbAccessor(getApplicationContext());
     pendingAlarms = new PendingAlarmList(getApplicationContext());
+    alarmManager = alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
 
-    // Schedule enabled alarms during initial startup.
+    // Schedule enabled alarms during initial startup. We must check first if we have the notification permission and alarm & reminders permission
     for (Long alarmId : db.getEnabledAlarms()) {
       if (pendingAlarms.pendingTime(alarmId) != null) {
         continue;
@@ -87,20 +96,20 @@ public final class AlarmClockService extends Service {
         Toast.makeText(getApplicationContext(), "RENABLE " + alarmId, Toast.LENGTH_SHORT).show();
       }
 
-        AlarmTime alarmTime = null;
+      AlarmTime alarmTime = null;
 
-        AlarmInfo info = db.readAlarmInfo(alarmId);
+      AlarmInfo info = db.readAlarmInfo(alarmId);
 
-        if (info != null) {
-            alarmTime = info.getTime();
-        }
+      if (info != null) {
+        alarmTime = info.getTime();
+      }
 
       pendingAlarms.put(alarmId, alarmTime);
     }
 
     // Make the notification launch the UI Activity when clicked.
     final Intent notificationIntent = new Intent(this, ActivityAlarmClock.class);
-    notificationActivity = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+    notificationActivity = PendingIntent.getActivity(this, 536, notificationIntent, pendingIntentNoFlag());
 
     //final NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
     notificationManager = NotificationManagerCompat.from(this);
@@ -118,12 +127,14 @@ public final class AlarmClockService extends Service {
             .setCategory(NotificationCompat.CATEGORY_ALARM);
     //mNotificationBuilder.build().flags |= Notification.FLAG_FOREGROUND_SERVICE;
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      // use startForeground instead of notificationManager because startForegroundService is called from the Receiver
-      startForeground(NOTIFICATION_BAR_ID, mNotificationBuilder.build());
+    // use startForeground instead of notificationManager because startForegroundService is called from the Receiver
+    startForeground(NOTIFICATION_BAR_ID, mNotificationBuilder.build());
+
+    Log.d(TAG, "onCreate pendingAlarms size=: "+pendingAlarms.size());
+    if(pendingAlarms.size()>0){
+      ReceiverNotificationRefresh.startRefreshing(this);
     }
 
-    ReceiverNotificationRefresh.startRefreshing(getApplicationContext());
   }
 
   @Override
@@ -175,46 +186,46 @@ public final class AlarmClockService extends Service {
   }
 
   private void refreshNotification() {
-      String resolvedString = getString(R.string.no_pending_alarms);
+    String resolvedString = getString(R.string.no_pending_alarms);
 
-      AlarmTime nextTime = pendingAlarms.nextAlarmTime();
+    AlarmTime nextTime = pendingAlarms.nextAlarmTime();
 
-      if (nextTime != null) {
-          Map<String, String> values = new HashMap<>();
+    if (nextTime != null) {
+      Map<String, String> values = new HashMap<>();
 
-          values.put("t", nextTime.localizedString(getApplicationContext()));
+      values.put("t", nextTime.localizedString(getApplicationContext()));
 
-          // append "or less" at the end because we update the countdown only every hour instead of every minute
-          values.put("c", nextTime.timeUntilString(getApplicationContext())+ getString(R.string.or_less_time));
-          //values.put("c", nextTime.timeUntilString(getApplicationContext()));
+      // append "or less" at the end because we update the countdown only every hour instead of every minute
+      values.put("c", nextTime.timeUntilString(getApplicationContext()) + getString(R.string.or_less_time));
+      //values.put("c", nextTime.timeUntilString(getApplicationContext()));
 
-          String templateString = AppSettings.getNotificationTemplate(
-                  getApplicationContext());
+      String templateString = AppSettings.getNotificationTemplate(
+              getApplicationContext());
 
-          StrSubstitutor sub = new StrSubstitutor(values);
+      StrSubstitutor sub = new StrSubstitutor(values);
 
-          resolvedString = sub.replace(templateString);
-      }
+      resolvedString = sub.replace(templateString);
+    }
 
     Context c = getApplicationContext();
 
-      //NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext());
+    //NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext());
 
-      String notificationTitle = getString(R.string.upcoming_alarm);
+    String notificationTitle = getString(R.string.upcoming_alarm);
 
-      if (pendingAlarms.nextAlarmId() != AlarmClockServiceBinder.NO_ALARM_ID) {
-          DbAccessor db = new DbAccessor(getApplicationContext());
+    if (pendingAlarms.nextAlarmId() != AlarmClockServiceBinder.NO_ALARM_ID) {
+      DbAccessor db = new DbAccessor(getApplicationContext());
 
-          AlarmInfo alarmInfo = db.readAlarmInfo(pendingAlarms.nextAlarmId());
+      AlarmInfo alarmInfo = db.readAlarmInfo(pendingAlarms.nextAlarmId());
 
-          if (alarmInfo != null) {
-              notificationTitle = alarmInfo.getName() != null && !alarmInfo.getName().isEmpty()
-                      ? alarmInfo.getName()
-                      : getString(R.string.upcoming_alarm);
-          }
-
-          db.closeConnections();
+      if (alarmInfo != null) {
+        notificationTitle = alarmInfo.getName() != null && !alarmInfo.getName().isEmpty()
+                ? alarmInfo.getName()
+                : getString(R.string.upcoming_alarm);
       }
+
+      db.closeConnections();
+    }
 
     // build another notification to update the countdown on every refresh to the notification (every hour instead of minutes)
     mNotificationBuilder = new NotificationCompat.Builder(AlarmClockService.this, UPCOMING_ALARM_CHANNEL_ID)
@@ -230,35 +241,26 @@ public final class AlarmClockService extends Service {
     //mNotificationBuilder.build().flags |= Notification.FLAG_FOREGROUND_SERVICE;
 
     if (pendingAlarms.size() > 0 && AppSettings.displayNotificationIcon(c)) {
-      Log.d(TAG, "pendingAlarms.size = : "+ pendingAlarms.size() +" We must update service");
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        // use startForeground instead of notificationManager because startForegroundService is called from the Receiver
-        startForeground(NOTIFICATION_BAR_ID, mNotificationBuilder.build());
-      }else{
-        notificationManager.notify(NOTIFICATION_BAR_ID, mNotificationBuilder.build());
-      }
+      Log.d(TAG, "pendingAlarms.size = : " + pendingAlarms.size() + " We must update service");
+      // use startForeground instead of notificationManager because startForegroundService is called from the Receiver
+      startForeground(NOTIFICATION_BAR_ID, mNotificationBuilder.build());
     } else {
       Log.d(TAG, "pendingAlarms.size = : "+ pendingAlarms.size() +" We must stop service");
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        // Muse use a runnable or the app will crash when changing the "Display notification icon" settings or when selecting a media for the alarm
-        Handler stopForegroundHandler = new Handler();
-        Runnable stopForegroundRunnable = new Runnable() {
-          @Override
-          public void run() {
-            // To remove the notification
-            startForeground(NOTIFICATION_BAR_ID, mNotificationBuilder.build()); // to be sure startForeground is called in all cases
-            stopForeground(true);
-            //stopSelf();
-            Log.d(TAG, "stopForeground and stopSelf");
+      // Must use a runnable or the app will crash when changing the "Display notification icon" settings or when selecting a media for the alarm
+      Handler stopForegroundHandler = new Handler();
+      Runnable stopForegroundRunnable = new Runnable() {
+        @Override
+        public void run() {
+          // To remove the notification
+          //startForeground(NOTIFICATION_BAR_ID, mNotificationBuilder.build()); // to be sure startForeground is called in all cases
+          stopForeground(true);
+          stopSelf();
+          Log.d(TAG, "stopForeground and stopSelf");
 
-          }
-        };
-        //stopForegroundHandler.postDelayed(stopForegroundRunnable, 500);
-        stopForegroundHandler.post(stopForegroundRunnable);
-      }else{
-        // cancel the notification by notificationManager because it is not a foreground service
-        notificationManager.cancel(NOTIFICATION_BAR_ID);
-      }
+        }
+      };
+      //stopForegroundHandler.postDelayed(stopForegroundRunnable, 500);
+      stopForegroundHandler.post(stopForegroundRunnable);
     }
 
     setSystemAlarmStringOnLockScreen(getApplicationContext(), nextTime);
@@ -313,12 +315,8 @@ public final class AlarmClockService extends Service {
     super.onDestroy();
     db.closeConnections();
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      // Use stopForeground instead of cancelling the notification, because this service is a foreground service
-      stopForeground(true);
-    }else{
-      notificationManager.cancel(NOTIFICATION_BAR_ID); // To remove the upcoming alarms notification
-    }
+    // Use stopForeground instead of cancelling the notification, because this service is a foreground service
+    stopForeground(true);
 
     ReceiverNotificationRefresh.stopRefreshing(getApplicationContext());
 
@@ -386,6 +384,20 @@ public final class AlarmClockService extends Service {
   public void scheduleAlarm(long alarmId) {
     AlarmInfo info = db.readAlarmInfo(alarmId);
     if (info == null) {
+      return;
+    }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !CheckPermissions.isNotificationPermissionGranted(getApplicationContext())){
+      // Starting from Api 33 we must grant post notification permission at run time
+      Toast.makeText(getApplicationContext(), R.string.allow_notification_toast, Toast.LENGTH_LONG).show();
+      return;
+    }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()){
+      // in App 32/31, user may disable Schedule Exact Alarms from app settings, we must check
+      Toast.makeText(getApplicationContext(), R.string.allow_alarm_settings_toast, Toast.LENGTH_LONG).show();
+      return;
+    }else if(!CheckPermissions.isNotificationEnabled(getApplicationContext())){
+      // User disabled notifications channels
+      Toast.makeText(getApplicationContext(), R.string.allow_notification_toast, Toast.LENGTH_LONG).show();
       return;
     }
     // Schedule the next alarm.

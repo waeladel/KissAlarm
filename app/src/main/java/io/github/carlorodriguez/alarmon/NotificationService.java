@@ -17,6 +17,7 @@ package io.github.carlorodriguez.alarmon;
 
 import java.util.LinkedList;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -29,7 +30,6 @@ import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -42,9 +42,13 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.util.Log;
 import android.view.Surface;
+import android.widget.Toast;
 
 import static io.github.carlorodriguez.alarmon.App.FIRING_ALARM_CHANNEL_ID;
 import static io.github.carlorodriguez.alarmon.App.MISSED_ALARM_CHANNEL_ID;
+import static io.github.carlorodriguez.alarmon.Utils.PendingIntentFlags.pendingIntentUpdateCurrentFlag;
+
+import io.github.carlorodriguez.alarmon.Utils.CheckPermissions;
 
 /**
  * This service is responsible for notifying the user when an alarm is
@@ -197,7 +201,9 @@ public class NotificationService extends Service {
   private DbAccessor db;
   // Notification tools
   private NotificationManager manager;
-  private PendingIntent notificationActivity;
+  private PendingIntent notificationPendingIntent, dismissPendingIntent, snoozePendingIntent;
+  private Intent notificationIntent, dismissIntent, snoozeIntent;
+
   private Handler handler;
   private VolumeIncreaser volumeIncreaseCallback;
   private Runnable soundCheck;
@@ -217,12 +223,12 @@ public class NotificationService extends Service {
     super.onCreate();
     firingAlarms = new LinkedList<>();
     // Access to in-memory and persistent data structures.
-    service = new AlarmClockServiceBinder(getApplicationContext());
+    service = new AlarmClockServiceBinder(NotificationService.this);
     service.bind();
-    db = new DbAccessor(getApplicationContext());
+    db = new DbAccessor(NotificationService.this);
 
     // Setup audio.
-    MediaSingleton.INSTANCE.useContext(getApplicationContext());
+    MediaSingleton.INSTANCE.useContext(NotificationService.this);
 
     // Setup notification bar.
     //manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -250,7 +256,7 @@ public class NotificationService extends Service {
           AlarmInfo info = db.readAlarmInfo(currentAlarmId());
           notifyText = (info == null || info.getName() == null) ? "" : info.getName();
           if (notifyText.equals("") && info != null) {
-            notifyText = info.getTime().localizedString(getApplicationContext());
+            notifyText = info.getTime().localizedString(NotificationService.this);
           }
         } catch (NoAlarmsException e) {
           return;
@@ -259,56 +265,51 @@ public class NotificationService extends Service {
         // Use the notification activity explicitly in this intent just in case the
         // activity can't be viewed via the root activity.
         // Starts the heads up notification which is the foreground notification as well
-        Intent intent = new Intent(getApplicationContext(), ActivityAlarmNotification.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-        notificationActivity = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        notificationIntent = new Intent(NotificationService.this, ActivityAlarmNotification.class);
+        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        notificationPendingIntent = PendingIntent.getActivity(NotificationService.this, 196, notificationIntent, pendingIntentUpdateCurrentFlag());
 
         // Intent to for the action button to dismiss the alarm
-        Intent dismissIntent = new Intent(getApplicationContext(), NotificationService.class);
+        dismissIntent = new Intent(NotificationService.this, NotificationService.class);
         dismissIntent.putExtra(AlarmClockService.COMMAND_EXTRA, NotificationService.COMMAND_DISMISS_ALARM);
-        PendingIntent dismissPendingIntent = PendingIntent.getService(getApplicationContext(), 1, dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        dismissPendingIntent = PendingIntent.getService(NotificationService.this, 296, dismissIntent, pendingIntentUpdateCurrentFlag());
 
         // Intent to for the action button to snooze the alarm
-        Intent snoozeIntent = new Intent(getApplicationContext(), NotificationService.class);
+        snoozeIntent = new Intent(NotificationService.this, NotificationService.class);
         snoozeIntent.putExtra(AlarmClockService.COMMAND_EXTRA, NotificationService.COMMAND_SNOOZE_ALARM);
-        PendingIntent snoozePendingIntent = PendingIntent.getService(getApplicationContext(), 2, snoozeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        snoozePendingIntent = PendingIntent.getService(NotificationService.this, 396, snoozeIntent, pendingIntentUpdateCurrentFlag());
 
-        Notification mNotification = new NotificationCompat.Builder(getApplicationContext(), FIRING_ALARM_CHANNEL_ID)
+        mNotification = new NotificationCompat.Builder(NotificationService.this, FIRING_ALARM_CHANNEL_ID)
                 .setContentTitle(notifyText)
-                .setContentText(getApplicationContext().getString(R.string.notification_alarm_body))
+                .setContentText(NotificationService.this.getString(R.string.notification_alarm_body))
                 //.setSmallIcon(R.drawable.ic_stat_notify_alarm)
                 .setSmallIcon(R.mipmap.ic_notification)
-                .setColor(ContextCompat.getColor(getApplicationContext(), R.color.colorSecondary))
-                .setPriority(NotificationCompat.PRIORITY_MAX) // just to be above lower priority notifications
+                .setColor(ContextCompat.getColor(NotificationService.this, R.color.colorSecondary))
+                .setPriority(NotificationCompat.PRIORITY_HIGH) // just to be above lower priority notifications
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                 //.setNotificationSilent() //it prevents the heads up notification and fires the full screen intent
                 //.setAutoCancel(true)
                 .setOngoing(true)
                 // not needed for Android oreo and later when we set FullScreenIntent, but a must for older androids for the notification to be clickable
-                .setContentIntent(notificationActivity)
+                .setContentIntent(notificationPendingIntent)
                 // Use a full-screen intent only for the highest-priority alerts where you
                 // have an associated activity that you would like to launch after the user
                 // interacts with the notification. Also, if your app targets Android 10
                 // or higher, you need to request the USE_FULL_SCREEN_INTENT permission in
                 // order for the platform to invoke this notification.
-                .setFullScreenIntent(notificationActivity, true)
-                .addAction(R.drawable.ic_baseline_snooze_24, getApplicationContext().getString(R.string.snooze), snoozePendingIntent) // Snooze button
-                .addAction(R.drawable.ic_baseline_alarm_off_24, getApplicationContext().getString(R.string.dismiss), dismissPendingIntent) // Dismiss button
+                .setFullScreenIntent(notificationPendingIntent, true)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setLocalOnly(true)
+                .setWhen(0)
+                .setDefaults(Notification.DEFAULT_LIGHTS)
+                .addAction(R.drawable.ic_snooze, NotificationService.this.getString(R.string.snooze), snoozePendingIntent) // Snooze button
+                .addAction(R.drawable.ic_alarm_off, NotificationService.this.getString(R.string.dismiss), dismissPendingIntent) // Dismiss button
                 .setOnlyAlertOnce(true) // to make sure we pop the heads up notification only once.
                 .build();
 
         mNotification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-          // use startForeground because startForegroundService is called from the ReceiverAlarm
-          startForeground(FIRING_NOTIFICATION_BAR_ID, mNotification);
-          // Never blink here because the heads up notification will keeps popping over and over every time it's clicked
-        }else{
-          notificationManager.notify(FIRING_NOTIFICATION_BAR_ID, mNotification);
-          // blinking notification only works in old androids. handler.post will be called later in soundAlarm function
-          long next = AlarmUtil.millisTillNextInterval(AlarmUtil.Interval.SECOND);
-          handler.postDelayed(notificationBlinker, next);
-        }
+        startForeground(FIRING_NOTIFICATION_BAR_ID, mNotification);
       }
     };
 
@@ -321,7 +322,7 @@ public class NotificationService extends Service {
           return;
         }
         // When alarm timed out we will close the alarm activity if it's already opened and display a notification instead of restarting the alarm activity to display a dialog
-        /*Intent notifyActivity = new Intent(getApplicationContext(), ActivityAlarmNotification.class);
+        /*Intent notifyActivity = new Intent(NotificationService.this, ActivityAlarmNotification.class);
         notifyActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         notifyActivity.putExtra(ActivityAlarmNotification.TIMEOUT_COMMAND, true);
         startActivity(notifyActivity);*/
@@ -332,22 +333,22 @@ public class NotificationService extends Service {
 
         // To refresh the alarm's "next time" if the main activity was already opened
         if(ActivityAlarmClock.isActive){
-          Intent i =new Intent(getApplicationContext(), ActivityAlarmClock.class);
-          i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+          Intent i =new Intent(NotificationService.this, ActivityAlarmClock.class);
+          i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
           startActivity(i);
         }
 
         // Display a missed alarm notification
         // Intent to open the main activity when missed notification is clicked
-        Intent intent = new Intent(getApplicationContext(), ActivityAlarmClock.class);
-        PendingIntent AlarmClockPending = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent intent = new Intent(NotificationService.this, ActivityAlarmClock.class);
+        PendingIntent AlarmClockPending = PendingIntent.getActivity(NotificationService.this, 197, intent, pendingIntentUpdateCurrentFlag());
 
-        Notification missedNotification = new NotificationCompat.Builder(getApplicationContext(), MISSED_ALARM_CHANNEL_ID)
+        Notification missedNotification = new NotificationCompat.Builder(NotificationService.this, MISSED_ALARM_CHANNEL_ID)
                 .setContentTitle(getString(R.string.missed_alarms_notification_title))
                 .setContentText(notifyText)
                 //.setSmallIcon(R.drawable.ic_stat_notify_alarm)
                 .setSmallIcon(R.mipmap.ic_notification)
-                .setColor(ContextCompat.getColor(getApplicationContext(), R.color.colorSecondary))
+                .setColor(ContextCompat.getColor(NotificationService.this, R.color.colorSecondary))
                 .setPriority(NotificationCompat.PRIORITY_LOW) // just to be above lower priority notifications
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                 //.setNotificationSilent() //it prevents the heads up notification and fires the full screen intent
@@ -356,7 +357,13 @@ public class NotificationService extends Service {
                 .build();
 
         int now = (int) System.currentTimeMillis(); // to have additional notification for each missed alarm
-        notificationManager.notify(now, missedNotification);
+
+        if ( (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !CheckPermissions.isNotificationPermissionGranted(NotificationService.this))
+                || (CheckPermissions.isNotificationEnabled(NotificationService.this)) ){
+          // Starting from Api 33 we must grant post notification permission at run time
+          notificationManager.notify(now, missedNotification);
+        }
+
       }
     };
   }
@@ -369,15 +376,11 @@ public class NotificationService extends Service {
 
     // This service wouldn't be destroy until the last clint unbound, that why we remove the notification when stopping the player
     // We already canceling the foreground notification when user stops the sound, but lets do it here just in case
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      stopForeground(true);
-    }else{
-      notificationManager.cancel(FIRING_NOTIFICATION_BAR_ID); // To remove the heads up notification that starts the activity
-    }
+    stopForeground(true);
 
     service.unbind();
 
-    boolean debug = AppSettings.isDebugMode(getApplicationContext());
+    boolean debug = AppSettings.isDebugMode(NotificationService.this);
     if (debug && firingAlarms.size() != 0) {
       throw new IllegalStateException("Notification service terminated with pending notifications.");
     }
@@ -421,8 +424,8 @@ public class NotificationService extends Service {
 
         // To refresh the alarm's "next time" if the main activity was already opened
         if(ActivityAlarmClock.isActive){
-          Intent i =new Intent(getApplicationContext(), ActivityAlarmClock.class);
-          i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+          Intent i =new Intent(NotificationService.this, ActivityAlarmClock.class);
+          i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
           startActivity(i);
         }
 
@@ -440,13 +443,13 @@ public class NotificationService extends Service {
       try {
         WakeLock.assertHeld(alarmId);
       } catch (WakeLock.WakeLockException e) {
-        if (AppSettings.isDebugMode(getApplicationContext())) {
+        if (AppSettings.isDebugMode(NotificationService.this)) {
           throw new IllegalStateException(e.getMessage());
         }
       }
       // We starts the notification activity by the notification now, so that the system Ui can choose to show
       // heads up notification instead of the activity if the user is busy using the device right now
-      /*Intent notifyActivity = new Intent(getApplicationContext(), ActivityAlarmNotification.class);
+      /*Intent notifyActivity = new Intent(NotificationService.this, ActivityAlarmNotification.class);
       notifyActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
       startActivity(notifyActivity);*/
 
@@ -521,12 +524,8 @@ public class NotificationService extends Service {
     // start the next alarm in the stack.
     if (firingAlarms.size() == 0) {
       // We must clear the foreground notification here because in OnDestroy is not called until all activities unbound
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        // This service wouldn't be destroy until the last clint unbound, that why we remove the notification when stopping the player
-        stopForeground(true);
-      }else{
-        notificationManager.cancel(FIRING_NOTIFICATION_BAR_ID); //  Remove the heads up notification that starts the activity
-      }
+      // This service wouldn't be destroy until the last clint unbound, that why we remove the notification when stopping the player
+      stopForeground(true);
 
       stopSelf();
     } else {
@@ -535,14 +534,14 @@ public class NotificationService extends Service {
     try {
       WakeLock.release(alarmId);
     } catch (WakeLock.WakeLockException e) {
-      if (AppSettings.isDebugMode(getApplicationContext())) {
+      if (AppSettings.isDebugMode(NotificationService.this)) {
         throw new IllegalStateException(e.getMessage());
       }
     }
   }
 
   private void soundAlarm(long alarmId) {
-    // Begin notifying based on settings for this alaram.
+    // Begin notifying based on settings for this alarm.
     AlarmSettings settings = db.readAlarmSettings(alarmId);
     if (settings.getVibrate()) {
       MediaSingleton.INSTANCE.vibrate();
@@ -550,8 +549,8 @@ public class NotificationService extends Service {
 
     volumeIncreaseCallback.reset(settings);
     MediaSingleton.INSTANCE.normalizeVolume(
-        getApplicationContext(), volumeIncreaseCallback.volume());
-    MediaSingleton.INSTANCE.play(getApplicationContext(), settings.getTone());
+            NotificationService.this, volumeIncreaseCallback.volume());
+    MediaSingleton.INSTANCE.play(NotificationService.this, settings.getTone());
     //Store getTone value for notification activity
     currentTone = settings.getTone();
     // Start periodic events for handling this notification.
@@ -559,7 +558,7 @@ public class NotificationService extends Service {
     handler.post(soundCheck);
     handler.post(notificationBlinker);
     // Set up a canceler if this notification isn't acknowledged by the timeout.
-    int timeoutMillis = 60 * 1000 * AppSettings.alarmTimeOutMins(getApplicationContext());
+    int timeoutMillis = 60 * 1000 * AppSettings.alarmTimeOutMins(NotificationService.this);
     handler.postDelayed(autoCancel, timeoutMillis);
   }
 
@@ -572,9 +571,8 @@ public class NotificationService extends Service {
 
     // Stop notifying.
     MediaSingleton.INSTANCE.stop();
-    MediaSingleton.INSTANCE.resetVolume(getApplicationContext());
+    MediaSingleton.INSTANCE.resetVolume(NotificationService.this);
   }
-
   /**
    * Helper class for gradually increasing the volume of the alarm audio
    * stream.

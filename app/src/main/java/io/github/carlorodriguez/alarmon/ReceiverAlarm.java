@@ -38,11 +38,7 @@ public class ReceiverAlarm extends BroadcastReceiver {
     notifyService.setData(alarmUri);
     // We must use startForegroundService because we need to start the service even if we received this receiver when the app is in the background
     // even the activity bound to the service immediately, to start the service from the background we must use startForegroundService
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      context.startForegroundService(notifyService);
-    }else{
-      context.startService(notifyService);
-    }
+    ContextCompat.startForegroundService(context, notifyService);
 
   }
 }

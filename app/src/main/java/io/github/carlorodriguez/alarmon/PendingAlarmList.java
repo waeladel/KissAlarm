@@ -15,6 +15,11 @@
 
 package io.github.carlorodriguez.alarmon;
 
+import static android.app.PendingIntent.FLAG_IMMUTABLE;
+
+import static io.github.carlorodriguez.alarmon.Utils.PendingIntentFlags.pendingIntentNoFlag;
+import static io.github.carlorodriguez.alarmon.Utils.PendingIntentFlags.pendingIntentUpdateCurrentFlag;
+
 import java.util.TreeMap;
 
 import android.app.AlarmManager;
@@ -22,6 +27,11 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+
+import io.github.carlorodriguez.alarmon.Utils.CheckPermissions;
 
 /**
  * This container holds a list of all currently scheduled alarms.
@@ -30,11 +40,15 @@ import android.os.Build;
  */
 public final class PendingAlarmList {
   // Maps alarmId -> alarm.
+  private static String TAG = PendingAlarmList.class.getSimpleName();
+
   private TreeMap<Long, PendingAlarm> pendingAlarms;
   // Maps alarm time -> alarmId.
   private TreeMap<AlarmTime, Long> alarmTimes;
   private AlarmManager alarmManager;
   private Context context;
+
+  private AlertDialog permissionDialog;
 
   public PendingAlarmList(Context context) {
     pendingAlarms = new TreeMap<>();
@@ -62,18 +76,29 @@ public final class PendingAlarmList {
     // the extras bundle.
     Intent notifyIntent = new Intent(context, ReceiverAlarm.class);
     notifyIntent.setData(AlarmUtil.alarmIdToUri(alarmId));
-    PendingIntent scheduleIntent =
-      PendingIntent.getBroadcast(context, 0, notifyIntent, 0);
+
+    PendingIntent scheduleIntent = PendingIntent.getBroadcast(context, 624, notifyIntent, pendingIntentNoFlag());
 
     // Schedule the alarm with the AlarmManager.
     // Previous instances of this intent will be overwritten in
     // the alarm manager.
 
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-          Intent intent = new Intent(context, ActivityAlarmClock.class);
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !CheckPermissions.isNotificationPermissionGranted(context)){
+        // Starting from Api 33 we must grant post notification permission at run time
+        Toast.makeText(context, R.string.allow_notification_toast, Toast.LENGTH_LONG).show();
+        return;
+      }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()){
+        // in App 32/31, user may disable Schedule Exact Alarms from app settings, we must check
+        Toast.makeText(context, R.string.allow_alarm_settings_toast, Toast.LENGTH_LONG).show();
+        return;
+      }else if(!CheckPermissions.isNotificationEnabled(context)){
+        // User disabled notifications channels
+        Toast.makeText(context, R.string.allow_notification_toast, Toast.LENGTH_LONG).show();
+        return;
+      }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        Intent intent = new Intent(context, ActivityAlarmClock.class);
 
-          PendingIntent showIntent = PendingIntent.getActivity(context, 0,
-                  intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent showIntent = PendingIntent.getActivity(context, 623, intent, pendingIntentUpdateCurrentFlag());
 
           AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.
                   AlarmClockInfo(time.calendar().getTimeInMillis(),

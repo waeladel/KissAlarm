@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="minutes">
+        <item quantity="one">%1$d minuto</item>
+        <item quantity="other">%1$d minutos</item>
+    </plurals>
+
+    <plurals name="hours">
+        <item quantity="one">%1$d hora</item>
+        <item quantity="other">%1$d horas</item>
+    </plurals>
+
+    <plurals name="days">
+        <item quantity="one">%1$d día</item>
+        <item quantity="other">%1$d días</item>
+    </plurals>
+
+
+    <plurals name="fade_description">
+        <item quantity="one">De %1$d%% a %2$d%% en %3$d segundo.</item>
+        <item quantity="other">De %1$d%% a %2$d%% en %3$d segundos.</item>
+    </plurals>
+
+    <plurals name="volume_duration_label">
+        <item quantity="one">Duración: %1$d segundo.</item>
+        <item quantity="other">Duration: %1$d segundos.</item>
+    </plurals>
+
+</resources>

@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Translation by Ilija Milicevic <engr3337@gmail.com> -->
 <resources>
-    <string name="add_alarm">Agregar alarma</string>
+  <string name="firing_alarms_notification_channel_name">Alarmas activados</string>
+  <string name="upcoming_alarms_notification_channel_name">Próximas alarmas</string>
+  <string name="missed_alarms_notification_channel_name">Alarmas perdidas</string>
+  <string name="firing_alarm_notification_channel_description">Para notificarle cuando dispare una alarma.</string>
+  <string name="upcoming_alarm_notification_channel_description">Para notificarle cuando hay una próxima alarma.</string>
+  <string name="missed_alarm_notification_channel_description">"Para notificarle cuando hay una alarma perdida. "</string>
+  <string name="missed_alarms_notification_title">"Alarma perdida "</string>
+  <string name="notification_alarm_title">Alarma</string>
+  <string name="notification_alarm_body">Despierta, presiona para besar a tu pareja</string>
+  <string name="add_alarm">Agregar alarma</string>
   <string name="default_settings">Opciones de alarma por defecto</string>
   <string name="app_settings">Configuración</string>
   <string name="delete_all">Borrar todo</string>
@@ -33,11 +42,13 @@
   <string name="minus_five">-5</string>
   <string name="next_alarm">Proxima alarma:</string>
   <string name="no_pending_alarms">No hay alarmas pendientes</string>
+  <string name="upcoming_alarm">"Próxima alarma "</string>
   <string name="alarm_has_occurred">La alarma se ha producido</string>
   <string name="day">%d día</string>
   <string name="days">%d días</string>
   <string name="hour">%d hora</string>
   <string name="hours">%d horas</string>
+  <string name="or_less_time">o menos</string>
   <string name="minute">%d minuto</string>
   <string name="minutes">%d minutos</string>
   <string name="am">AM</string>
@@ -95,6 +106,8 @@
   <string name="read_external_storage_title">Leer archivos</string>
   <string name="read_external_storage_message">Necesitamos su permiso para leer los archivos de audio para que pueda establecer sus propios tonos de alarma.</string>
   <string name="permission_not_granted">Lo sentimos, no podemos acceder a esta funcionalidad hasta que nos conceda su permiso.</string>
+  <string name="no_camera_app_error">Lo sentimos, no hay una aplicación de cámara.</string>
+  <string name="no_audio_file_error">Lo sentimos, no se pudo crear un archivo para grabar.</string>
   <string name="permission_not_granted_title">Sin permiso</string>
   <string name="notification_text_title">Texto en notificación</string>
   <string name="notification_text_summary">Configure la información de la alarma que se muestra en la notificación.</string>
@@ -131,6 +144,7 @@
   <string name="toast_cant_detect_face">Lo sentimos, no pudimos detectar la cara de tu compañero, tratamos de usar una foto de la cara más clara.</string>
   <string name="audio_source">Fuente de audio</string>
   <string name="btn_choose">Escoger</string>
+    <string name="default_media">Medios predeterminados</string>
     <string name="default_tone">La llamada de activación predeterminada</string>
   <string name="detecting_you_partner_face">Detectando la cara de tu pareja</string>
     <string name="low_storage_error">Lo sentimos, no hay suficiente espacio de almacenamiento.</string>
@@ -138,6 +152,8 @@
   <string name="media_video">Vídeo</string>
   <string name="partner_video_or_photo">Video / foto del socio</string>
   <string name="pending_alarms">Alertas pendientes</string>
+  <string name="storage_permission_dialog_title">Storage permissions</string>
+  <string name="storage_permission_dialog_message">La aplicación necesita acceso a su almacenamiento para guardar la foto o el video capturado.</string>
   <string name="permission_camera_rationale">El acceso a la cámara es necesario para detectar la cara de tu pareja</string>
   <string name="select_alarm_sound">seleccionar sonido de alarma</string>
   <string name="select_music_file">seleccionar archivo de música</string>
@@ -149,14 +165,24 @@
   <string name="toggle_button_hint">Si está habilitado, los labios comienzan a dormitar y la frente detiene la alarma.</string>
   <string name="tone">Voz del socio</string>
   <string name="visibility_button">Claridad de botones</string>
-    <string name="deep_link_congratulation">Felicitaciones</string>
+  <string name="deep_link_fmt">Vínculo profundo: %s</string>
+  <string name="invitation_id_fmt">ID de invitación: %s</string>
+  <string name="deep_link_congratulation">Felicitaciones</string>
   <string name="deep_link_welcome_text">Ahora puede usar la aplicación.</string>
   <string name="google_play_services_error">La conexión falló.</string>
   <string name="invitation_cta">Instalar</string>
   <string name="invitation_failed">Lo sentimos, no pudimos enviar la invitación a tus amigos.</string>
+  <string name="invitation_subject">¡Hola! esta aplicación es divertida</string>
   <string name="invitation_message">Hola, esta aplicación es divertida. Despierta con el video o la voz de tu amante</string>
   <string name="invitation_title">Sugerir a amigos</string>
   <string name="invite_dialog_title">Tienes una invitación</string>
+  <string name="allow_notification_title">Permitir notificaciones de alarma</string>
+    <string name="allow_notification_message">La aplicación necesita el permiso de notificaciones para mostrar alarmas en pantalla completa. Debe permitir las notificaciones para poder apagar la alarma.</string>
+  <string name="notification_settings_message">La aplicación necesita el permiso de notificaciones para mostrar alarmas en pantalla completa. \n\n ¿Quieres ir a la configuración para habilitar las notificaciones?</string>
+  <string name="allow_alarm_settings_title">Permitir alarmas</string>
+  <string name="allow_alarm_settings_message">Debe habilitar \"alarmas y recordatorios\" para esta aplicación. \n\n ¿Quieres ir a la configuración para habilitarlo?</string>
+  <string name="allow_alarm_settings_toast">Debe habilitar \"alarmas y recordatorios\" para esta aplicación.</string>
+  <string name="allow_notification_toast">Debe permitir el envío de notificaciones.</string>
   <string name="menu_invite">Invitar a amigos</string>
   <string name="send_failed">Error al enviar invitaciones</string>
   <string name="sent_invitations_fmt">Enviado %d invitaciones</string>
@@ -164,4 +190,11 @@
   <string name="mic_permission_required">Se requiere acceso al micrófono para grabar una llamada de despertador y guardarla.</string>
     <string name="proceed">Proceder</string>
     <string name="aspect_ratio">Relación de aspecto</string>
+  <string name="deep_link_default">El enlace profundo no está establecido</string>
+  <string name="invitation_id_default">Invitation ID not set</string>
+  <string name="menu_item_select_picture">Seleccionar foto de la galería</string>
+  <string name="menu_item_capture_picture">Capturar foto</string>
+  <string name="menu_item_select_video">Seleccionar video de la galería</string>
+  <string name="menu_item_record_video">Record video</string>
+  <string name="about_text">Todos los días comienzan abriendo los ojos, así que nada hará que tu día sea como despertar con tu ser querido. ¿Por qué elegir un tono de llamada cuando puedes despertarte todos los días con lo que más te gusta, la voz de tu amante? La \"Kiss Alarm\" te permite elegir un video grabado o una nota de voz acompañada de la foto de tu pareja para despertarte, es más como una llamada de atención visual pero no de un empleado del hotel. Hablando de imágenes, tienes que besar los labios de tu pareja para apagar la alarma o la frente para dormir. Características:  - Puedes elegir un video de tu pareja o una foto acompañada de nota de voz.  - Detección de labios y frente en fotos y videos.  - Besar los labios de tu pareja apaga la alarma, mientras que la frente la adormece.  - Alterne entre descartar y posponer, si desea descartar la alarma besando la frente y viceversa.  - Resalta los límites de los labios y la frente para facilitar el clic.  - Elegir la transparencia del resaltado, en caso de que no quieras perderte los detalles de tu pareja.</string>
 </resources>

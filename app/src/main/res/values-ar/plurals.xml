@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <plurals name="minutes">
+        <item quantity="zero">%1$d دقائق</item>
+        <item quantity="one">دقيقة</item>
+        <item quantity="two">دقيقتان</item>
+        <item quantity="few">%1$d دقائق</item>
+        <item quantity="many">%1$d دقيقة</item>
+        <item quantity="other">%1$d دقيقة</item>
+    </plurals>
+
+    <plurals name="hours">
+        <item quantity="zero">%1$d ساعات</item>
+        <item quantity="one">ساعة</item>
+        <item quantity="two">ساعتان</item>
+        <item quantity="few">%1$d ساعات</item>
+        <item quantity="many">%1$d ساعة</item>
+        <item quantity="other">%1$d ساعة</item>
+    </plurals>
+
+    <plurals name="days">
+        <item quantity="zero">%1$d أيام</item>
+        <item quantity="one">يوم</item>
+        <item quantity="two">يومان</item>
+        <item quantity="few">%1$d أيام</item>
+        <item quantity="many">%1$d يومًا</item>
+        <item quantity="other">%1$d يوم</item>
+    </plurals>
+
+
+    <plurals name="fade_description">
+        <item quantity="zero">من %1$d%% إلى %2$d%% خلال %3$d ثوانٍ.</item>
+        <item quantity="one">من %1$d%% إلى %2$d%% خلال %3$d ثانية.</item>
+        <item quantity="two">من %1$d%% إلى %2$d%% خلال ثانيتان.</item>
+        <item quantity="few">من %1$d%% إلى %2$d%% خلال %3$d ثوانٍ.</item>
+        <item quantity="many">من %1$d%% إلى %2$d%% خلال %3$d ثانية.</item>
+        <item quantity="other">من %1$d%% إلى %2$d%% خلال %3$d ثانية.</item>
+    </plurals>
+
+    <plurals name="volume_duration_label">
+        <item quantity="zero">المدة: %1$d ثوانٍ</item>
+        <item quantity="one">المدة: %1$d ثانية.</item>
+        <item quantity="two">المدة: ثانيتان.</item>
+        <item quantity="few">المدة: %1$d ثوانٍ.</item>
+        <item quantity="many">المدة: %1$d ثانية.</item>
+        <item quantity="other">المدة: %1$d ثانية.</item>
+    </plurals>
+
+</resources>

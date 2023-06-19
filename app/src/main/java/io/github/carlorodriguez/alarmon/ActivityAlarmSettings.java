@@ -498,7 +498,7 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
       @Override
       public String name() { return getString(R.string.alarm_fade); }
       @Override
-      public String value() { return getString(R.string.fade_description,
+      public String value() { return ActivityAlarmSettings.this.getResources().getQuantityString(R.plurals.fade_description, settings.getVolumeChangeTimeSec(),
           settings.getVolumeStartPercent(), settings.getVolumeEndPercent(),
           settings.getVolumeChangeTimeSec()); }
       @Override
@@ -783,8 +783,8 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-            @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         switch (requestCode) {
             case READ_EXTERNAL_STORAGE_PERMISSION_REQUEST:
@@ -2097,14 +2097,13 @@ public final class ActivityAlarmSettings extends AppCompatActivity implements
               final TextView durationTextView = (TextView) fadeView.findViewById(
                       R.id.volume_duration_tv);
 
-              durationTextView.setText(getString(R.string.volume_duration_label,
-                              settings.getVolumeChangeTimeSec()));
+              durationTextView.setText(getResources().getQuantityString(R.plurals.volume_duration_label, settings.getVolumeChangeTimeSec(),
+                      settings.getVolumeChangeTimeSec()));
 
               durationSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                   @Override
                   public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                      durationTextView.setText(getString(R.string.volume_duration_label,
-                                      progress));
+                      durationTextView.setText(getResources().getQuantityString(R.plurals.volume_duration_label, progress, progress));
                   }
 
                   @Override

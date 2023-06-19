@@ -16,7 +16,7 @@
 
   <string name="Scanning">Scanning</string>
   <string name="detecting_you_partner_face">Detecting your partner\'s face</string>
-  <string name="toast_cant_detect_face">Sorry, couldn\'t detect your partner\'s face, try to use a clearer photo for his/her face.</string>
+  <string name="toast_cant_detect_face">Couldn\'t detect your partner\'s face. Use a clearer photo.</string>
   <string name="firing_alarms_notification_channel_name">Firing alarms</string>
   <string name="upcoming_alarms_notification_channel_name">Upcoming alarms</string>
   <string name="missed_alarms_notification_channel_name">Missed alarms</string>
@@ -61,7 +61,6 @@
 
 
     <string name="alarm_fade">Alarm volume fade</string>
-  <string name="fade_description">From %1$d%% to %2$d%% over %3$d seconds.</string>
   <string name="unknown_name">Unknown name</string>
   <string name="volume_start">Start volume (percent)</string>
   <string name="volume_end">End volume (percent)</string>
@@ -78,13 +77,7 @@
   <string name="no_pending_alarms">No pending alarms</string>
   <string name="upcoming_alarm">Upcoming alarm</string>
   <string name="alarm_has_occurred">Alarm has occurred</string>
-  <string name="day">%d day</string>
-  <string name="days">%d days</string>
-  <string name="hour">%d hour</string>
-  <string name="hours">%d hours</string>
   <string name="or_less_time">or less</string>
-  <string name="minute">%d minute</string>
-  <string name="minutes">%d minutes</string>
   <string name="am">AM</string>
   <string name="pm">PM</string>
   <string name="dow_sun_short">Su</string>
@@ -149,7 +142,7 @@
   <string name="notification_text_title">Notification text</string>
   <string name="notification_text_summary">Configure alarm information displayed on the notification</string>
   <string name="custom_notification_text">Custom notification text</string>
-  <string name="custom_notification_text_description" formatted="false">This is the text that will display on the notification. In your text, you may use the string ${c} to display the count down time and/or the string ${t} to display the alarm time.\nExample: Hello ${t}\nWould appear as: Hello 8:00 AM</string>
+  <string name="custom_notification_text_description" formatted="false">This is the text that will display on the notification. In your text, you may use the string ${c} to display the count down time and/or the string ${t} to display the alarm time. Example: Hello ${t} Would appear as: Hello 8:00 AM</string>
   <string name="time_picker_color_title">Time picker color</string>
   <string name="time_picker_color_summary">Select the color for the time picker.</string>
   <string name="red">Red</string>
@@ -173,7 +166,6 @@
   <string name="selected_media">&#160;%1$s</string>
   <string name="volume_start_label" formatted="true">Start volume: %1$d%%</string>
   <string name="volume_end_label" formatted="true">End volume: %1$d%%</string>
-  <string name="volume_duration_label">Duration: %1$d seconds</string>
   <string name="loading">Loading</string>
   <string name="please_wait">Please wait</string>
   <string name="alarm_deleted">Alarm deleted</string>
@@ -181,11 +173,19 @@
   <string name="swipe_right_to_delete">Hi There! Swipe right  to delete an alarm.</string>
   <string name="material_intro_id_alarm_deletion">material_intro_id_119.104</string>
 
-  <string name="storage_permission_dialog_title">Storage permissions</string>
-  <string name="storage_permission_dialog_message">The app needs access to your storage to save the captured  photo/video.</string>
+  <string name="storage_permission_dialog_title">Storage permission</string>
+  <string name="storage_permission_dialog_message">The app needs access to your storage to save the captured photo/video.</string>
   <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
   <string name="access_mic">Microphone Access</string>
   <string name="mic_permission_required">Access to the Microphone is required to record a wake-up call and save it.</string>
+  <string name="allow_notification_title">Allow Alarm notifications</string>
+  <string name="allow_notification_message">The app needs notifications\' permission to display alarms in full screen. You must allow notifications to be able to dismiss the alarm.</string>
+  <string name="notification_settings_message">The app needs notifications\' permission to display alarms in full screen. \n\n Do you want to go to settings to enable notifications?</string>
+  <string name="allow_alarm_settings_title">Allow Alarms</string>
+  <string name="allow_alarm_settings_message">You must enable \"alarms &amp; reminders\" for this app. \n\n Do you want to go to settings to enable it?</string>
+  <string name="allow_alarm_settings_toast">You must enable \"alarms &amp; reminders\".</string>
+  <string name="allow_notification_toast">You must allow sending notifications.</string>
+
 
   <string name="menu_invite">Invite Friends</string>
     <string name="invitation_title">Suggest to friends</string>
@@ -216,14 +216,7 @@
   <string name="menu_item_record_video">Record video</string>
   <!-- Media selection popup Menu -->
 
-  <string name="about_text">Every day starts by opening your eyes, so nothing will make your day like waking up by your beloved one.\n\nWhy choosing a ringtone while you can wake up every day by the most thing you adore, your lover\'s voice.\n\n\"kiss alarm\" enables you to choose a recorded video or a voice note accompanied by your partner\'s photo to wake you up, it\'s more like a visual wake-up call but not from a hotel employee. Speaking of visuals, you have to kiss your partner\'s lips to dismiss the alarm, or forehead to snooze.\n\n
-  Features:\n\n
-- You can choose a video of your partner or a photo accompanied by voice note.\n\n
-- Detecting lips and forehead on photos and videos.\n\n
-- Kissing your partner\'s lips dismisses the alarm, while forehead snoozes it.\n\n
-- Toggle between dismiss and snooze, if you want to dismiss the alarm by kissing forehead and vice versa.\n\n
-- Highlights lips and forehead\'s boundaries for easier clicking.\n\n
-- Choosing the highlight\'s transparency, in case you don\'t want to miss your partner\'s details.</string>
+  <string name="about_text">Every day starts by opening your eyes, so nothing will make your day like waking up by your beloved one.  Why choosing a ringtone while you can wake up every day by the most thing you adore, your lover\'s voice.  \"kiss alarm\" enables you to choose a recorded video or a voice note accompanied by your partner\'s photo to wake you up, it\'s more like a visual wake-up call but not from a hotel employee. Speaking of visuals, you have to kiss your partner\'s lips to dismiss the alarm, or forehead to snooze.     Features:   - You can choose a video of your partner or a photo accompanied by voice note.   - Detecting lips and forehead on photos and videos.   - Kissing your partner\'s lips dismisses the alarm, while forehead snoozes it.   - Toggle between dismiss and snooze, if you want to dismiss the alarm by kissing forehead and vice versa.   - Highlights lips and forehead\'s boundaries for easier clicking.   - Choosing the highlight\'s transparency, in case you don\'t want to miss your partner\'s details.</string>
 
 
 </resources>

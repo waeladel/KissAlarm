@@ -23,12 +23,14 @@ public class WakeLock {
       }
     }
 
+    // Use Partial wake lock instead of SCREEN_DIM_WAKE_LOCK amd ACQUIRE_CAUSES_WAKEUP because screen dim wakes up the screen
+    // so the system thinks that user is using the phone so it displays heads-up notification instead of Full intent notification
     PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
     PowerManager.WakeLock wakeLock = powerManager.newWakeLock(
-        PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP,
+        PowerManager.PARTIAL_WAKE_LOCK ,
         "Alarm Notification Wake Lock id " + alarmId);
     wakeLock.setReferenceCounted(false);
-    wakeLock.acquire();
+    wakeLock.acquire(60 * 60000);
 
     wakeLocks.put(alarmId, wakeLock);
   }

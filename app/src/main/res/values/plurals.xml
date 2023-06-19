@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="minutes">
+        <item quantity="zero">%1$d minutes</item>
+        <item quantity="one">%1$d minute</item>
+        <item quantity="two">%1$d minutes</item>
+        <item quantity="few">%1$d minutes</item>
+        <item quantity="many">%1$d minutes</item>
+        <item quantity="other">%1$d minutes</item>
+    </plurals>
+
+    <plurals name="hours">
+        <item quantity="zero">%1$d hours</item>
+        <item quantity="one">%1$d hour</item>
+        <item quantity="two">%1$d hours</item>
+        <item quantity="few">%1$d hours</item>
+        <item quantity="many">%1$d hours</item>
+        <item quantity="other">%1$d hours</item>
+    </plurals>
+
+    <plurals name="days">
+        <item quantity="zero">%1$d days</item>
+        <item quantity="one">%1$d day</item>
+        <item quantity="two">%1$d days</item>
+        <item quantity="few">%1$d days</item>
+        <item quantity="many">%1$d days</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+
+
+    <plurals name="fade_description">
+        <item quantity="zero">From %1$d%% to %2$d%% over %3$d seconds.</item>
+        <item quantity="one">From %1$d%% to %2$d%% over %3$d second.</item>
+        <item quantity="two">From %1$d%% to %2$d%% over %3$d seconds.</item>
+        <item quantity="few">%From %1$d%% to %2$d%% over %3$d seconds.</item>
+        <item quantity="many">From %1$d%% to %2$d%% over %3$d seconds.</item>
+        <item quantity="other">From %1$d%% to %2$d%% over %3$d seconds.</item>
+    </plurals>
+
+    <plurals name="volume_duration_label">
+        <item quantity="zero">Duration: %1$d seconds.</item>
+        <item quantity="one">Duration: %1$d second.</item>
+        <item quantity="two">Duration: %1$d seconds.</item>
+        <item quantity="few">Duration: %1$d seconds.</item>
+        <item quantity="many">Duration: %1$d seconds.</item>
+        <item quantity="other">Duration: %1$d seconds.</item>
+    </plurals>
+
+</resources>

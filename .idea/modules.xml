@@ -4,7 +4,13 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/KissAlarm.iml" filepath="$PROJECT_DIR$/KissAlarm.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/KissAlarm.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/KissAlarm.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/KissAlarm.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/KissAlarm.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/KissAlarm.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/KissAlarm.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/KissAlarm.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/KissAlarm.app.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/library/KissAlarm.library.iml" filepath="$PROJECT_DIR$/.idea/modules/library/KissAlarm.library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/library/KissAlarm.library.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/library/KissAlarm.library.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/library/KissAlarm.library.main.iml" filepath="$PROJECT_DIR$/.idea/modules/library/KissAlarm.library.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/library/KissAlarm.library.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/library/KissAlarm.library.unitTest.iml" />
     </modules>
   </component>
 </project>

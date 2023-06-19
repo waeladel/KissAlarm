@@ -16,12 +16,16 @@
 package io.github.carlorodriguez.alarmon;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
@@ -33,6 +37,7 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -46,17 +51,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 import com.wdullaer.materialdatetimepicker.time.*;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import io.github.carlorodriguez.alarmon.Utils.CheckPermissions;
 
 //import com.facebook.FacebookSdk; // for facebook ads app installs
 //import com.facebook.appevents.AppEventsLogger; // for facebook analytics
@@ -87,12 +89,16 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
 
 
     private TimePickerDialog picker;
+
+    private AlertDialog permissionDialog;
     public static ActivityAlarmClock activityAlarmClock;
 
     private static AlarmClockServiceBinder service;
     private static NotificationServiceBinder notifyService;
     private DbAccessor db;
     private static AlarmAdapter adapter;
+
+    private AlarmManager alarmManager;
     private Cursor cursor;
     private Handler handler;
     private Runnable tickCallback;
@@ -116,6 +122,8 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
         setSupportActionBar(toolbar);
 
         activityAlarmClock = this;
+
+        alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 
         //Only use if you need to know the key hash for facebook
         // printHashKey(getBaseContext());
@@ -176,37 +184,23 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Calendar now = Calendar.getInstance();
 
-                picker = TimePickerDialog.newInstance(
-                        ActivityAlarmClock.this,
-                        ActivityAlarmClock.this,
-                        now.get(Calendar.HOUR_OF_DAY),
-                        now.get(Calendar.MINUTE),
-                        DateFormat.is24HourFormat(ActivityAlarmClock.this)
-                );
-
-                if (AppSettings.isThemeDark(ActivityAlarmClock.this)) {
-                    picker.setThemeDark(true);
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !CheckPermissions.isNotificationPermissionGranted(ActivityAlarmClock.this)){
+                    // Starting from Api 33 we must grant post notification permission at run time
+                    CheckPermissions.requestNotificationPermission(ActivityAlarmClock.this);
+                    return;
+                }else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()){
+                    // in App 32/31, user may disable Schedule Exact Alarms from app settings, we must check
+                    CheckPermissions.showAlarmsRemindersDialog(ActivityAlarmClock.this);
+                    return;
+                }else if(!CheckPermissions.isNotificationEnabled(ActivityAlarmClock.this)){
+                    // User disabled notifications channels
+                    CheckPermissions.showNotificationSettingsDialog(ActivityAlarmClock.this);
+                    return;
                 }
 
-                picker.setAccentColor(AppSettings.getTimePickerColor(
-                        ActivityAlarmClock.this));
-
-                picker.vibrate(true);
-
-                if (AppSettings.isDebugMode(ActivityAlarmClock.this)) {
-                    picker.enableSeconds(true);
-                } else {
-                    picker.enableSeconds(false);
-                }
-
-                AlarmTime time = new AlarmTime(now.get(Calendar.HOUR_OF_DAY),
-                        now.get(Calendar.MINUTE), 0);
-
-                picker.setTitle(time.timeUntilString(ActivityAlarmClock.this));
-
-                picker.show(getFragmentManager(), "TimePickerDialog");
+                // Now we can proceed with selecting time from the time picker
+                showTimePicker();
             }
         });
 
@@ -736,6 +730,59 @@ public final class ActivityAlarmClock extends AppCompatActivity implements
             }
         }
 
+    }
+
+
+    // Get Request Permissions Result
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CheckPermissions.NOTIFICATION_PERMISSION_REQUEST_CODE) {
+            // If request is cancelled, the result arrays are empty.
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // permission was granted, yay! Do the task you need to do.
+                Log.i(TAG, "onRequestPermissionsResult post notification permission was granted");
+                showTimePicker();
+            } else {
+                // permission denied, boo! lets go to settings
+                Log.i(TAG, "onRequestPermissionsResult post notification permission denied");
+                CheckPermissions.showNotificationSettingsDialog(ActivityAlarmClock.this);
+            }
+        }
+    }
+
+    private void showTimePicker() {
+        Calendar now = Calendar.getInstance();
+
+        picker = TimePickerDialog.newInstance(
+                ActivityAlarmClock.this,
+                ActivityAlarmClock.this,
+                now.get(Calendar.HOUR_OF_DAY),
+                now.get(Calendar.MINUTE),
+                DateFormat.is24HourFormat(ActivityAlarmClock.this)
+        );
+
+        if (AppSettings.isThemeDark(ActivityAlarmClock.this)) {
+            picker.setThemeDark(true);
+        }
+
+        picker.setAccentColor(AppSettings.getTimePickerColor(
+                ActivityAlarmClock.this));
+
+        picker.vibrate(true);
+
+        if (AppSettings.isDebugMode(ActivityAlarmClock.this)) {
+            picker.enableSeconds(true);
+        } else {
+            picker.enableSeconds(false);
+        }
+
+        AlarmTime time = new AlarmTime(now.get(Calendar.HOUR_OF_DAY),
+                now.get(Calendar.MINUTE), 0);
+
+        picker.setTitle(time.timeUntilString(ActivityAlarmClock.this));
+
+        picker.show(getFragmentManager(), "TimePickerDialog");
     }
 
 }

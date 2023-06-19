@@ -1,5 +1,10 @@
 package io.github.carlorodriguez.alarmon;
 
+
+import static android.app.PendingIntent.FLAG_IMMUTABLE;
+
+import static io.github.carlorodriguez.alarmon.Utils.PendingIntentFlags.pendingIntentNoFlag;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -7,6 +12,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
+
+import androidx.core.content.ContextCompat;
 
 public class ReceiverNotificationRefresh extends BroadcastReceiver {
   private final static String TAG = ReceiverNotificationRefresh.class.getSimpleName();
@@ -25,7 +32,7 @@ public class ReceiverNotificationRefresh extends BroadcastReceiver {
   }
 
   private static PendingIntent pendingIntent(Context context) {
-    return PendingIntent.getBroadcast(context, 0, intent(context), 0);
+    return PendingIntent.getBroadcast(context, 430, intent(context), pendingIntentNoFlag());
   }
 
   @Override
@@ -35,11 +42,7 @@ public class ReceiverNotificationRefresh extends BroadcastReceiver {
     causeRefresh.putExtra(AlarmClockService.COMMAND_EXTRA, AlarmClockService.COMMAND_NOTIFICATION_REFRESH);
     // We must use startForegroundService because we need to start the service
     // even if we received this receiver when the app is in the background
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      context.startForegroundService(causeRefresh);
-    }else{
-      context.startService(causeRefresh);
-    }
+    ContextCompat.startForegroundService(context, causeRefresh);
     // Don't refresh every minute it's bad for battery life, lets refresh the notification every hour
     //long next = AlarmUtil.nextIntervalInUTC(AlarmUtil.Interval.MINUTE);
     long next = AlarmUtil.nextIntervalInUTC(AlarmUtil.Interval.HOUR);
